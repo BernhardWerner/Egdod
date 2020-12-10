@@ -4,11 +4,44 @@
 (function(){
 	var code = document.createTextNode(`
 
-		// ************************************************************************************************
-		// Gets the ALICE and Toolbox colours.
-		// ************************************************************************************************
+	// ************************************************************************************************
+	// Gets the current time from the computer clock converted to seconds.
+	// ************************************************************************************************
+	computerSeconds() := (
+		regional(actualTime);
 
+		actualTime = time();
 
+		actualTime_1 * 3600 + actualTime_2 * 60 + actualTime_3 + actualTime_4 * 0.001;
+	);
+
+	// ************************************************************************************************
+	// Sets up time-keeping variables. Will be automatically called when included.
+	// ************************************************************************************************
+	setupTime() := (
+		timeBufferEABOW = computerSeconds();
+	);
+	setupTime();
+
+	// ************************************************************************************************
+	// Returns the duration ofthe last frame/tick in seconds.
+	// ************************************************************************************************
+	deltaTime() := (
+		regional(result);
+
+		result = computerSeconds() - timeBufferEABOW;
+		timeBufferEABOW = computerSeconds();
+
+		result;
+	);
+
+	// ************************************************************************************************
+	// Returns the current FPS with a given precision.
+	// ************************************************************************************************
+	fps(digits) := (
+		0.1^digits * round(10^digits / deltaTime());
+	);
+	fps() := fps(0);
 
 `);
 
