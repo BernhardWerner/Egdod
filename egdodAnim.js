@@ -49,7 +49,7 @@
 	// ************************************************************************************************
 	easeInSine(x)        := 1 - cos((x * pi) / 2);
 	easeOutSine(x)       := sin((x * pi) / 2);
-	easeInOutSine(x)     := -(cos(PI * x) - 1) / 2;
+	easeInOutSine(x)     := -(cos(pi * x) - 1) / 2;
    
 	easeInQuad(x)        := x^2;
 	easeOutQuad(x)       := 1 - (1 - x)^2;
@@ -69,19 +69,19 @@
    
 	easeInExpo(x)        := if(x == 0, 0, 2^(10 * x - 10));
 	easeOutExpo(x)       := if(x == 1, 1, 1 - 2^(-10 * x));
-	easeInOutExpo(x)     := if(x == 0, 0, if(x == 1, 1, if(x < 0.5, 2^(20 * x - 10) / 2, (2 - 2^(-10 * x + 10)) / 2)));
+	easeInOutExpo(x)     := if(x == 0, 0, if(x == 1, 1, if(x < 0.5, 2^(20 * x - 10) / 2, (2 - 2^(-20 * x + 10)) / 2)));
    
 	easeInCirc(x)        := 1 - sqrt(1 - x^2);
 	easeOutCirc(x)       := sqrt(1 - (x - 1)^2);
-	easeInOutCirc(x)     := if(x < 0.5, (1 - sqrt(1 - 4 * x^2, 2)) / 2, (sqrt(1 - (-2 * x + 2)^2) + 1) / 2);
+	easeInOutCirc(x)     := if(x < 0.5, (1 - sqrt(1 - 4 * x^2)) / 2, (sqrt(1 - (-2 * x + 2)^2) + 1) / 2);
 
 	easeInBack(x)        := 2.70158 * x^3 - 1.70158 * x^2;
-	easeOutBack(x)       := 1 + 2.70158 * (x - 1)^3 - 1.70158 * (x - 1)^2;
+	easeOutBack(x)       := 1 - easeInBack(1 - x);
 	easeInOutBack(x)     := if(x < 0.5, 4 * x^2 * ((1.70158 * 1.525 + 1) * 2 * x - 1.70158 * 1.525) / 2, ((2 * x - 2)^2 * ((1.70158 * 1.525 + 1) * (2 * x - 2) + 1.70158 * 1.525) + 2) / 2);
 
 	easeInElastic(x)     := if(x == 0, 0, if(x == 1, 1, -2^(10 * x - 10) * sin(2 * pi / 3 * (10 * x - 10.75))));
-	easeOutElastic(x)    := if(x == 0, 0, if(x == 1, 1, 2^(-10 * x) * sin(2 * pi / 3 * (10 * x - 10.75)) + 1));
-	easeInOutElastic(x)  := if(x == 0, 0, if(x == 1, 1, if(x < 0.5, -2^(20 * x - 10) * sin(4 * pi / 9 * (20 * x - 11.125)) / 2, 2^(-20 * x - 10) * sin(4 * pi / 9 * (20 * x - 11.125)) / 2 + 1));
+	easeOutElastic(x)    := 1 - easeInElastic(1 - x);
+	easeInOutElastic(x)  := if(x == 0, 0, if(x == 1, 1, if(x < 0.5, -2^(20 * x - 10) * sin(4 * pi / 9 * (20 * x - 11.125)) / 2, 2^(-20 * x + 10) * sin(4 * pi / 9 * (20 * x - 11.125)) / 2 + 1)));
 
 
 

@@ -91,6 +91,8 @@
 		// The Kaylee way to scale probabilities.
 		// *************************************************************************************************
 		fuzzyScale(x, c) := c * x / ((c - 1) * x + 1);
+		fuzzyS(x, c, lambda) := (x < lambda, lambda * fuzzyScale(x / lambda, 1 / c),  lambda + (1 - lambda) * fuzzyScale((x - lambda) / (1 - lambda), c));
+
 		fuzzyVectorScale(x, c) := apply(x, fuzzyScale(#, c));
 
 
