@@ -36,15 +36,36 @@ canvasheight  = dist(canvascorners_1, canvascorners_4);
 
 
 
-testObject = {
+testCircle = {
   "x":     canvascenter.x,
   "y":     canvascenter.y,
   "size":  0.5,
   "color": (1,0,0)
 };
-testDraw(obj) := (
+drawTestCircle(obj) := (
   fillcircle([obj.x, obj.y], obj.size, color->obj.color);
 );
+
+
+
+
+
+text1 = {
+  "x":              canvascorners_4.x + 1,
+  "y":              canvascorners_4.y + 1,
+  "text":           "This is just a test.",
+  "percentVisible": 0,
+  "size":           30
+};
+
+
+
+
+
+
+
+
+
 
 
 animationPlayer1 = setupAnimationPlayer(1, 2);
@@ -65,7 +86,9 @@ animationPlayer2.running = true;
 
 
 <script id='draw' type='text/x-cindyscript'>
-  testDraw(testObject);
+  drawTestCircle(testCircle);
+
+  drawTextObject(text1);
 </script>
 
 
@@ -75,11 +98,12 @@ animationPlayer2.running = true;
   updateAnimationPlayer(animationPlayer1, delta);
   updateAnimationPlayer(animationPlayer2, delta);
 
-  tween(testObject, "x", canvascenter.x, canvascorners_1.x, animationPlayer2);
-  tween(testObject, "y", canvascenter.y, canvascorners_1.y, animationPlayer2);
+  tween(testCircle, "x", canvascenter.x, canvascorners_1.x, animationPlayer2);
+  tween(testCircle, "y", canvascenter.y, canvascorners_1.y, animationPlayer2);
+  tween(text1, "percentVisible", 0, 1, animationPlayer1);
   
-  tween(testObject, "size", 0.5, 2, animationPlayer1);
-  tween(testObject, "color", (1,0,0), (0,0,1), animationPlayer1);
+  tween(testCircle, "size", 0.5, 2, animationPlayer1);
+  tween(testCircle, "color", (1,0,0), (0,0,1), animationPlayer1);
 </script>
 
 
@@ -94,7 +118,7 @@ animationPlayer2.running = true;
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:0px solid #000000;">
+<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:2px solid #000000;">
 <canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="z-index: 2; position:absolute; left: 0px; top: 0px"></canvas>
 </div>
 

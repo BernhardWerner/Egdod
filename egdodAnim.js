@@ -121,12 +121,22 @@
 
 	// PROPERTY HAS TO PRESENT IN OBJECT!!!
 	tween(obj, prop, from, to, aniPlayer) := (
-		if(aniPlayer.running, 
-			obj_prop = lerp(from, to, 1 - aniPlayer.timeLeft / aniPlayer.duration);
+		if(contains(keys(obj), prop),
+			if(aniPlayer.running, 
+				obj_prop = lerp(from, to, 1 - aniPlayer.timeLeft / aniPlayer.duration);
+			);
 		);
 	);
 	
 
+
+	// ************************************************************************************************
+	// Rendering various animation objects.
+	// ************************************************************************************************
+	// Text objects 
+	drawTextObject(obj) := (
+		drawtext([obj.x, obj.y], substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size);
+	);
 
 
 
