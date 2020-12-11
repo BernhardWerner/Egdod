@@ -133,9 +133,29 @@
 	// ************************************************************************************************
 	// Rendering various animation objects.
 	// ************************************************************************************************
-	// Text objects 
+	// Text objects needs
+	// x
+	// y
+	// text
+	// percentVisible
+	// size
+	// color 
 	drawTextObject(obj) := (
-		drawtext([obj.x, obj.y], substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size);
+		drawtext([obj.x, obj.y], substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align);
+	);
+
+	// Graph object needs
+	// name // has to name of separate function; can't use lambda expressions
+	// x
+	// y
+	// scale
+	// start
+	// stop
+	// color
+	// lineSize
+
+	drawGraphObject(obj) := (
+		plot(parse(obj.y + " + " + obj.scale + " * " + obj.name + "((x - " + obj.x + ") / " + obj.scale + ")"), x, start->obj.x + obj.start * obj.scale, stop->obj.x + obj.stop * obj.scale, color->obj.color, size->obj.lineSize);
 	);
 
 

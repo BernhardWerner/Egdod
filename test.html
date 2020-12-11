@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
  <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -51,11 +51,27 @@ drawTestCircle(obj) := (
 
 
 text1 = {
-  "x":              canvascorners_4.x + 1,
-  "y":              canvascorners_4.y + 1,
+  "x":              canvascorners_3.x - 1,
+  "y":              canvascorners_3.y + 1,
   "text":           "This is just a test.",
   "percentVisible": 0,
-  "size":           30
+  "size":           30,
+  "color":          (0,1,0),
+  "align":          "right"
+};
+
+
+
+
+graph1 = {
+  "name":     "easeInOutElastic",
+  "x":        canvascenter.x + 5,
+	"y":        canvascenter.y,
+	"scale":    8,
+	"start":    0,
+	"stop":     0,
+	"color":    (1,0,0),
+	"lineSize": 3
 };
 
 
@@ -65,17 +81,12 @@ text1 = {
 
 
 
-
-
-
 animationPlayer1 = setupAnimationPlayer(1, 2);
-animationPlayer2 = setupAnimationPlayer(1.5, 3.5);
 
 
 playanimation();
 setupTime();
 animationPlayer1.running = true;
-animationPlayer2.running = true;
 </script>
 <script src="egdodColor.js" data-scriptid="init"></script>
 <script src="egdodMath.js" data-scriptid="init"></script>
@@ -86,9 +97,7 @@ animationPlayer2.running = true;
 
 
 <script id='draw' type='text/x-cindyscript'>
-  drawTestCircle(testCircle);
-
-  drawTextObject(text1);
+  drawGraphObject(graph1);
 </script>
 
 
@@ -96,14 +105,8 @@ animationPlayer2.running = true;
 <script id='tick' type='text/x-cindyscript'>
   delta = deltaTime();
   updateAnimationPlayer(animationPlayer1, delta);
-  updateAnimationPlayer(animationPlayer2, delta);
 
-  tween(testCircle, "x", canvascenter.x, canvascorners_1.x, animationPlayer2);
-  tween(testCircle, "y", canvascenter.y, canvascorners_1.y, animationPlayer2);
-  tween(text1, "percentVisible", 0, 1, animationPlayer1);
-  
-  tween(testCircle, "size", 0.5, 2, animationPlayer1);
-  tween(testCircle, "color", (1,0,0), (0,0,1), animationPlayer1);
+  tween(graph1, "stop", 0, 1, animationPlayer1);
 </script>
 
 
