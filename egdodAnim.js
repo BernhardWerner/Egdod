@@ -4,6 +4,15 @@
 (function(){
 	var code = document.createTextNode(`
 
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+	// This library needs egdodMath to work!
+	///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	
+
+
+
+
 	// ************************************************************************************************
 	// Gets the current time from the computer clock converted to seconds.
 	// ************************************************************************************************
@@ -17,14 +26,17 @@
 
 	// ************************************************************************************************
 	// Sets up time-keeping variables. Will be automatically called when included.
+	// Has to be called together with playanimation()!
 	// ************************************************************************************************
 	setupTime() := (
 		timeBufferEABOW = computerSeconds();
+		scriptStartTimeEABOW = timeBufferEABOW;
 	);
-	setupTime();
+
 
 	// ************************************************************************************************
 	// Returns the duration ofthe last frame/tick in seconds.
+	// Needs to run on every frame!
 	// ************************************************************************************************
 	deltaTime() := (
 		regional(result);
@@ -83,6 +95,37 @@
 	easeOutElastic(x)    := 1 - easeInElastic(1 - x);
 	easeInOutElastic(x)  := if(x == 0, 0, if(x == 1, 1, if(x < 0.5, -2^(20 * x - 10) * sin(4 * pi / 9 * (20 * x - 11.125)) / 2, 2^(-20 * x + 10) * sin(4 * pi / 9 * (20 * x - 11.125)) / 2 + 1)));
 
+
+
+	// ************************************************************************************************
+	// Basic animation functionlity.
+	// ************************************************************************************************
+
+	setupAnimationPlayer(s, e) := {
+		"start":    s,
+		"end":      e,
+		"duration": e - s,
+		"timeLeft": e - s,
+		"running": false
+	}; 
+
+	// Needs to run every frame.
+	updateAnimationPlayer(aniPlayer, delta) := (
+		if(aniPlayer.running & (computerSeconds() - scriptStartTimeEABOW >= aniPlayer.start),
+			aniPlayer.timeLeft = aniPlayer.timeLeft - delta;	
+			if(aniPlayer.timeLeft <= 0,
+				aniPlayer.running = false;	
+			);
+		);
+	);
+
+	// PROPERTY HAS TO PRESENT IN OBJECT!!!
+	tween(obj, prop, from, to, aniPlayer) := (
+		if(aniPlayer.running, 
+			obj_prop = lerp(from, to, 1 - aniPlayer.timeLeft / aniPlayer.duration);
+		);
+	);
+	
 
 
 

@@ -28,11 +28,27 @@ canvasheight  = dist(canvascorners_1, canvascorners_4);
 
 
 
+testObject = {
+  "x":     canvascenter.x,
+  "y":     canvascenter.y,
+  "size":  0.5,
+  "color": (1,0,0)
+};
+testDraw(obj) := (
+  fillcircle([obj.x, obj.y], obj.size, color->obj.color);
+);
+
+
+animationPlayer1 = setupAnimationPlayer(1, 2);
+animationPlayer2 = setupAnimationPlayer(1.5, 3.5);
 
 
 playanimation();
-
+setupTime();
+animationPlayer1.running = true;
+animationPlayer2.running = true;
 </script>
+<script src="egdodMath.js" data-scriptid="init"></script>
 <script src="egdodAnim.js" data-scriptid="init"></script>
 
 
@@ -40,10 +56,21 @@ playanimation();
 
 
 <script id='draw' type='text/x-cindyscript'>
+  testDraw(testObject);
 </script>
 
 
+
 <script id='tick' type='text/x-cindyscript'>
+  delta = deltaTime();
+  updateAnimationPlayer(animationPlayer1, delta);
+  updateAnimationPlayer(animationPlayer2, delta);
+
+  tween(testObject, "x", canvascenter.x, canvascorners_1.x, animationPlayer2);
+  tween(testObject, "y", canvascenter.y, canvascorners_1.y, animationPlayer2);
+  
+  tween(testObject, "size", 0.5, 2, animationPlayer1);
+  tween(testObject, "color", (1,0,0), (0,0,1), animationPlayer1);
 </script>
 
 
@@ -58,10 +85,8 @@ playanimation();
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:2px solid #000000;">
-<div style="position:relative; width:800px; height:600px; background-image: url('widget_back_07.png');  background-size: 800px 600px; opacity: 0.4"></div>
+<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:0px solid #000000;">
 <canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="z-index: 2; position:absolute; left: 0px; top: 0px"></canvas>
-<canvas id="popCanvas" align="left" valign="top" width="800" height="600" style="z-index: 1; position:absolute; left: 0px; top: 0px"></canvas>
 </div>
 
 
@@ -84,348 +109,6 @@ playanimation();
 </script>
 
 
-
-
-
-<script type='text/javascript'>
-
-
-
-class BB {
-  constructor(x,y,w,h) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-  }
-}
-
-
-
-
-
-
-// Quad tree ////////////////////////////////////////
-
-
-
-
-
-
-class GameObject {
-    constructor (context, x, y, vx, vy){
-        this.context = context;
-        this.x = x;
-        this.y = y;
-        this.vx = vx;
-        this.vy = vy;
-
-        this.isColliding = false;
-
-    }
-}
-
-
-class Bubble extends GameObject {
-    constructor (context, x, y, vx, vy, r){
-        super(context, x, y, vx, vy);
-
-        //Set default width and height
-        this.rad = r;
-        this.width = 2 * r;
-        this.height = 2 * r;
-    }
-
-
-    draw(){
-        //this.context.fillStyle = this.isColliding ? '#FF8C00DD' : '#0C5AA6DD';
-        this.context.fillStyle = '#5288BCDD';
-        
-        ctx.beginPath();
-        this.context.arc(this.x, this.y, 0.8 * this.rad, 0, 2 * Math.PI);
-        this.context.fill();
-    }
-
-    update(secondsPassed){
-      //this.vy += gravity * secondsPassed;
-      //this.vy += gravity * Math.pow(1 - this.y / livingSpace.h, 2.0) * secondsPassed;
-      //this.vy += gravity * Math.pow(1 - population.length / (22*43), 0.5) * secondsPassed;
-      this.vy += gravity * Math.pow(1 - this.y / livingSpace.h, 2.0) * Math.pow(1 - population.length / (22*43), 0.5) * secondsPassed;
-        
-      this.x += this.vx * secondsPassed;
-      this.y += this.vy * secondsPassed;
-    }
-}
-
-
-
-
-
-
-
-
-function dist(a, b) {
-  return Math.sqrt((a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y));
-}
-
-
-
-
-
-function squareDist(a, b) {
-  return (a.x - b.x)*(a.x - b.x) + (a.y - b.y)*(a.y - b.y);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-// Input ///////////////////////////////////////////////////////
-
-document.addEventListener('keydown', function(event) {
-    if(event.code == "Space") {
-        running = !running;
-        if(running) window.requestAnimationFrame(step);
-    }
-});
-
-// Simulation /////////////////////////////////////////////////
-
-
-const gravity = 510;
-const restitution = 0.9;
-
-preyStart = 900;
-noiMax = preyStart;
-
-decompositionRate = 0.01;
-
-startSpeed = 60;
-radius = 5;
-
-maxObjects = 10;
-maxLevels = 6;
-
-dataUpdateThreshold = 200;
-
-running = true;
-
-// HARD CODED!!!
-livingSpace = new BB(300, 0, 200, 450);
-
-
-canvas = document.getElementById('popCanvas');
-ctx = canvas.getContext('2d');
-
-
-
-
-
-function clearCanvas() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
-
-
-function drawLivingSpace() {
-  ctx.fillStyle = "rgb(224, 224, 224, 0.35)";
-  ctx.fillRect(livingSpace.x, livingSpace.y, livingSpace.w, livingSpace.h);
-  
-}
-
-function init() {
-  population = [];
-  qt = new Quadtree({x: livingSpace.x, y: livingSpace.y, width: livingSpace.w, height: livingSpace.h}, maxObjects, maxLevels);
-  
-
-  cindy.evokeCS("noi = " + noiMax + ";"); 
-
-
-  startTime = Date.now();
-
-  dataUpdateTime = 0;
-  
-  // for(k = 0; k < preyStart; k++) {
-  //   x = livingSpace.x + 0.01 * livingSpace.w + 0.98 * livingSpace.w * Math.random();
-  //   y = livingSpace.y + 0.01 * livingSpace.h + 0.98 * livingSpace.h * Math.random();
-    
-    
-  //   angle = 2 * Math.PI * Math.random();
-    
-  //   new_indi = new Bubble(ctx, x, y, startSpeed * Math.sin(angle), startSpeed * Math.cos(angle), radius * (0.5 + 1.0 * Math.random()));
-
-  //   population.push(new_indi);
-  //   qt.insert(new_indi);  
-  // }
-
-
-  hSize = 22;
-  vSize = 43;
-  for(let i = 0; i < hSize; i++) {
-    for(let j = 0; j < vSize; j++) {
-      x = livingSpace.x + radius + (2 * i + 0.5) * (livingSpace.w - 2 * radius) / (2 * hSize - 1);
-      y = livingSpace.y + radius + (2 * j + 0.5) * (livingSpace.h - 2 * radius) / (2 * vSize - 1);
-      
-      
-      angle = 0.8 * Math.PI * Math.random() - 0.4 * Math.PI;
-      
-      new_indi = new Bubble(ctx, x, y, startSpeed * Math.sin(angle), startSpeed * Math.cos(angle), radius * (0.5 + 1.0 * Math.random()));
-
-      population.push(new_indi);
-      qt.insert(new_indi);  
-    }
-  }
-
-}
-
-
-
-
-
-function updateCindy() {
-
-
-  //cindy.evokeCS("data.zero = data.zero :> " + population.length + ";");
-
-}
-
-
-
-
-
-
-function step() {
-  deltaTime = 0.001 * (Date.now() - startTime); // IN SECONDS!
-  startTime = Date.now();
-
-  qt.clear();
-  
-  for(i of population) {
-    if(Math.random() < decompositionRate * deltaTime) {
-      population.splice(population.indexOf(i), 1);
-    }
-    i.update(deltaTime);
-    qt.insert(i); 
-  }
-
-  detectCollisions();
-
-
-
-  clearCanvas();
-  if(running) drawLivingSpace();
-  for(i of population) {
-    i.draw();
-  }  
-
-
-  dataUpdateTime += deltaTime;
-  if(dataUpdateTime >= dataUpdateThreshold) {
-    updateCindy();
-    dataUpdateTime = 0;
-  }
-
-  if(running) window.requestAnimationFrame(step);
-}
-
-
-
-
-
-
-
-function detectCollisions(){
-  
-  for(a of population) {
-    a.isColliding = false;
-  }
-  
-
-
-    for(a of population) {
-  
-      if(a.x <= livingSpace.x + a.rad) {
-        a.x = livingSpace.x + a.rad;
-        a.vx = Math.abs(a.vx) * restitution;
-      }
-      if(a.x >= livingSpace.x + livingSpace.w - a.rad) {
-        a.x = livingSpace.x + livingSpace.w - a.rad;
-        a.vx = -Math.abs(a.vx) * restitution;
-      }
-      if(a.y <= livingSpace.y + a.rad) {
-        a.y = livingSpace.y + a.rad;
-        a.vy = Math.abs(a.vy) * restitution;
-      }
-      if(a.y >= livingSpace.y + livingSpace.h - a.rad) {
-        a.y = livingSpace.y + livingSpace.h - a.rad;
-        // a.vy = -Math.abs(a.vy) * restitution;
-        a.vy = 0; 
-        a.vx = 0;
-      }
-
-      neighbours = qt.retrieve(a);
-
-      for(b of neighbours) {
-        if(a!=b & squareDist(a, b) <= (a.rad + b.rad)*(a.rad + b.rad)) {
-            a.isColliding = true;
-            b.isColliding = true;
-
-            let vCollision = {x: b.x - a.x, y: b.y - a.y};
-            let distance = dist(a, b);
-            let vCollisionNorm = {x: vCollision.x / distance, y: vCollision.y / distance};
-            let vRelativeVelocity = {x: a.vx - b.vx, y: a.vy - b.vy};
-            let speed = vRelativeVelocity.x * vCollisionNorm.x + vRelativeVelocity.y * vCollisionNorm.y;
-            if (speed < 0) break;
-            a.vx -= (speed * vCollisionNorm.x);
-            a.vy -= (speed * vCollisionNorm.y);
-            b.vx += (speed * vCollisionNorm.x);
-            b.vy += (speed * vCollisionNorm.y);
-
-            a.vx *= restitution;
-            a.vy *= restitution;
-            b.vx *= restitution;
-            b.vy *= restitution;
-
-            a.x -= 0.1 * (a.rad + b.rad - distance) * vCollisionNorm.x;
-            a.y -= 0.1 * (a.rad + b.rad - distance) * vCollisionNorm.y;
-            b.x += 0.1 * (a.rad + b.rad - distance) * vCollisionNorm.x;
-            b.y += 0.1 * (a.rad + b.rad - distance) * vCollisionNorm.y;
-        
-        }
-      }
-    }
-
-    
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-function start() {
-
-  window.requestAnimationFrame(step);
-}
-
-
-</script>
 
 
 
