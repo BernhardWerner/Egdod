@@ -101,37 +101,77 @@
 	// Basic animation functionlity.
 	// ************************************************************************************************
 
-	setupAnimationPlayer(s, e) := {
+	setupAnimationTrack(s, e) := {
 		"start":    s,
 		"end":      e,
 		"duration": e - s,
 		"timeLeft": e - s,
-		"running": false
+		"running":  false,
+		"looping":  false
 	}; 
 
-	// Needs to run every frame.
-	updateAnimationPlayer(aniPlayer, delta) := (
-		if(aniPlayer.running & (computerSeconds() - scriptStartTimeEABOW >= aniPlayer.start),
-			aniPlayer.timeLeft = aniPlayer.timeLeft - delta;	
-			if(aniPlayer.timeLeft <= 0,
-				aniPlayer.running = false;	
+	// Needs to run on every frame!
+	updateAnimationTrack(track, delta) := (
+		if(track.running & (computerSeconds() - scriptStartTimeEABOW >= track.start),
+			track.timeLeft = track.timeLeft - delta;	
+			if(track.timeLeft <= 0,
+				if(track.looping,
+					track.timeLeft = track.end - track.start;
+				, // else //
+					track.timeLeft = 0;
+					track.running = false;		
+				);
 			);
 		);
 	);
 
-	// PROPERTY HAS TO PRESENT IN OBJECT!!!
-	tween(obj, prop, from, to, aniPlayer) := (
+	tween(obj, prop, from, to, track, easing) := (
+		regional(t);
+
+		t = 1 - track.timeLeft / track.duration;
+
+		if(easing != "none",
+			t = parse(easing + "(" + t + ")");
+		);
+
 		if(contains(keys(obj), prop),
-			if(aniPlayer.running, 
-				obj_prop = lerp(from, to, 1 - aniPlayer.timeLeft / aniPlayer.duration);
+			if(track.running, 
+				obj_prop = lerp(from, to, t);
 			);
 		);
 	);
-	
+	tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");
+
+
+	// ************************************************************************************************
+	// Setting up several animation tracks with delay.
+	// ************************************************************************************************
+	setupAnimationCascade(number, start, duration, step) := (
+		apply(0..number - 1,
+			setupAnimationTrack(start + # * step, start + # * step + duration);	
+		);
+	);
+
+	// ************************************************************************************************
+	// Updating all tracks in a cascade. Has to run on every frame.
+	// ************************************************************************************************
+	updateAnimationCascade(cascade, delta) := (
+		forall(cascade, track,
+			updateAnimationTrack(track, delta);
+		);
+	);
+
+	// ************************************************************************************************
+	// Updating all tracks in a cascade. Has to run on every frame.
+	// ************************************************************************************************
+	runAnimationCascade(cascade) := forall(cascade, track, track.running = true);
+
+
 
 
 	// ************************************************************************************************
 	// Rendering various animation objects.
+	// ************************************************************************************************
 	// ************************************************************************************************
 	// Text objects needs
 	// x
@@ -140,10 +180,13 @@
 	// percentVisible
 	// size
 	// color 
+	// ************************************************************************************************
 	drawTextObject(obj) := (
 		drawtext([obj.x, obj.y], substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align);
 	);
 
+
+	// ************************************************************************************************
 	// Graph object needs
 	// name // has to name of separate function; can't use lambda expressions
 	// x
@@ -153,12 +196,74 @@
 	// stop
 	// color
 	// lineSize
-
+	// ************************************************************************************************
 	drawGraphObject(obj) := (
 		plot(parse(obj.y + " + " + obj.scale + " * " + obj.name + "((x - " + obj.x + ") / " + obj.scale + ")"), x, start->obj.x + obj.start * obj.scale, stop->obj.x + obj.stop * obj.scale, color->obj.color, size->obj.lineSize);
 	);
 
+	// ************************************************************************************************
+	// Line object needs
+	// xStart
+	// yStart
+	// xEnd
+	// yEnd
+	// color
+	// size
+	// arrow
+	// ************************************************************************************************
+	drawLineObject(obj) := (
+		draw([(obj.xStart, obj.yStart), (obj.xEnd, obj.yEnd)], color->obj.color, size->obj.size, arrow->obj.arrow > 0.5, alpha->obj.alpha);
+	);
 
+	// ************************************************************************************************
+	// Draws quiver of line objects.
+	// ************************************************************************************************
+	drawQuiver(quiver) := forall(quiver, obj, drawLineObject(obj));
+
+
+	// ************************************************************************************************
+	// Animates every property of a line object that makes it appear.
+	// ************************************************************************************************
+	constructLineObject(obj, endPos, size, arrow, track) := (
+		tween(obj, "xEnd", obj.xStart, endPos.x, track, "easeInOutCubic");
+		tween(obj, "yEnd", obj.yStart, endPos.y, track, "easeInOutCubic");
+		tween(obj, "alpha", 0, 1, track, "easeOutCirc");
+		tween(obj, "size", 0, size, track, "easeOutCirc");
+		if(arrow, tween(obj, "arrow", 0, 1, track, "easeInQuad"));
+	);
+
+	// ************************************************************************************************
+	// Creates an "empty" line object which can be constructed afterwards.
+	// ************************************************************************************************
+	createRootLineObject(pos, color) := {
+		"xStart": pos.x,
+		"yStart": pos.y,
+		"xEnd":   0,
+		"yEnd":   0,
+		"color":  color,
+		"size":   0,
+	  "arrow":  0,
+	  "alpha":  0
+	};
+
+	// ************************************************************************************************
+	// Initialises quiver of lines.
+	// ************************************************************************************************
+	createRootQuiver(roots, color) := (
+		apply(roots,
+			createRootLineObject(#, color);	
+		);
+	);
+
+
+	// ************************************************************************************************
+	// Animates every property of the line objects of a quiver via an animation cascade.
+	// ************************************************************************************************
+	constructQuiver(quiver, targets, size, arrow, cascade) := (
+		forall(1..length(quiver),
+			constructLineObject(quiver_#, targets_#, size, arrow, cascade_#);
+		);
+	);
 
 
 `);
