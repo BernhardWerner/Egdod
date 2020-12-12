@@ -261,10 +261,27 @@
 	// ************************************************************************************************
 	constructQuiver(quiver, targets, size, arrow, cascade) := (
 		forall(1..length(quiver),
-			constructLineObject(quiver_#, targets_#, size, arrow, cascade_#);
+		constructLineObject(quiver_#, targets_#, size, arrow, cascade_#);
 		);
+		);
+		
+	// ************************************************************************************************
+	// Setting up grid lines.
+	// ************************************************************************************************
+	createRootGrid(pos, hNumber, vNumber, vDist, hDist, color) := (
+		[
+			createRootQuiver(apply(0..hNumber - 1, pos + [# * hDist, 0]), color),
+			createRootQuiver(apply(0..vNumber - 1, pos + [0, # * vDist]), color)
+		];
 	);
 
+	// ************************************************************************************************
+	// Creating a grid.
+	// ************************************************************************************************
+	constructGrid(grid, hLength, vLength, size, arrow, cascade) := (
+		constructQuiver(grid.x, targets, size, arrow, cascade):
+		constructQuiver(grid.y, targets, size, arrow, cascade):
+	);
 
 `);
 
