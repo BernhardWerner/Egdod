@@ -222,6 +222,12 @@
 
 
 	// ************************************************************************************************
+	// Draws grid.
+	// ************************************************************************************************
+	drawGrid(grid) := forall(grid, quiver, drawQuiver(quiver));
+
+
+	// ************************************************************************************************
 	// Animates every property of a line object that makes it appear.
 	// ************************************************************************************************
 	constructLineObject(obj, endPos, size, arrow, track) := (
@@ -255,6 +261,15 @@
 		);
 	);
 
+	// ************************************************************************************************
+	// Extracts start and end points from quiver.
+	// ************************************************************************************************
+	getQuiverStartPoints(quiver) := (
+		apply(quiver, obj, [obj.xStart, obj.yStart]);
+	);
+	getQuiverEndPoints(quiver) := (
+		apply(quiver, obj, [obj.xEnd, obj.yEnd]);
+	);
 
 	// ************************************************************************************************
 	// Animates every property of the line objects of a quiver via an animation cascade.
@@ -268,19 +283,19 @@
 	// ************************************************************************************************
 	// Setting up grid lines.
 	// ************************************************************************************************
-	createRootGrid(pos, hNumber, vNumber, vDist, hDist, color) := (
+	createRootGrid(pos, xOffset, yOffset, hNumber, vNumber, vDist, hDist, color) := (
 		[
-			createRootQuiver(apply(0..hNumber - 1, pos + [# * hDist, 0]), color),
-			createRootQuiver(apply(0..vNumber - 1, pos + [0, # * vDist]), color)
+			createRootQuiver(apply(0..hNumber - 1, pos + [xOffset + # * hDist, 0]), color),
+			createRootQuiver(apply(0..vNumber - 1, pos + [0, yOffset + # * vDist]), color)
 		];
 	);
 
 	// ************************************************************************************************
 	// Creating a grid.
 	// ************************************************************************************************
-	constructGrid(grid, hLength, vLength, size, arrow, cascade) := (
-		constructQuiver(grid.x, targets, size, arrow, cascade):
-		constructQuiver(grid.y, targets, size, arrow, cascade):
+	constructGrid(grid, hLength, vLength, size, arrow, hCascade, vCascade) := (
+		constructQuiver(grid.x, apply(getQuiverStartPoints(grid.x), # + [0, vLength]), size, arrow, hCascade);
+		constructQuiver(grid.y, apply(getQuiverStartPoints(grid.y), # + [hLength, 0]), size, arrow, vCascade);
 	);
 
 `);
