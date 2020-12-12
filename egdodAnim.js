@@ -285,8 +285,8 @@
 	// ************************************************************************************************
 	createRootGrid(pos, xOffset, yOffset, hNumber, vNumber, vDist, hDist, color) := (
 		[
-			createRootQuiver(apply(0..hNumber - 1, pos + [xOffset + # * hDist, 0]), color),
-			createRootQuiver(apply(0..vNumber - 1, pos + [0, yOffset + # * vDist]), color)
+			createRootQuiver(apply(0..hNumber - 1, pos + [# * hDist, yOffset]), color),
+			createRootQuiver(apply(0..vNumber - 1, pos + [xOffset, # * vDist]), color)
 		];
 	);
 

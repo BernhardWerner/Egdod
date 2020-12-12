@@ -56,7 +56,7 @@ text1 = {
   "text":           "This is just a test.",
   "percentVisible": 1,
   "size":           30,
-  "color":          (0,0.5,0.5),
+  "color":          alicecolor("blue"),
   "align":          "left"
 };
 
@@ -65,12 +65,12 @@ text1 = {
 
 
 
-origin = canvascenter;
-graphSize = 8;
+origin = canvascenter + [-5, -3];
+graphSize = 12;
 
-func1(x) := 0.3 * sin(3 * x) * exp(x);
+func1(x) := 0.3 * sin(10 * x) + (x^2);
 func2(x) := easeInOutElastic(x);
-func3(x) := 0.3 * sin(3 * x) * exp(x);
+func3(x) := x^2;
 
 graph1 = {
   "name":     "func1",
@@ -79,17 +79,17 @@ graph1 = {
 	"scale":    graphSize,
 	"start":    0,
 	"stop":     0,
-	"color":    (0.1,0.8 ,0.5),
-	"lineSize": 7
+	"color":    aliceColor("red"),
+	"lineSize": 5
 };
 
 
 
 vNumber = 8;
 hNumber = 8;
-testGrid = createRootGrid(origin, 0, 0, hNumber, vNumber, 1, 1, (0.7, 0.7, 0.7));
-axisX = createRootLineObject(origin, (0.3, 0.3, 0.3));
-axisY = createRootLineObject(origin, (0.3, 0.3, 0.3));
+testGrid = createRootGrid(origin, -0.03 * graphSize, -0.03 * graphSize, hNumber, vNumber, graphSize/hNumber, graphSize/vNumber, (0.6, 0.6, 0.6));
+axisX = createRootLineObject(origin + (-0.05*graphSize, 0), (0.2, 0.2, 0.2));
+axisY = createRootLineObject(origin + (0, -0.05*graphSize), (0.2, 0.2, 0.2));
 
 
 
@@ -98,7 +98,7 @@ animationTrack2 = setupAnimationTrack(1, 2);
 animationTrack3 = setupAnimationTrack(1.5, 2.5);
 cascade1 = setupAnimationCascade(hNumber, 2, 1, 0.1);
 cascade2 = setupAnimationCascade(vNumber, 2.5, 1, 0.1);
-animationTrack4 = setupAnimationTrack(4.5, 5.5);
+animationTrack4 = setupAnimationTrack(4, 5);
 
 
 playanimation();
@@ -142,11 +142,11 @@ runAnimationCascade(cascade2);
 
   tween(text1, "percentVisible", 0, 1, animationTrack1);
   
-  constructLineObject(axisX, origin + [graphSize, 0], 3, true, animationTrack2);
-  constructLineObject(axisY, origin + [0, graphSize], 3, true, animationTrack3);
+  constructLineObject(axisX, origin + [1.1 * graphSize, 0], 3, true, animationTrack2);
+  constructLineObject(axisY, origin + [0, 1.1 * graphSize], 3, true, animationTrack3);
   constructGrid(testGrid, graphSize, graphSize, 1, false, cascade2, cascade1);
   
-  tween(graph1, "stop", 0, 1, animationTrack4);
+  tween(graph1, "stop", 0, 1, animationTrack4, "EaseInOutQuad");
 </script>
 
 
@@ -161,7 +161,7 @@ runAnimationCascade(cascade2);
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:2px solid #000000;">
+<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:0px solid #000000;">
 <canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="z-index: 2; position:absolute; left: 0px; top: 0px"></canvas>
 </div>
 
