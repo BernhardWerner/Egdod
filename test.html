@@ -54,7 +54,7 @@ text1 = {
   "x":              canvascorners_1.x + 1,
   "y":              canvascorners_1.y - 2,
   "text":           "This is just a test.",
-  "percentVisible": 1,
+  "percentVisible": 0,
   "size":           30,
   "color":          alicecolor("blue"),
   "align":          "left"
@@ -87,7 +87,7 @@ graph1 = {
 
 vNumber = 8;
 hNumber = 8;
-testGrid = createRootGrid(origin, -0.03 * graphSize, -0.03 * graphSize, hNumber, vNumber, graphSize/hNumber, graphSize/vNumber, (0.6, 0.6, 0.6));
+testGrid = createRootGrid(origin, -0.03 * graphSize, -0.03 * graphSize, hNumber, vNumber, graphSize/vNumber, graphSize/hNumber, (0.6, 0.6, 0.6));
 axisX = createRootLineObject(origin + (-0.05*graphSize, 0), (0.2, 0.2, 0.2));
 axisY = createRootLineObject(origin + (0, -0.05*graphSize), (0.2, 0.2, 0.2));
 
@@ -96,13 +96,12 @@ axisY = createRootLineObject(origin + (0, -0.05*graphSize), (0.2, 0.2, 0.2));
 animationTrack1 = setupAnimationTrack(0, 1);
 animationTrack2 = setupAnimationTrack(1, 2);
 animationTrack3 = setupAnimationTrack(1.5, 2.5);
-cascade1 = setupAnimationCascade(hNumber, 2, 1, 0.1);
-cascade2 = setupAnimationCascade(vNumber, 2.5, 1, 0.1);
+cascade1 = setupAnimationCascade(vNumber, 2, 1, 0.1);
+cascade2 = setupAnimationCascade(hNumber, 2.5, 1, 0.1);
 animationTrack4 = setupAnimationTrack(4, 5);
 
 
-playanimation();
-setupTime();
+
 
 animationTrack1.running = true;
 animationTrack2.running = true;
@@ -125,7 +124,7 @@ runAnimationCascade(cascade2);
   drawGrid(testGrid);
   drawLineObject(axisX);
   drawLineObject(axisY);
-
+  
   drawGraphObject(graph1);
 </script>
 
@@ -139,7 +138,7 @@ runAnimationCascade(cascade2);
   updateAnimationTrack(animationTrack4, delta);
   updateAnimationCascade(cascade1, delta);
   updateAnimationCascade(cascade2, delta);
-
+  
   tween(text1, "percentVisible", 0, 1, animationTrack1);
   
   constructLineObject(axisX, origin + [1.1 * graphSize, 0], 3, true, animationTrack2);
@@ -152,6 +151,8 @@ runAnimationCascade(cascade2);
 
 
 <script id='mouse_down' type='text/x-cindyscript'>
+  playanimation();
+  setupTime();
 </script>
 
 <script id='mouse_drag' type='text/x-cindyscript'>
