@@ -370,6 +370,14 @@
 		obj.stroke = sampleCircle(rad, lerp(0, 2 * pi, 1 - easeInOutCubic(track.timeLeft)));
 	);
 
+	// ************************************************************************************************
+	// Grows a circle.
+	// ************************************************************************************************
+	constructCircleGrow(obj, rad, lineSize, track) := (
+		tween(obj, "lineSize", 0, lineSize, track);
+		obj.stroke = sampleCircle(lerp(0, rad, 1 - easeOutQuad(track.timeLeft)), 2 * pi);
+	);
+
 `);
 
 
