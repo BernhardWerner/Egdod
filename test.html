@@ -36,18 +36,7 @@ canvasheight  = dist(canvascorners_1, canvascorners_4);
 
 
 
-testCircle = {
-  "x":     canvascenter.x,
-  "y":     canvascenter.y,
-  "size":  0.5,
-  "color": (1,0,0)
-};
-drawTestCircle(obj) := (
-  fillcircle([obj.x, obj.y], obj.size, color->obj.color);
-);
-
-
-
+testCircle = 	createRootStrokeObject(canvascenter +  [-10, 3], aliceColor("turquoise"), aliceColor("turquoise"), 0.5);
 
 
 text1 = {
@@ -56,7 +45,7 @@ text1 = {
   "text":           "This is just a test.",
   "percentVisible": 0,
   "size":           30,
-  "color":          alicecolor("blue"),
+  "color":          aliceColor("blue"),
   "align":          "left"
 };
 
@@ -99,6 +88,7 @@ animationTrack3 = setupAnimationTrack(1.5, 2.5);
 cascade1 = setupAnimationCascade(vNumber, 2, 1, 0.1);
 cascade2 = setupAnimationCascade(hNumber, 2.5, 1, 0.1);
 animationTrack4 = setupAnimationTrack(4, 5);
+animationTrack5 = setupAnimationTrack(5, 6);
 
 
 
@@ -107,6 +97,7 @@ animationTrack1.running = true;
 animationTrack2.running = true;
 animationTrack3.running = true;
 animationTrack4.running = true;
+animationTrack5.running = true;
 runAnimationCascade(cascade1);
 runAnimationCascade(cascade2);
 </script>
@@ -126,6 +117,8 @@ runAnimationCascade(cascade2);
   drawLineObject(axisY);
   
   drawGraphObject(graph1);
+
+  drawStrokeObject(testCircle);
 </script>
 
 
@@ -136,6 +129,7 @@ runAnimationCascade(cascade2);
   updateAnimationTrack(animationTrack2, delta);
   updateAnimationTrack(animationTrack3, delta);
   updateAnimationTrack(animationTrack4, delta);
+  updateAnimationTrack(animationTrack5, delta);
   updateAnimationCascade(cascade1, delta);
   updateAnimationCascade(cascade2, delta);
   
@@ -146,6 +140,8 @@ runAnimationCascade(cascade2);
   constructGrid(testGrid, graphSize, graphSize, 1, false, cascade2, cascade1);
   
   tween(graph1, "stop", 0, 1, animationTrack4, "EaseInOutQuad");
+
+  constructCircleDraw(testCircle, 2, 4, animationTrack5);
 </script>
 
 

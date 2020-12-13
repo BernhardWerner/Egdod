@@ -215,6 +215,26 @@
 		draw([(obj.xStart, obj.yStart), (obj.xEnd, obj.yEnd)], color->obj.color, size->obj.size, arrow->obj.arrow > 0.5, alpha->obj.alpha);
 	);
 
+
+	// ************************************************************************************************
+	// Circle object needs
+	// pos
+	// stroke (list of points, relative to pos)
+	// lineColor
+	// lineSize
+	// fillColor
+	// fillAlpha
+	// ************************************************************************************************
+	drawStrokeObject(obj) := (
+		regional(absoluteStroke);
+		absoluteStroke = apply(obj.stroke, obj.pos + #);
+		fillpoly(absoluteStroke, color->obj.fillColor, alpha->obj.fillAlpha);
+		connect(absoluteStroke, size->obj.lineSize, color->obj.lineColor);
+	);
+
+
+	
+
 	// ************************************************************************************************
 	// Draws quiver of line objects.
 	// ************************************************************************************************
@@ -296,6 +316,58 @@
 	constructGrid(grid, hLength, vLength, size, arrow, hCascade, vCascade) := (
 		constructQuiver(grid.x, apply(getQuiverStartPoints(grid.x), # + [0, vLength]), size, arrow, hCascade);
 		constructQuiver(grid.y, apply(getQuiverStartPoints(grid.y), # + [hLength, 0]), size, arrow, vCascade);
+		);
+		
+		
+		
+	strokeSampleRateEABOW = 128;
+	// ************************************************************************************************
+	// Setting up a stroke object.
+	// ************************************************************************************************
+	createRootStrokeObject(pos, lineColor, fillColor, fillAlpha) := {
+		"pos": pos,
+		"stroke": apply(1..strokeSampleRateEABOW, [1,0]),
+		"lineSize": 0,
+		"lineColor": lineColor,
+		"fillColor": fillColor,
+		"fillAlpha": fillAlpha
+	};
+	
+	// ************************************************************************************************
+	// Zero strokes.
+	// ************************************************************************************************
+	zeroStrokeCenter() := apply(1..strokeSampleRateEABOW, [0,0]);
+	zeroStrokeRight() := apply(1..strokeSampleRateEABOW, [1,0]);
+	
+	// ************************************************************************************************
+	// Creates stroke around a circle.
+	// ************************************************************************************************
+	sampleCircle(rad, angle) := apply(0..strokeSampleRateEABOW - 1, rad * [cos(angle * # / (strokeSampleRateEABOW - 1)), sin(angle * # / (strokeSampleRateEABOW - 1))]);
+	
+	// ************************************************************************************************
+	// Subdivides the distance between two points.
+	// ************************************************************************************************
+	subdivideSegment(p, q, n) := apply(1..n, lerp(p, q, # / (n + 1)));
+	
+	// ************************************************************************************************
+	// Creates stroke around a polygon.
+	// ************************************************************************************************
+	samplePolygon(poly) := (
+		regional(dists, effectiveNumber, splitNumbers, stepSize);
+		
+		dists = apply(consecutive(poly), dist(#_1, #_2));
+		
+		effectiveNumber = strokeSampleRateEABOW - length(poly) - 1;
+		
+		
+		);
+		
+	// ************************************************************************************************
+	// Draws a circle.
+	// ************************************************************************************************
+	constructCircleDraw(obj, rad, lineSize, track) := (
+		tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
+		obj.stroke = sampleCircle(rad, lerp(0, 2 * pi, 1 - easeInOutCubic(track.timeLeft)));
 	);
 
 `);
