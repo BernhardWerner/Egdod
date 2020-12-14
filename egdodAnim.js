@@ -110,9 +110,11 @@
 		"looping":  false
 	}; 
 
+	trackStarted(track) := computerSeconds() - scriptStartTimeEABOW >= track.start;
+
 	// Needs to run on every frame!
 	updateAnimationTrack(track, delta) := (
-		if(track.running & (computerSeconds() - scriptStartTimeEABOW >= track.start),
+		if(track.running & trackStarted(track),
 			track.timeLeft = track.timeLeft - delta;	
 			if(track.timeLeft <= 0,
 				if(track.looping,
@@ -182,15 +184,14 @@
 	// color 
 	// ************************************************************************************************
 	drawTextObject(obj) := (
-		drawtext([obj.x, obj.y], substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align);
+		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align);
 	);
 
 
 	// ************************************************************************************************
 	// Graph object needs
 	// name // has to name of separate function; can't use lambda expressions
-	// x
-	// y
+	// pos
 	// scale
 	// start
 	// stop
@@ -198,21 +199,19 @@
 	// lineSize
 	// ************************************************************************************************
 	drawGraphObject(obj) := (
-		plot(parse(obj.y + " + " + obj.scale + " * " + obj.name + "((x - " + obj.x + ") / " + obj.scale + ")"), x, start->obj.x + obj.start * obj.scale, stop->obj.x + obj.stop * obj.scale, color->obj.color, size->obj.lineSize);
+		plot(parse(obj.pos.y + " + " + obj.scale + " * " + obj.name + "((x - " + obj.pos.x + ") / " + obj.scale + ")"), x, start->obj.pos.x + obj.start * obj.scale, stop->obj.pos.x + obj.stop * obj.scale, color->obj.color, size->obj.lineSize);
 	);
 
 	// ************************************************************************************************
 	// Line object needs
-	// xStart
-	// yStart
-	// xEnd
-	// yEnd
+	// start
+	// end
 	// color
 	// size
 	// arrow
 	// ************************************************************************************************
 	drawLineObject(obj) := (
-		draw([(obj.xStart, obj.yStart), (obj.xEnd, obj.yEnd)], color->obj.color, size->obj.size, arrow->obj.arrow > 0.5, alpha->obj.alpha);
+		draw([obj.start, obj.end], color->obj.color, size->obj.size, arrow->obj.arrow > 0.5, alpha->obj.alpha);
 	);
 
 
@@ -220,16 +219,19 @@
 	// Circle object needs
 	// pos
 	// stroke (list of points, relative to pos)
+	// drawPercent
 	// lineColor
 	// lineSize
 	// fillColor
 	// fillAlpha
 	// ************************************************************************************************
 	drawStrokeObject(obj) := (
-		regional(absoluteStroke);
+		regional(absoluteStroke, ratio);
 		absoluteStroke = apply(obj.stroke, obj.pos + #);
-		fillpoly(absoluteStroke, color->obj.fillColor, alpha->obj.fillAlpha);
-		connect(absoluteStroke, size->obj.lineSize, color->obj.lineColor);
+		ratio = 1..round(obj.drawPercent * length(absoluteStroke));
+		fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
+		connect(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor);
+		//drawall(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor);
 	);
 
 
@@ -251,8 +253,7 @@
 	// Animates every property of a line object that makes it appear.
 	// ************************************************************************************************
 	constructLineObject(obj, endPos, size, arrow, track) := (
-		tween(obj, "xEnd", obj.xStart, endPos.x, track, "easeInOutCubic");
-		tween(obj, "yEnd", obj.yStart, endPos.y, track, "easeInOutCubic");
+		tween(obj, "end", obj.start, endPos, track, "easeInOutCubic");
 		tween(obj, "alpha", 0, 1, track, "easeOutCirc");
 		tween(obj, "size", 0, size, track, "easeOutCirc");
 		if(arrow, tween(obj, "arrow", 0, 1, track, "easeInQuad"));
@@ -262,10 +263,8 @@
 	// Creates an "empty" line object which can be constructed afterwards.
 	// ************************************************************************************************
 	createRootLineObject(pos, color) := {
-		"xStart": pos.x,
-		"yStart": pos.y,
-		"xEnd":   0,
-		"yEnd":   0,
+		"start": pos,
+		"end":   0,
 		"color":  color,
 		"size":   0,
 	  "arrow":  0,
@@ -285,10 +284,10 @@
 	// Extracts start and end points from quiver.
 	// ************************************************************************************************
 	getQuiverStartPoints(quiver) := (
-		apply(quiver, obj, [obj.xStart, obj.yStart]);
+		apply(quiver, obj, obj.start);
 	);
 	getQuiverEndPoints(quiver) := (
-		apply(quiver, obj, [obj.xEnd, obj.yEnd]);
+		apply(quiver, obj, obj.end);
 	);
 
 	// ************************************************************************************************
@@ -320,13 +319,14 @@
 		
 		
 		
-	strokeSampleRateEABOW = 128;
+	strokeSampleRateEABOW = 64;
 	// ************************************************************************************************
 	// Setting up a stroke object.
 	// ************************************************************************************************
 	createRootStrokeObject(pos, lineColor, fillColor, fillAlpha) := {
 		"pos": pos,
 		"stroke": apply(1..strokeSampleRateEABOW, [1,0]),
+		"drawPercent": 0,
 		"lineSize": 0,
 		"lineColor": lineColor,
 		"fillColor": fillColor,
@@ -353,21 +353,32 @@
 	// Creates stroke around a polygon.
 	// ************************************************************************************************
 	samplePolygon(poly) := (
-		regional(dists, effectiveNumber, splitNumbers, stepSize);
+		regional(pairs, dists, totalDist, effectiveNumber, splitNumbers, stepSize);
 		
-		dists = apply(consecutive(poly), dist(#_1, #_2));
+		pairs = cycle(poly);
+		
+		dists = apply(pairs, dist(#_1, #_2));
+		totalDist = sum(dists);
 		
 		effectiveNumber = strokeSampleRateEABOW - length(poly) - 1;
-		
-		
+		splitNumbers = [];
+
+		forall(1..length(poly) - 1,
+			splitNumbers = splitNumbers :> floor(effectiveNumber * dists_# / totalDist);	
 		);
+
+		splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers);
+		
+		flatten(apply(1..length(pairs), pairs_#_1 <: subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_#))) :> poly_1;
+		
+	);
 		
 	// ************************************************************************************************
-	// Draws a circle.
+	// Draws a stroke object as a stroke.
 	// ************************************************************************************************
-	constructCircleDraw(obj, rad, lineSize, track) := (
+	constructStrokeDraw(obj, lineSize, track) := (
 		tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
-		obj.stroke = sampleCircle(rad, lerp(0, 2 * pi, 1 - easeInOutCubic(track.timeLeft)));
+		tween(obj, "drawPercent", 0, 1, track, "easeInOutCubic");
 	);
 
 	// ************************************************************************************************
@@ -376,8 +387,16 @@
 	constructCircleGrow(obj, rad, lineSize, track) := (
 		tween(obj, "lineSize", 0, lineSize, track);
 		obj.stroke = sampleCircle(lerp(0, rad, 1 - easeOutQuad(track.timeLeft)), 2 * pi);
-	);
+		);
+		
+		
+	
+	// ************************************************************************************************
+	// Transformation matrices.
+	// ************************************************************************************************
+	rotation(alpha) := [[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]];
 
+	
 `);
 
 

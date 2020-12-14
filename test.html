@@ -36,12 +36,25 @@ canvasheight  = dist(canvascorners_1, canvascorners_4);
 
 
 
-testCircle = 	createRootStrokeObject(canvascenter +  [-10, 3], aliceColor("turquoise"), aliceColor("turquoise"), 0.5);
+circlePos = canvascenter +  [-10, 3];
+testCircle = 	createRootStrokeObject(circlePos, aliceColor("turquoise"), aliceColor("turquoise"), 0.5);
+circleStroke = sampleCircle(2, 2 * pi);
+testCircle.stroke = circleStroke;
+
+triPoly = [(2, 0), (2, 3), (-3, 0)];
+triStroke = samplePolygon(triPoly);
+triPos = circlePos + [0, -8];
+
+
+testQuadrangle = 	createRootStrokeObject(canvascenter +  [3, -8], aliceColor("violet"), aliceColor("violet"), 0.5);
+quadPoly = [(1, 2), (-3, 3), (-5, -1), (2, -2)];
+testQuadrangle.stroke = samplePolygon(quadPoly);
+
+
 
 
 text1 = {
-  "x":              canvascorners_1.x + 1,
-  "y":              canvascorners_1.y - 2,
+  "pos":            canvascorners_1 + [1, -2],
   "text":           "This is just a test.",
   "percentVisible": 0,
   "size":           30,
@@ -63,8 +76,7 @@ func3(x) := x^2;
 
 graph1 = {
   "name":     "func1",
-  "x":        origin.x,
-	"y":        origin.y,
+  "pos":        origin,
 	"scale":    graphSize,
 	"start":    0,
 	"stop":     0,
@@ -89,6 +101,10 @@ cascade1 = setupAnimationCascade(vNumber, 2, 1, 0.1);
 cascade2 = setupAnimationCascade(hNumber, 2.5, 1, 0.1);
 animationTrack4 = setupAnimationTrack(4, 5);
 animationTrack5 = setupAnimationTrack(5, 6);
+animationTrack6 = setupAnimationTrack(6, 7);
+animationTrack7 = setupAnimationTrack(7, 9);
+animationTrack8 = setupAnimationTrack(9, 11);
+animationTrack8.looping = true;
 
 
 
@@ -98,6 +114,9 @@ animationTrack2.running = true;
 animationTrack3.running = true;
 animationTrack4.running = true;
 animationTrack5.running = true;
+animationTrack6.running = true;
+animationTrack7.running = true;
+animationTrack8.running = true;
 runAnimationCascade(cascade1);
 runAnimationCascade(cascade2);
 </script>
@@ -119,6 +138,7 @@ runAnimationCascade(cascade2);
   drawGraphObject(graph1);
 
   drawStrokeObject(testCircle);
+  drawStrokeObject(testQuadrangle);
 </script>
 
 
@@ -130,6 +150,9 @@ runAnimationCascade(cascade2);
   updateAnimationTrack(animationTrack3, delta);
   updateAnimationTrack(animationTrack4, delta);
   updateAnimationTrack(animationTrack5, delta);
+  updateAnimationTrack(animationTrack6, delta);
+  updateAnimationTrack(animationTrack7, delta);
+  updateAnimationTrack(animationTrack8, delta);
   updateAnimationCascade(cascade1, delta);
   updateAnimationCascade(cascade2, delta);
   
@@ -138,15 +161,26 @@ runAnimationCascade(cascade2);
   constructLineObject(axisX, origin + [1.1 * graphSize, 0], 3, true, animationTrack2);
   constructLineObject(axisY, origin + [0, 1.1 * graphSize], 3, true, animationTrack3);
   constructGrid(testGrid, graphSize, graphSize, 1, false, cascade2, cascade1);
-  
   tween(graph1, "stop", 0, 1, animationTrack4, "EaseInOutQuad");
 
-  constructCircleDraw(testCircle, 2, 4, animationTrack5);
+  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
+
+  constructStrokeDraw(testCircle, 4, animationTrack6);
+  
+  tween(testCircle, "stroke", circleStroke, triStroke, animationTrack7, "easeInOutQuad");
+  tween(testCircle, "pos", circlePos, triPos, animationTrack7, "easeInOutQuad");
+  tween(testCircle, "lineColor", aliceColor("turquoise"), alicecolor("orange"), animationTrack7);
+  tween(testCircle, "fillColor", aliceColor("turquoise"), alicecolor("orange"), animationTrack7);
+
+  if(trackStarted(animationTrack8),
+    testCircle.stroke = apply(testCircle.stroke, rotation(delta * pi) * #);
+  );
 </script>
 
 
 
 <script id='mouse_down' type='text/x-cindyscript'>
+  
   playanimation();
   setupTime();
 </script>
