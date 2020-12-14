@@ -118,9 +118,9 @@
 			l = length(list);
 
 			while(l > 0,
-				i = randomint(m) + 1;
+				i = randomint(l) + 1;
 
-				temp = list_m;
+				temp = list_l;
 				list_l = list_i;
 				list_i = temp;
 				l = l - 1;
