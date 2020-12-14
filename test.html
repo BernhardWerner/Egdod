@@ -37,7 +37,7 @@ canvasheight  = dist(canvascorners_1, canvascorners_4);
 
 
 circlePos = canvascenter +  [-10, 3];
-testCircle = 	createRootStrokeObject(circlePos, aliceColor("turquoise"), aliceColor("turquoise"), 0.5);
+testCircle = 	createRootStrokeObject(circlePos, aliceColor("orange"), aliceColor("orange"), 0.5);
 circleStroke = sampleCircle(2, 2 * pi);
 testCircle.stroke = circleStroke;
 
@@ -169,8 +169,8 @@ runAnimationCascade(cascade2);
   
   tween(testCircle, "stroke", circleStroke, triStroke, animationTrack7, "easeInOutQuad");
   tween(testCircle, "pos", circlePos, triPos, animationTrack7, "easeInOutQuad");
-  tween(testCircle, "lineColor", aliceColor("turquoise"), alicecolor("orange"), animationTrack7);
-  tween(testCircle, "fillColor", aliceColor("turquoise"), alicecolor("orange"), animationTrack7);
+  tween(testCircle, "lineColor", aliceColor("orange"), alicecolor("turquoise"), animationTrack7);
+  tween(testCircle, "fillColor", aliceColor("orange"), alicecolor("turquoise"), animationTrack7);
 
   if(trackStarted(animationTrack8),
     testCircle.stroke = apply(testCircle.stroke, rotation(delta * pi) * #);
