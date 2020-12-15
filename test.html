@@ -27,6 +27,17 @@ canvasheight  = dist(canvascorners_1, canvascorners_4);
 
 
 
+startButton = {
+  "position": (canvascorners_3 + [-4, 2]),
+  "size":     [2.5, 1.5],
+  "label":    "play",
+  "textSize": 20,
+  "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
+  "corner":   0.4,
+  "pressed":  false
+};
+
+
 
 
 
@@ -121,6 +132,8 @@ runAnimationCascade(cascade1);
 runAnimationCascade(cascade2);
 </script>
 <script src="egdodColor.js" data-scriptid="init"></script>
+<script src="egdodArray.js" data-scriptid="init"></script>
+<script src="egdodUI.js" data-scriptid="init"></script>
 <script src="egdodMath.js" data-scriptid="init"></script>
 <script src="egdodAnim.js" data-scriptid="init"></script>
 
@@ -129,6 +142,8 @@ runAnimationCascade(cascade2);
 
 
 <script id='draw' type='text/x-cindyscript'>
+drawButton(startButton);
+
   drawTextObject(text1);
   
   drawGrid(testGrid);
@@ -180,9 +195,13 @@ runAnimationCascade(cascade2);
 
 
 <script id='mouse_down' type='text/x-cindyscript'>
-  
-  playanimation();
-  setupTime();
+if(mouseInButton(startButton),
+startButton.pressed = true;
+
+playanimation();
+setupTime();
+);  
+
 </script>
 
 <script id='mouse_drag' type='text/x-cindyscript'>

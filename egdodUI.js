@@ -29,6 +29,26 @@
 
 		
 		
+		// ************************************************************************************************
+		// Draws a rectangle with rounded corners.
+		// ************************************************************************************************
+		roundedrectangle(tl, w, h, r) := roundedrectangle(tl, tl + [w,-h], r);
+		roundedrectangle(tl, br, r) := (
+			regional(tr, bl);
+			tr = [br.x, tl.y];
+			bl = [tl.x, br.y];
+			r = min([r, |tl.x-br.x|/2, |tl.y-br.y|/2]);
+			//rounded corners
+			circle(tl.xy + [r,-r], r)
+				++ circle(bl.xy + [r,r], r)
+				++ circle(br.xy + [-r,r], r)
+				++ circle(tr.xy + [-r,-r], r)
+			//rectangle
+				++ polygon([tl.xy + [r,0], tr.xy + [-r,0], br.xy + [-r,0], bl.xy + [r,0]])
+				++ polygon([tl.xy + [0,-r], tr.xy + [0,-r], br.xy + [0,r], bl.xy + [0,r]]);
+		);
+
+
 		
 		
 		// ************************************************************************************************
