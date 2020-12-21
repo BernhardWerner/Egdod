@@ -32,7 +32,7 @@ startButton = {
   "size":     [2.5, 1.5],
   "label":    "play",
   "textSize": 20,
-  "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
+  "colors":   (apply(0..2, toolColor("blue", 1 - #))),
   "corner":   0.4,
   "pressed":  false
 };
@@ -48,7 +48,7 @@ startButton = {
 
 
 circlePos = canvascenter +  [-10, 3];
-testCircle = 	createRootStrokeObject(circlePos, aliceColor("orange"), aliceColor("orange"), 0.5);
+testCircle = 	createRootStrokeObject(circlePos, toolColor("grey"), toolColor("grey"), 0.5);
 circleStroke = sampleCircle(2, 2 * pi);
 testCircle.stroke = circleStroke;
 
@@ -57,7 +57,7 @@ triStroke = samplePolygon(triPoly);
 triPos = circlePos + [0, -8];
 
 
-testQuadrangle = 	createRootStrokeObject(canvascenter +  [3, -8], aliceColor("violet"), aliceColor("violet"), 0.5);
+testQuadrangle = 	createRootStrokeObject(canvascenter +  [3, -8], toolColor("blue"), toolColor("blue"), 0.5);
 quadPoly = [(1, 2), (-3, 3), (-5, -1), (2, -2)];
 testQuadrangle.stroke = samplePolygon(quadPoly);
 
@@ -69,11 +69,18 @@ text1 = {
   "text":           "This is just a test.",
   "percentVisible": 0,
   "size":           30,
-  "color":          aliceColor("blue"),
+  "color":          toolColor("blue"),
   "align":          "left"
 };
 
 
+
+runner = {
+  "pos":   canvascenter +  [3, -8],
+  "scale": 5,
+  "flipbook": ["runner1", "runner2", "runner3", "runner2"],
+  "index": 1
+};
 
 
 
@@ -91,7 +98,7 @@ graph1 = {
 	"scale":    graphSize,
 	"start":    0,
 	"stop":     0,
-	"color":    aliceColor("red"),
+	"color":    toolColor("red"),
 	"lineSize": 5
 };
 
@@ -106,12 +113,14 @@ axisY = createRootLineObject(origin + (0, -0.05*graphSize), (0.2, 0.2, 0.2));
 
 
 animationTrack1 = setupAnimationTrack(0, 1);
+animationTrack5 = setupAnimationTrack(0, 0.7); animationTrack5.looping = true;
+
+
 animationTrack2 = setupAnimationTrack(1, 2);
 animationTrack3 = setupAnimationTrack(1.5, 2.5);
 cascade1 = setupAnimationCascade(vNumber, 2, 1, 0.1);
 cascade2 = setupAnimationCascade(hNumber, 2.5, 1, 0.1);
 animationTrack4 = setupAnimationTrack(4, 5);
-animationTrack5 = setupAnimationTrack(5, 6);
 animationTrack6 = setupAnimationTrack(6, 7);
 animationTrack7 = setupAnimationTrack(7, 9);
 animationTrack8 = setupAnimationTrack(9, 11);
@@ -153,7 +162,9 @@ drawButton(startButton);
   drawGraphObject(graph1);
 
   drawStrokeObject(testCircle);
-  drawStrokeObject(testQuadrangle);
+  //drawStrokeObject(testQuadrangle);
+
+  drawFlipbookObject(runner);
 </script>
 
 
@@ -172,20 +183,25 @@ drawButton(startButton);
   updateAnimationCascade(cascade2, delta);
   
   tween(text1, "percentVisible", 0, 1, animationTrack1);
-  
+
+  animateFlipbook(runner, animationTrack5);
+
+
   constructLineObject(axisX, origin + [1.1 * graphSize, 0], 3, true, animationTrack2);
   constructLineObject(axisY, origin + [0, 1.1 * graphSize], 3, true, animationTrack3);
   constructGrid(testGrid, graphSize, graphSize, 1, false, cascade2, cascade1);
   tween(graph1, "stop", 0, 1, animationTrack4, "EaseInOutQuad");
 
-  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
+//  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
+
+
 
   constructStrokeDraw(testCircle, 4, animationTrack6);
   
   tween(testCircle, "stroke", circleStroke, triStroke, animationTrack7, "easeInOutQuad");
   tween(testCircle, "pos", circlePos, triPos, animationTrack7, "easeInOutQuad");
-  tween(testCircle, "lineColor", aliceColor("orange"), alicecolor("turquoise"), animationTrack7);
-  tween(testCircle, "fillColor", aliceColor("orange"), alicecolor("turquoise"), animationTrack7);
+  tween(testCircle, "lineColor", toolColor("grey"), toolcolor("green"), animationTrack7);
+  tween(testCircle, "fillColor", toolColor("grey"), toolcolor("green"), animationTrack7);
 
   if(trackStarted(animationTrack8),
     testCircle.stroke = apply(testCircle.stroke, rotation(delta * pi) * #);
@@ -229,7 +245,12 @@ setupTime();
                  mousedownscript:"mouse_down",
                  mousedragscript:"mouse_drag",
                  mouseupscript:"mouse_up",
-                 tickscript:"tick"
+                 tickscript:"tick",
+                 images: {
+		                runner1: "runner_1.jpg",
+		                runner2: "runner_2.jpg",
+		                runner3: "runner_3.jpg",
+	               }
                 });
 
 </script>

@@ -234,7 +234,16 @@
 		//drawall(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor);
 	);
 
-
+	// ************************************************************************************************
+	// Flipbook object needs
+	// pos
+	// scale
+	// flipbook
+	// index
+	// ************************************************************************************************
+	drawFlipbookObject(obj) := (
+		drawimage(obj.pos + obj.scale * 0.5 * [-1, -1], obj.pos + obj.scale * 0.5 * [1, -1], obj.flipbook_(obj.index));
+	);
 	
 
 	// ************************************************************************************************
@@ -247,6 +256,19 @@
 	// Draws grid.
 	// ************************************************************************************************
 	drawGrid(grid) := forall(grid, quiver, drawQuiver(quiver));
+
+
+
+	// ************************************************************************************************
+	// Cycles through flipbook of a flipbook object. Flipbook pages are equdistantly 
+	// spread across animation track as key frames.
+	// ************************************************************************************************
+	animateFlipbook(obj, track) := (
+		regional(n);
+		n = length(obj.flipbook);
+
+		obj.index = floor(lerp(1, n + 0.9999, track.timeLeft, track.start, track.end));
+	);
 
 
 	// ************************************************************************************************
@@ -386,7 +408,7 @@
 	// ************************************************************************************************
 	constructCircleGrow(obj, rad, lineSize, track) := (
 		tween(obj, "lineSize", 0, lineSize, track);
-		obj.stroke = sampleCircle(lerp(0, rad, 1 - easeOutQuad(track.timeLeft)), 2 * pi);
+		obj.stroke = sampleCircle(lerp(0, rad, 1 - easeOutQuad(track.timeLeft / track.duration)), 2 * pi);
 		);
 		
 		
