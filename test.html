@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>Egdod test</title>
     <script type="text/javascript" src="Cindy.js"></script>
+    <script src="CCapture.all.min.js"></script>
 </head>
 
 <body style="font-family:Palatino; margin:0; font-size:16pt">
@@ -139,6 +140,8 @@ animationTrack7.running = true;
 animationTrack8.running = true;
 runAnimationCascade(cascade1);
 runAnimationCascade(cascade2);
+
+javascript("capturer.start();");
 </script>
 <script src="egdodColor.js" data-scriptid="init"></script>
 <script src="egdodArray.js" data-scriptid="init"></script>
@@ -151,8 +154,8 @@ runAnimationCascade(cascade2);
 
 
 <script id='draw' type='text/x-cindyscript'>
-drawButton(startButton);
-
+  drawButton(startButton);
+  
   drawTextObject(text1);
   
   drawGrid(testGrid);
@@ -160,11 +163,13 @@ drawButton(startButton);
   drawLineObject(axisY);
   
   drawGraphObject(graph1);
-
+  
   drawStrokeObject(testCircle);
   //drawStrokeObject(testQuadrangle);
-
+  
   drawFlipbookObject(runner);
+  
+  javascript(" capturer.capture( CSCanvas ); ");
 </script>
 
 
@@ -183,41 +188,41 @@ drawButton(startButton);
   updateAnimationCascade(cascade2, delta);
   
   tween(text1, "percentVisible", 0, 1, animationTrack1);
-
+  
   animateFlipbook(runner, animationTrack5);
-
-
+  
+  
   constructLineObject(axisX, origin + [1.1 * graphSize, 0], 3, true, animationTrack2);
   constructLineObject(axisY, origin + [0, 1.1 * graphSize], 3, true, animationTrack3);
   constructGrid(testGrid, graphSize, graphSize, 1, false, cascade2, cascade1);
   tween(graph1, "stop", 0, 1, animationTrack4, "EaseInOutQuad");
-
-//  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
-
-
-
+  
+  //  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
+  
+  
+  
   constructStrokeDraw(testCircle, 4, animationTrack6);
   
   tween(testCircle, "stroke", circleStroke, triStroke, animationTrack7, "easeInOutQuad");
   tween(testCircle, "pos", circlePos, triPos, animationTrack7, "easeInOutQuad");
   tween(testCircle, "lineColor", toolColor("grey"), toolcolor("green"), animationTrack7);
   tween(testCircle, "fillColor", toolColor("grey"), toolcolor("green"), animationTrack7);
-
+  
   if(trackStarted(animationTrack8),
-    testCircle.stroke = apply(testCircle.stroke, rotation(delta * pi) * #);
+  testCircle.stroke = apply(testCircle.stroke, rotation(delta * pi) * #);
   );
 </script>
 
 
 
 <script id='mouse_down' type='text/x-cindyscript'>
-if(mouseInButton(startButton),
-startButton.pressed = true;
-
-playanimation();
-setupTime();
-);  
-
+  if(mouseInButton(startButton),
+  startButton.pressed = true;
+  
+  playanimation();
+  setupTime();
+  );  
+  
 </script>
 
 <script id='mouse_drag' type='text/x-cindyscript'>
@@ -234,25 +239,31 @@ setupTime();
 
 
 <script>
+var capturer = new CCapture( { format: 'gif', workersPath: '' } );
 
+  document.addEventListener('keydown', function(event) {
+  if(event.code == "Space") {
+      capturer.stop();
+      capturer.save();
+  }
+})
 </script>
 
 <script>
-
-    cindy = createCindy({canvasname:"CSCanvas",
-                 drawscript:"draw",
-                 initscript:"init",
-                 mousedownscript:"mouse_down",
-                 mousedragscript:"mouse_drag",
-                 mouseupscript:"mouse_up",
-                 tickscript:"tick",
-                 images: {
-		                runner1: "runner_1.jpg",
-		                runner2: "runner_2.jpg",
-		                runner3: "runner_3.jpg",
-	               }
-                });
-
+  cindy = createCindy({canvasname:"CSCanvas",
+                drawscript:"draw",
+                initscript:"init",
+                mousedownscript:"mouse_down",
+                mousedragscript:"mouse_drag",
+                mouseupscript:"mouse_up",
+                tickscript:"tick",
+                images: {
+                   runner1: "runner_1.jpg",
+                   runner2: "runner_2.jpg",
+                   runner3: "runner_3.jpg",
+                }
+               });
+  
 </script>
 
 
