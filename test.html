@@ -33,7 +33,7 @@ startButton = {
   "size":     [2.5, 1.5],
   "label":    "play",
   "textSize": 20,
-  "colors":   (apply(0..2, toolColor("blue", 1 - #))),
+  "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
   "corner":   0.4,
   "pressed":  false
 };
@@ -49,7 +49,7 @@ startButton = {
 
 
 circlePos = canvascenter +  [-10, 3];
-testCircle = 	createRootStrokeObject(circlePos, toolColor("grey"), toolColor("grey"), 0.5);
+testCircle = 	createRootStrokeObject(circlePos, aliceColor("grey"), aliceColor("grey"), 0.5);
 circleStroke = sampleCircle(2, 2 * pi);
 testCircle.stroke = circleStroke;
 
@@ -58,7 +58,7 @@ triStroke = samplePolygon(triPoly);
 triPos = circlePos + [0, -8];
 
 
-testQuadrangle = 	createRootStrokeObject(canvascenter +  [3, -8], toolColor("blue"), toolColor("blue"), 0.5);
+testQuadrangle = 	createRootStrokeObject(canvascenter +  [3, -8], aliceColor("blue"), aliceColor("blue"), 0.5);
 quadPoly = [(1, 2), (-3, 3), (-5, -1), (2, -2)];
 testQuadrangle.stroke = samplePolygon(quadPoly);
 
@@ -70,14 +70,14 @@ text1 = {
   "text":           "This is just a test.",
   "percentVisible": 0,
   "size":           30,
-  "color":          toolColor("blue"),
+  "color":          aliceColor("blue"),
   "align":          "left"
 };
 
 
 
 runner = {
-  "pos":   canvascenter +  [3, -8],
+  "pos":   canvascenter +  [0, -8],
   "scale": 5,
   "flipbook": ["runner1", "runner2", "runner3", "runner2"],
   "index": 1
@@ -99,7 +99,7 @@ graph1 = {
 	"scale":    graphSize,
 	"start":    0,
 	"stop":     0,
-	"color":    toolColor("red"),
+	"color":    aliceColor("red"),
 	"lineSize": 5
 };
 
@@ -114,7 +114,7 @@ axisY = createRootLineObject(origin + (0, -0.05*graphSize), (0.2, 0.2, 0.2));
 
 
 animationTrack1 = setupAnimationTrack(0, 1);
-animationTrack5 = setupAnimationTrack(0, 0.7); animationTrack5.looping = true;
+animationTrack5 = setupAnimationTrack(0, 0.7); //animationTrack5.looping = true;
 
 
 animationTrack2 = setupAnimationTrack(1, 2);
@@ -141,7 +141,7 @@ animationTrack8.running = true;
 runAnimationCascade(cascade1);
 runAnimationCascade(cascade2);
 
-javascript("capturer.start();");
+//javascript("capturer.start();");
 </script>
 <script src="egdodColor.js" data-scriptid="init"></script>
 <script src="egdodArray.js" data-scriptid="init"></script>
@@ -165,11 +165,11 @@ javascript("capturer.start();");
   drawGraphObject(graph1);
   
   drawStrokeObject(testCircle);
-  //drawStrokeObject(testQuadrangle);
+  drawStrokeObject(testQuadrangle);
   
-  drawFlipbookObject(runner);
+  //drawFlipbookObject(runner);
   
-  javascript(" capturer.capture( CSCanvas ); ");
+  //javascript(" capturer.capture( CSCanvas ); ");
 </script>
 
 
@@ -189,24 +189,24 @@ javascript("capturer.start();");
   
   tween(text1, "percentVisible", 0, 1, animationTrack1);
   
-  animateFlipbook(runner, animationTrack5);
-  
+  //animateFlipbook(runner, animationTrack5);
+  //tween(runner, "pos", canvascenter +  [0, -8], canvascenter +  [5, -8], animationTrack5);
   
   constructLineObject(axisX, origin + [1.1 * graphSize, 0], 3, true, animationTrack2);
   constructLineObject(axisY, origin + [0, 1.1 * graphSize], 3, true, animationTrack3);
   constructGrid(testGrid, graphSize, graphSize, 1, false, cascade2, cascade1);
   tween(graph1, "stop", 0, 1, animationTrack4, "EaseInOutQuad");
   
-  //  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
+  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
   
   
   
-  constructStrokeDraw(testCircle, 4, animationTrack6);
+  constructStrokeDraw(te  stCircle, 4, animationTrack6);
   
   tween(testCircle, "stroke", circleStroke, triStroke, animationTrack7, "easeInOutQuad");
   tween(testCircle, "pos", circlePos, triPos, animationTrack7, "easeInOutQuad");
-  tween(testCircle, "lineColor", toolColor("grey"), toolcolor("green"), animationTrack7);
-  tween(testCircle, "fillColor", toolColor("grey"), toolcolor("green"), animationTrack7);
+  tween(testCircle, "lineColor", aliceColor("grey"), alicecolor("green"), animationTrack7);
+  tween(testCircle, "fillColor", aliceColor("grey"), alicecolor("green"), animationTrack7);
   
   if(trackStarted(animationTrack8),
   testCircle.stroke = apply(testCircle.stroke, rotation(delta * pi) * #);
