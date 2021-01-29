@@ -174,7 +174,6 @@
 	// ************************************************************************************************
 	// Rendering various animation objects.
 	// ************************************************************************************************
-	// ************************************************************************************************
 	// Text objects needs
 	// x
 	// y
@@ -224,15 +223,28 @@
 	// lineSize
 	// fillColor
 	// fillAlpha
+	// arrow
+	// arrowSize
 	// ************************************************************************************************
 	drawStrokeObject(obj) := (
 		regional(absoluteStroke, ratio);
 		absoluteStroke = apply(obj.stroke, obj.pos + #);
-		ratio = 1..round(obj.drawPercent * length(absoluteStroke));
+		ratio = 1..ceil(obj.drawPercent * length(absoluteStroke));
 		fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
 		connect(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor);
-		//drawall(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor);
+		if(obj.arrow & length(ratio) > 3, connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.arrowSize), size->obj.lineSize, color->obj.lineColor));
 	);
+	arrowTipAngleEABOW = pi/ 6;
+	arrowTip(tipPos, dir, size) := (
+		if(abs(dir) > 0, dir = dir / abs(dir));
+
+		[
+			tipPos - size * rotation(arrowTipAngleEABOW) * dir,
+			tipPos,
+			tipPos - size * rotation(-arrowTipAngleEABOW) * dir
+		];		
+	);
+
 
 	// ************************************************************************************************
 	// Flipbook object needs
@@ -352,7 +364,9 @@
 		"lineSize": 0,
 		"lineColor": lineColor,
 		"fillColor": fillColor,
-		"fillAlpha": fillAlpha
+		"fillAlpha": fillAlpha,
+		"arrow": false,
+		"arrowSize": 0
 	};
 	
 	// ************************************************************************************************
@@ -395,12 +409,46 @@
 		
 	);
 		
+
+	// ************************************************************************************************
+	// Creates stroke as Bezier curves.
+	// ************************************************************************************************
+	sampleBezierLin(a, b) := (
+		regional(t);
+		apply(0..strokeSampleRateEABOW - 1, 
+			t = # / (strokeSampleRateEABOW - 1);
+
+			t*b + (1-t)*a;
+		);
+	);
+	sampleBezierQuad(a, b, c) := (
+		regional(t);
+		apply(0..strokeSampleRateEABOW - 1, 
+			t = # / (strokeSampleRateEABOW - 1);
+
+			t^2*c + 2*t*(1-t)*b + (1-t)^2*a;
+		);
+	);
+	sampleBezierCube(a, b, c, d) := (
+		regional(t);
+		apply(0..strokeSampleRateEABOW - 1, 
+			t = # / (strokeSampleRateEABOW - 1);
+
+			t^3*d + 3*t^2*(1-t)*c + 3*t*(1-t)^2*b + (1-t)^3*a;
+		);
+	);
+
+
+
 	// ************************************************************************************************
 	// Draws a stroke object as a stroke.
 	// ************************************************************************************************
-	constructStrokeDraw(obj, lineSize, track) := (
+	constructStrokeDraw(obj, lineSize, arrowSize, track) := (
 		tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
 		tween(obj, "drawPercent", 0, 1, track, "easeInOutCubic");
+		if(obj.arrow,
+			tween(obj, "arrowSize", 0, arrowSize, track);	
+		);
 	);
 
 	// ************************************************************************************************
