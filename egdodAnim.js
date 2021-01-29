@@ -198,7 +198,7 @@
 	// lineSize
 	// ************************************************************************************************
 	drawGraphObject(obj) := (
-		plot(parse(obj.pos.y + " + " + obj.scale + " * " + obj.name + "((x - " + obj.pos.x + ") / " + obj.scale + ")"), x, start->obj.pos.x + obj.start * obj.scale, stop->obj.pos.x + obj.stop * obj.scale, color->obj.color, size->obj.lineSize);
+		plot(parse(obj.pos.y + " + " + obj.scale + " * " + obj.name + "((x + " + (-obj.pos.x) + ") / " + obj.scale + ")"), x, start->obj.pos.x + obj.start * obj.scale, stop->obj.pos.x + obj.stop * obj.scale, color->obj.color, size->obj.lineSize);
 	);
 
 	// ************************************************************************************************
