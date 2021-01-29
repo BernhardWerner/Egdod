@@ -388,10 +388,14 @@
 	// ************************************************************************************************
 	// Creates stroke around a polygon.
 	// ************************************************************************************************
-	samplePolygon(poly) := (
+	samplePolygon(poly, closed) := (
 		regional(pairs, dists, totalDist, effectiveNumber, splitNumbers, stepSize);
 		
-		pairs = cycle(poly);
+		if(closed, 
+			pairs = cycle(poly);
+		, // else //
+			pairs = consecutive(poly);
+		);
 		
 		dists = apply(pairs, dist(#_1, #_2));
 		totalDist = sum(dists);
@@ -405,7 +409,7 @@
 
 		splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers);
 		
-		flatten(apply(1..length(pairs), pairs_#_1 <: subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_#))) :> poly_1;
+		flatten(apply(1..length(pairs), pairs_#_1 <: subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_#))) ++ if(closed, [poly_1], []);
 		
 	);
 		
