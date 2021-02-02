@@ -106,7 +106,7 @@
 		"end":      e,
 		"duration": e - s,
 		"timeLeft": e - s,
-		"running":  false,
+		"running":  true,
 		"looping":  false
 	}; 
 
