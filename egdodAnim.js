@@ -187,19 +187,6 @@
 	);
 
 
-	// ************************************************************************************************
-	// Graph object needs
-	// name // has to name of separate function; can't use lambda expressions
-	// pos
-	// scale
-	// start
-	// stop
-	// color
-	// lineSize
-	// ************************************************************************************************
-	drawGraphObject(obj) := (
-		plot(parse(obj.pos.y + " + " + obj.scale + " * " + obj.name + "((x + " + (-obj.pos.x) + ") / " + obj.scale + ")"), x, start->obj.pos.x + obj.start * obj.scale, stop->obj.pos.x + obj.stop * obj.scale, color->obj.color, size->obj.lineSize);
-	);
 
 	// ************************************************************************************************
 	// Line object needs
@@ -353,7 +340,7 @@
 		
 		
 		
-	strokeSampleRateEABOW = 64;
+	strokeSampleRateEABOW = 256;
 	// ************************************************************************************************
 	// Setting up a stroke object.
 	// ************************************************************************************************
@@ -410,8 +397,8 @@
 		splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers);
 		
 		flatten(apply(1..length(pairs), pairs_#_1 <: subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_#))) ++ if(closed, [poly_1], []);
-		
 	);
+	samplePolygon(poly) := 	samplePolygon(poly, true);
 		
 
 	// ************************************************************************************************
@@ -443,6 +430,17 @@
 	);
 
 
+	// ************************************************************************************************
+	// Creates a stroke based on a function graph.
+	// ************************************************************************************************
+	sampleFunctionGraph(func, start, end) := (
+		apply(0..strokeSampleRateEABOW-1,
+			t = lerp(start, end, #, 0, strokeSampleRateEABOW-1);
+
+			(t, parse(func + "(" + t + ")"));	
+		);
+	);
+
 
 	// ************************************************************************************************
 	// Draws a stroke object as a stroke.
@@ -461,7 +459,7 @@
 	constructCircleGrow(obj, rad, lineSize, track) := (
 		tween(obj, "lineSize", 0, lineSize, track);
 		obj.stroke = sampleCircle(lerp(0, rad, 1 - easeOutQuad(track.timeLeft / track.duration)), 2 * pi);
-		);
+	);
 		
 		
 	

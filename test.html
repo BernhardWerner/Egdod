@@ -37,110 +37,20 @@ startButton = {
   "pressed":  false
 };
 
+origin = canvascenter + [-3, -3];
+
+function(x) := x^2;
+
+testGraph = createRootStrokeObject(origin, aliceColor("blue"), aliceColor("blue"), 0);
+testGraph.arrow = true;
+testGraph.stroke = sampleCircle(2, 2*pi);
+testGraph.stroke = sampleFunctionGraph("function", -2, 3);
 
 
 
 
+animationTrack1 = setupAnimationTrack(0, 3);
 
-
-
-
-
-
-circlePos = canvascenter +  [-10, 3];
-testCircle = 	createRootStrokeObject(circlePos, aliceColor("grey"), aliceColor("grey"), 0.5);
-circleStroke = sampleCircle(2, 2 * pi);
-testCircle.stroke = circleStroke;
-
-triPoly = [(2, 0), (2, 3), (-3, 0)];
-triStroke = samplePolygon(triPoly);
-triPos = circlePos + [0, -8];
-
-
-testQuadrangle = 	createRootStrokeObject(canvascenter +  [3, -8], aliceColor("blue"), aliceColor("blue"), 0.5);
-quadPoly = [(1, 2), (-3, 3), (-5, -1), (2, -2)];
-testQuadrangle.stroke = samplePolygon(quadPoly);
-
-
-
-
-text1 = {
-  "pos":            canvascorners_1 + [1, -2],
-  "text":           "This is $x^2$ a test.",
-  "percentVisible": 0,
-  "size":           30,
-  "color":          aliceColor("blue"),
-  "align":          "left"
-};
-
-
-
-runner = {
-  "pos":   canvascenter +  [0, -8],
-  "scale": 5,
-  "flipbook": ["runner1", "runner2", "runner3", "runner2"],
-  "index": 1
-};
-
-
-
-
-origin = canvascenter + [-5, -3];
-graphSize = 12;
-
-func1(x) := 0.3 * sin(10 * x) + (x^2);
-func2(x) := easeInOutElastic(x);
-func3(x) := x^2;
-
-graph1 = {
-  "name":     "func1",
-  "pos":        origin,
-	"scale":    graphSize,
-	"start":    0,
-	"stop":     0,
-	"color":    aliceColor("red"),
-	"lineSize": 5
-};
-
-
-
-vNumber = 8;
-hNumber = 8;
-testGrid = createRootGrid(origin, -0.03 * graphSize, -0.03 * graphSize, hNumber, vNumber, graphSize/vNumber, graphSize/hNumber, (0.6, 0.6, 0.6));
-axisX = createRootLineObject(origin + (-0.05*graphSize, 0), (0.2, 0.2, 0.2));
-axisY = createRootLineObject(origin + (0, -0.05*graphSize), (0.2, 0.2, 0.2));
-
-
-
-animationTrack1 = setupAnimationTrack(0, 1);
-animationTrack5 = setupAnimationTrack(0, 0.7); //animationTrack5.looping = true;
-
-
-animationTrack2 = setupAnimationTrack(1, 2);
-animationTrack3 = setupAnimationTrack(1.5, 2.5);
-cascade1 = setupAnimationCascade(vNumber, 2, 1, 0.1);
-cascade2 = setupAnimationCascade(hNumber, 2.5, 1, 0.1);
-animationTrack4 = setupAnimationTrack(4, 5);
-animationTrack6 = setupAnimationTrack(6, 7);
-animationTrack7 = setupAnimationTrack(7, 9);
-animationTrack8 = setupAnimationTrack(9, 11);
-animationTrack8.looping = true;
-
-
-
-
-animationTrack1.running = true;
-animationTrack2.running = true;
-animationTrack3.running = true;
-animationTrack4.running = true;
-animationTrack5.running = true;
-animationTrack6.running = true;
-animationTrack7.running = true;
-animationTrack8.running = true;
-runAnimationCascade(cascade1);
-runAnimationCascade(cascade2);
-
-//javascript("capturer.start();");
 </script>
 <script src="egdodColor.js" data-scriptid="init"></script>
 <script src="egdodArray.js" data-scriptid="init"></script>
@@ -155,20 +65,7 @@ runAnimationCascade(cascade2);
 <script id='draw' type='text/x-cindyscript'>
   drawButton(startButton);
   
-  drawTextObject(text1);
-  
-  drawGrid(testGrid);
-  drawLineObject(axisX);
-  drawLineObject(axisY);
-  
-  drawGraphObject(graph1);
-  
-  drawStrokeObject(testCircle);
-  drawStrokeObject(testQuadrangle);
-  
-  //drawFlipbookObject(runner);
-  
-  //javascript(" capturer.capture( CSCanvas ); ");
+drawStrokeObject(testGraph);
 </script>
 
 
@@ -176,40 +73,8 @@ runAnimationCascade(cascade2);
 <script id='tick' type='text/x-cindyscript'>
   delta = deltaTime();
   updateAnimationTrack(animationTrack1, delta);
-  updateAnimationTrack(animationTrack2, delta);
-  updateAnimationTrack(animationTrack3, delta);
-  updateAnimationTrack(animationTrack4, delta);
-  updateAnimationTrack(animationTrack5, delta);
-  updateAnimationTrack(animationTrack6, delta);
-  updateAnimationTrack(animationTrack7, delta);
-  updateAnimationTrack(animationTrack8, delta);
-  updateAnimationCascade(cascade1, delta);
-  updateAnimationCascade(cascade2, delta);
-  
-  tween(text1, "percentVisible", 0, 1, animationTrack1);
-  
-  //animateFlipbook(runner, animationTrack5);
-  //tween(runner, "pos", canvascenter +  [0, -8], canvascenter +  [5, -8], animationTrack5);
-  
-  constructLineObject(axisX, origin + [1.1 * graphSize, 0], 3, true, animationTrack2);
-  constructLineObject(axisY, origin + [0, 1.1 * graphSize], 3, true, animationTrack3);
-  constructGrid(testGrid, graphSize, graphSize, 1, false, cascade2, cascade1);
-  tween(graph1, "stop", 0, 1, animationTrack4, "EaseInOutQuad");
-  
-  constructStrokeDraw(testQuadrangle, 4, animationTrack5);
-  
-  
-  
-  constructStrokeDraw(te  stCircle, 4, animationTrack6);
-  
-  tween(testCircle, "stroke", circleStroke, triStroke, animationTrack7, "easeInOutQuad");
-  tween(testCircle, "pos", circlePos, triPos, animationTrack7, "easeInOutQuad");
-  tween(testCircle, "lineColor", aliceColor("grey"), alicecolor("green"), animationTrack7);
-  tween(testCircle, "fillColor", aliceColor("grey"), alicecolor("green"), animationTrack7);
-  
-  if(trackStarted(animationTrack8),
-  testCircle.stroke = apply(testCircle.stroke, rotation(delta * pi) * #);
-  );
+
+  constructStrokeDraw(testGraph, 5, 0.5, animationTrack1);  
 </script>
 
 
@@ -237,16 +102,6 @@ runAnimationCascade(cascade2);
 
 
 
-<script>
-var capturer = new CCapture( { format: 'gif', workersPath: '' } );
-
-  document.addEventListener('keydown', function(event) {
-  if(event.code == "Space") {
-      capturer.stop();
-      capturer.save();
-  }
-})
-</script>
 
 <script>
   cindy = createCindy({canvasname:"CSCanvas",
