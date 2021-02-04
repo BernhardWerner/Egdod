@@ -47,9 +47,14 @@ testGraph.stroke = sampleCircle(2, 2*pi);
 testGraph.stroke = sampleFunctionGraph("function", -2, 3);
 
 
+testLine = createRootStrokeObject(origin + [-3, -2], aliceColor("red"), aliceColor("red"), 0);
+testLineOldStroke = sampleBezierLin([0,0], [7,2]);
+testLineNewStroke = sampleBezierCube([0,0], [1,2], [4, 0], [7,2]);
+testLine.stroke = testLineOldStroke;
+testLine.arrow = true;
 
-
-animationTrack1 = setupAnimationTrack(0, 3);
+animationTrack1 = setupAnimationTrack(0, 1);
+animationTrack2 = setupAnimationTrack(1, 2);
 
 </script>
 <script src="egdodColor.js" data-scriptid="init"></script>
@@ -63,9 +68,10 @@ animationTrack1 = setupAnimationTrack(0, 3);
 
 
 <script id='draw' type='text/x-cindyscript'>
-  drawButton(startButton);
+drawButton(startButton);
   
 drawStrokeObject(testGraph);
+drawStrokeObject(testLine);
 </script>
 
 
@@ -73,8 +79,11 @@ drawStrokeObject(testGraph);
 <script id='tick' type='text/x-cindyscript'>
   delta = deltaTime();
   updateAnimationTrack(animationTrack1, delta);
+  updateAnimationTrack(animationTrack2, delta);
 
   constructStrokeDraw(testGraph, 5, 0.5, animationTrack1);  
+  constructStrokeDraw(testLine, 5, 0.5, animationTrack1);  
+  tween(testLine, "stroke",testLineOldStroke, testLineNewStroke, animationTrack2);
 </script>
 
 
