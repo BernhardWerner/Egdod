@@ -54,24 +54,25 @@
 		// ************************************************************************************************
 		// Draws and handles button. They have to be a JSON with the following keys and value-types:
 		// button = {
-		//   "position": (2D vector),
-		//   "size":     (2D vector),
-		//   "label":    (String),
-		//   "textSize": (float),
-		//   "colors":   (array with 3 colour vectors),
-		//   "corner":   (float),
-		//   "pressed":  (bool)
+		//   "position":   (2D vector),
+		//   "size":       (2D vector),
+		//   "label":      (String),
+		//   "textSize":   (float),
+		//   "colors":     (array with 3 colour vectors),
+		//   "corner":     (float),
+		//   "pressed":    (bool),
+		//   "fontFamily": (String)
 		// };
 		// ************************************************************************************************
 		drawButton(button) := (
 		    if(button.pressed,
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y), button.size.x, button.size.y, button.corner), color -> (button.colors)_2);
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y) + (0, -0.2), button.size.x, button.size.y, button.corner), color -> (button.colors)_1);
-		            drawtext(button.position + (0, -0.6 * button.textSize / 35) + (0, -0.2), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true);
+		            drawtext(button.position + (0, -0.6 * button.textSize / 35) + (0, -0.2), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
 		    , // else //
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y) + (0, -0.2), button.size.x, button.size.y, button.corner), color -> (button.colors)_3);
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y), button.size_1, button.size_2, button.corner), color -> (button.colors)_2);
-		        drawtext(button.position + (0, -0.6 * button.textSize / 35), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true);
+		        drawtext(button.position + (0, -0.6 * button.textSize / 35), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
 		    );
 		);
 
@@ -93,11 +94,11 @@
 		// *************************************************************************************************
 		// Draws text with border.
 		// *************************************************************************************************
-		drawwithborder(pos, txt, size, align, color, bordercolor, bordersize) := (
+		drawwithborder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
 		  forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
-		         drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align);
+		         drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align, family -> family);
 		        );
-		  drawtext(pos, txt, color -> color, size -> size, align -> align);
+		  drawtext(pos, txt, color -> color, size -> size, align -> align, family -> family);
 		);
 
 
@@ -147,7 +148,8 @@
 		//   "endLabel":    (string),
 		//   "labelSize":   (float),
 		//   "value":       (float),
-		//   "bulbSize":    (float)
+		//   "bulbSize":    (float),
+		//   "fontFamily":  (string)
 		// };
 		// *************************************************************************************************
 		sliderEnds(slider) := [slider.position, slider.position + if(slider.vertical, [0, -slider.length], [slider.length, 0])];
@@ -171,8 +173,8 @@
 		  , // else //
 		    [1.2 * slider.bulbSize, -0.015 * slider.labelSize];
 		  );
-		  drawtext(endPoints_1 + startOffset, slider.startLabel, align -> if(slider.vertical, "mid", "right"), size -> slider.labelSize);
-		  drawtext(endPoints_2 + endOffset,   slider.endLabel,   align -> if(slider.vertical, "mid", "left"),   size -> slider.labelSize);
+		  drawtext(endPoints_1 + startOffset, slider.startLabel, align -> if(slider.vertical, "mid", "right"), size -> slider.labelSize, slider.fontfamily);
+		  drawtext(endPoints_2 + endOffset,   slider.endLabel,   align -> if(slider.vertical, "mid", "left"),   size -> slider.labelSize, slider.fontfamily);
 		);
 
 		catchSlider(slider) := (
@@ -200,7 +202,8 @@
 		//   "textSize":    (float),
 		//   "content":			(array),
 		//   "index":       (int),
-		//   "bulbSize":    (float)
+		//   "bulbSize":    (float),
+		//   "fontFamily":  (String)
 		// };
 		// *************************************************************************************************
 		drawSelector(selector) := (
@@ -213,7 +216,7 @@
 		  fillcircle(lerp(endPoints_1, endPoints_2, selector.index, 1, length(selector.content)), 0.7 * selector.bulbSize, color -> (1,1,1));
 
 			forall(1..length(selector.content),
-		    drawwithborder(lerp(endPoints_1, endPoints_2, #, 1, length(selector.content)) + (0, -0.015 * selector.textSize), selector.content_#, selector.textSize, "mid", [0,0,0], [1,1,1], 2);
+		    drawwithborder(lerp(endPoints_1, endPoints_2, #, 1, length(selector.content)) + (0, -0.015 * selector.textSize), selector.content_#, selector.textSize, "mid", [0,0,0], [1,1,1], 2, selector.fontFamily);
 		  );
 
 		);

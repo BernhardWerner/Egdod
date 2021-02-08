@@ -175,15 +175,15 @@
 	// Rendering various animation objects.
 	// ************************************************************************************************
 	// Text objects needs
-	// x
-	// y
+	// pos
 	// text
 	// percentVisible
 	// size
 	// color 
+	// fontFamily
 	// ************************************************************************************************
 	drawTextObject(obj) := (
-		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align);
+		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily);
 	);
 
 

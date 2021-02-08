@@ -37,6 +37,18 @@ startButton = {
   "pressed":  false
 };
 
+
+
+testText = {
+  "pos": canvascorners_1 + (1,-3),
+  "text": "We want $\frac{\lvert A,C\rvert\cdot\lvert B,D\rvert}{\lvert A,D\rvert\cdot\lvert B,C\rvert}$",
+  "percentVisible": 100,
+  "size": 30,
+  "color": (0,0,0),
+  "fontfamily": "Palatino"
+};
+
+
 origin = canvascenter + [-3, -3];
 
 function(x) := x^2;
@@ -72,6 +84,7 @@ drawButton(startButton);
   
 drawStrokeObject(testGraph);
 drawStrokeObject(testLine);
+drawTextObject(testText);
 </script>
 
 
