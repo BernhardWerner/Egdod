@@ -39,11 +39,14 @@ startButton = {
 
 
 
+startTime = seconds();
+
 
 createimage("background", 800, 800);
 
+
 backgroundShader(uv) := (
-  perlinNoise(10 * uv);
+  voronoiNoise(10 * uv + (seconds() - startTime) * [1,-2]);
 );
 
 
@@ -81,6 +84,7 @@ animationTrack2 = setupAnimationTrack(1, 2);
 
 <script id='draw' type='text/x-cindyscript'>
 colorplot((0,0), (1,0), "background", backgroundShader(#));
+repaint();
 drawimage(canvascorners_4, canvascorners_4 + (24,0), "background");
 
 

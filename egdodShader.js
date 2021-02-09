@@ -22,13 +22,12 @@
 
 		randomGradient(pos) := [2 * fract(sin(pos * (127.1,311.7)) * 43758.5453) - 1, 
 			                    2 * fract(sin(pos * (269.5,183.3)) * 43758.5453) - 1 ];
+		randomPoint(pos) := [fract(sin(pos * (127.1,311.7)) * 43758.5453), 
+							 fract(sin(pos * (269.5,183.3)) * 43758.5453) ];
 
 		// *************************************************************************************************
-		// Gives random smooth noise based on a point in the plane.
+		// Gives random gradient noise based on a point in the plane.
 		// *************************************************************************************************
-		perlinNoise(coords, octaves, persistence, lactunarity) := (
-
-		);
 		perlinNoise(coords) := (
 			regional(iPoint, fPoint);
 			
@@ -46,8 +45,33 @@
 					smoothstep(fPoint.x)),
 				smoothstep(fPoint.y)) + 0.5;
 		);
+		perlinNoiseOctaves(coords) := (
+			sum(apply(0..2, pow(0.5, #) * perlinNoise(pow(2, #) * coords))) / 1.75;
+		);
 
-		
+		// *************************************************************************************************
+		// Gives noise based on Voronoi decomposition.
+		// *************************************************************************************************
+		voronoiNoise(coords) := (
+			regional(iPoint, mDist, neighbours, currDist);
+
+			iPoint = [floor(coords.x), floor(coords.y)];
+			fPoint = [fract(coords.x), fract(coords.y)];
+
+			neighbours = directproduct(-1..1, -1..1);
+
+			mDist = 1.5;
+
+			forall(neighbours,
+				currDist = dist(coords, iPoint + # + randomPoint(iPoint + #));	
+				if(currDist < mDist,
+					mDist = currDist;
+				);
+			);
+
+			mDist;
+
+		);
 
 
 `);
