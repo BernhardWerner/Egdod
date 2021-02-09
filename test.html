@@ -42,11 +42,33 @@ startButton = {
 testText = {
   "pos": canvascorners_1 + (1,-3),
   "text": "We want $\frac{\lvert A,C\rvert\cdot\lvert B,D\rvert}{\lvert A,D\rvert\cdot\lvert B,C\rvert}$",
-  "percentVisible": 100,
+  "percentVisible": 1,
   "size": 30,
   "color": (0,0,0),
-  "fontfamily": "Palatino"
+  "fontFamily": "Cambria Math",
+  "align": "left"
 };
+
+obfuscateColor = aliceColor("blue");
+
+obY = 0.4;
+obW = 9.1;
+obH = 2.4;
+obfuscateRect = {
+  "pos": testText.pos,
+  "stroke": expandrect((obW, obY), 6, obW, obH),
+  "drawPercent": 1,
+  "lineColor": (1,1,1),
+  "lineSize": 1,
+  "fillColor": (1,1,1),
+  "fillAlpha": 1,
+  "arrow": false,
+  "arrowSize": 0
+};
+
+
+
+
 
 
 origin = canvascenter + [-3, -3];
@@ -65,7 +87,7 @@ testLineNewStroke = sampleBezierCube([0,0], [1,2], [4, 0], [7,2]);
 testLine.stroke = testLineOldStroke;
 testLine.arrow = true;
 
-animationTrack1 = setupAnimationTrack(0, 1);
+animationTrack1 = setupAnimationTrack(0, 2);
 animationTrack2 = setupAnimationTrack(1, 2);
 
 </script>
@@ -82,9 +104,10 @@ animationTrack2 = setupAnimationTrack(1, 2);
 <script id='draw' type='text/x-cindyscript'>
 drawButton(startButton);
   
-drawStrokeObject(testGraph);
-drawStrokeObject(testLine);
+//drawStrokeObject(testGraph);
+//drawStrokeObject(testLine);
 drawTextObject(testText);
+drawStrokeObject(obfuscateRect);
 </script>
 
 
@@ -94,9 +117,14 @@ drawTextObject(testText);
   updateAnimationTrack(animationTrack1, delta);
   updateAnimationTrack(animationTrack2, delta);
 
+  tween(obfuscateRect, "stroke", expandrect((obW, obY), 6, obW, obH), expandrect((obW, obY), 6, 0, obH), animationTrack1, "easeInOutCubic");
+
   constructStrokeDraw(testGraph, 5, 0.5, animationTrack1);  
   constructStrokeDraw(testLine, 5, 0.5, animationTrack1);  
+  
   tween(testLine, "stroke",testLineOldStroke, testLineNewStroke, animationTrack2);
+
+
 </script>
 
 

@@ -181,9 +181,10 @@
 	// size
 	// color 
 	// fontFamily
+	// align
 	// ************************************************************************************************
 	drawTextObject(obj) := (
-		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily);
+		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily, align->obj.align);
 	);
 
 
