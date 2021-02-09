@@ -39,33 +39,15 @@ startButton = {
 
 
 
-testText = {
-  "pos": canvascorners_1 + (1,-3),
-  "text": "We want $\frac{\lvert A,C\rvert\cdot\lvert B,D\rvert}{\lvert A,D\rvert\cdot\lvert B,C\rvert}$",
-  "percentVisible": 1,
-  "size": 30,
-  "color": (0,0,0),
-  "fontFamily": "Cambria Math",
-  "align": "left"
-};
 
-obfuscateColor = aliceColor("blue");
+createimage("background", 800, 800);
 
-obY = 0.4;
-obW = 9.1;
-obH = 2.4;
-obfuscateRect = {
-  "pos": testText.pos,
-  "stroke": expandrect((obW, obY), 6, obW, obH),
-  "drawPercent": 1,
-  "lineColor": (1,1,1),
-  "lineSize": 1,
-  "fillColor": (1,1,1),
-  "fillAlpha": 1,
-  "arrow": false,
-  "arrowSize": 0
-};
+backgroundShader(uv) := (
+  perlinNoise(30 * uv);
+);
 
+
+println(randomGradient([3,4]));
 
 
 
@@ -96,18 +78,22 @@ animationTrack2 = setupAnimationTrack(1, 2);
 <script src="egdodUI.js" data-scriptid="init"></script>
 <script src="egdodMath.js" data-scriptid="init"></script>
 <script src="egdodAnim.js" data-scriptid="init"></script>
+<script src="egdodShader.js" data-scriptid="init"></script>
 
 
 
 
 
 <script id='draw' type='text/x-cindyscript'>
+colorplot((0,0), (1,0), "background", backgroundShader(#));
+drawimage(canvascorners_4, canvascorners_4 + (20,0), "background");
+
+
 drawButton(startButton);
   
 //drawStrokeObject(testGraph);
 //drawStrokeObject(testLine);
-drawTextObject(testText);
-drawStrokeObject(obfuscateRect);
+
 </script>
 
 
@@ -117,7 +103,6 @@ drawStrokeObject(obfuscateRect);
   updateAnimationTrack(animationTrack1, delta);
   updateAnimationTrack(animationTrack2, delta);
 
-  tween(obfuscateRect, "stroke", expandrect((obW, obY), 6, obW, obH), expandrect((obW, obY), 6, 0, obH), animationTrack1, "easeInOutCubic");
 
   constructStrokeDraw(testGraph, 5, 0.5, animationTrack1);  
   constructStrokeDraw(testLine, 5, 0.5, animationTrack1);  
@@ -146,7 +131,7 @@ drawStrokeObject(obfuscateRect);
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:0px solid #000000;">
+<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:2px solid #000000;">
 <canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="z-index: 2; position:absolute; left: 0px; top: 0px"></canvas>
 </div>
 
