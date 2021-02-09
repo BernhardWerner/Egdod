@@ -43,13 +43,8 @@ startButton = {
 createimage("background", 800, 800);
 
 backgroundShader(uv) := (
-  perlinNoise(30 * uv);
+  perlinNoise(10 * uv);
 );
-
-
-println(randomGradient([3,4]));
-
-
 
 
 
@@ -86,7 +81,7 @@ animationTrack2 = setupAnimationTrack(1, 2);
 
 <script id='draw' type='text/x-cindyscript'>
 colorplot((0,0), (1,0), "background", backgroundShader(#));
-drawimage(canvascorners_4, canvascorners_4 + (20,0), "background");
+drawimage(canvascorners_4, canvascorners_4 + (24,0), "background");
 
 
 drawButton(startButton);

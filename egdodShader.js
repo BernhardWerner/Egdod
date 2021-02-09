@@ -30,20 +30,21 @@
 
 		);
 		perlinNoise(coords) := (
-			regional();
+			regional(iPoint, fPoint);
 			
-			// a = randomValue( [floor(coords.x), floor(coords.y)] );
-			// b = randomValue( [ceil(coords.x), floor(coords.y)] );
-			// c = randomValue( [ceil(coords.x), ceil(coords.y)] );
-			// d = randomValue( [floor(coords.x), ceil(coords.y)] );
+			iPoint = [floor(coords.x), floor(coords.y)];
+			fPoint = [fract(coords.x), fract(coords.y)];
 
-			// e = lerp(a, b, smoothstep(fract(coords.x)));
-			// f = lerp(d, c, smoothstep(fract(coords.x)));
-
-			// lerp(e, f, smoothstep(fract(coords.y)));
-
-			
-
+			0.5 * lerp(
+					lerp(
+						randomGradient(iPoint) * (fPoint), 
+						randomGradient(iPoint + [1,0]) * (fPoint - [1,0]), 
+					smoothstep(fPoint.x)),
+					lerp(
+						randomGradient(iPoint + [0,1]) * (fPoint - [0,1]),
+						randomGradient(iPoint + [1,1]) * (fPoint - [1,1]),
+					smoothstep(fPoint.x)),
+				smoothstep(fPoint.y)) + 0.5;
 		);
 
 		
