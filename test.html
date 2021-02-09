@@ -42,13 +42,27 @@ startButton = {
 startTime = seconds();
 
 
-createimage("background", 800, 800);
+createimage("obfuscate", 256, 256);
+
+thresholdObject = {
+  "value": 1;
+};
+
 
 
 backgroundShader(uv) := (
-  voronoiNoise(10 * uv + (seconds() - startTime) * [1,-2]);
+  coords = [13 * uv.x, 2.5 * uv.y];
+  cutoff = (1 - voronoiNoise(3*coords)) * (1 - uv.x);
+
+  if(cutoff < thresholdObject.value, 1, 0) * (1, 1, 1, 0);
 );
 
+
+
+
+
+
+text = "We want $\sum_{k=0}^n q^n = \frac{q^n - 1}{q - 1}$";
 
 
 origin = canvascenter + [-3, -3];
@@ -67,7 +81,7 @@ testLineNewStroke = sampleBezierCube([0,0], [1,2], [4, 0], [7,2]);
 testLine.stroke = testLineOldStroke;
 testLine.arrow = true;
 
-animationTrack1 = setupAnimationTrack(0, 2);
+animationTrack1 = setupAnimationTrack(0, 3);
 animationTrack2 = setupAnimationTrack(1, 2);
 
 </script>
@@ -83,9 +97,11 @@ animationTrack2 = setupAnimationTrack(1, 2);
 
 
 <script id='draw' type='text/x-cindyscript'>
-colorplot((0,0), (1,0), "background", backgroundShader(#));
+drawtext(canvascorners_1 + (1, -3), text, size->30, family->"Palatino");
+
+colorplot((0,0), (1,0), "obfuscate", backgroundShader(#));
 repaint();
-drawimage(canvascorners_4, canvascorners_4 + (24,0), "background");
+drawimage(canvascorners_1 + (1,-4), canvascorners_1 + (1,-4) + (13, 0), canvascorners_1 + (1,-4) + (0, 2.5), "obfuscate");
 
 
 drawButton(startButton);
@@ -106,9 +122,9 @@ drawButton(startButton);
   constructStrokeDraw(testGraph, 5, 0.5, animationTrack1);  
   constructStrokeDraw(testLine, 5, 0.5, animationTrack1);  
   
-  tween(testLine, "stroke",testLineOldStroke, testLineNewStroke, animationTrack2);
+  tween(testLine, "stroke", testLineOldStroke, testLineNewStroke, animationTrack2);
 
-
+  tween(thresholdObject, "value", 1, 0, animationTrack1, "easeInOutQuad");
 </script>
 
 
@@ -130,7 +146,7 @@ drawButton(startButton);
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:2px solid #000000;">
+<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:0px solid #000000;">
 <canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="z-index: 2; position:absolute; left: 0px; top: 0px"></canvas>
 </div>
 
