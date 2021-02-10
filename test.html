@@ -17,6 +17,17 @@
 
 <script id='init' type='text/x-cindyscript'>
 
+
+getColor(img, pos) := imagergb([0,0], [0,1], img, pos, interpolate->false, repeat->false);
+
+drawImageObject(obj) := (
+  colorplot([0,0], [0,obj.size], obj.target,
+  imagergb([0,0], [0,obj.size], obj.source, #, interpolate->false, repeat->false);
+  );
+
+  drawimage(obj.pos, obj.pos + [obj.size, 0], obj.target);
+);
+
 // **********************************************************************************************************
 // Start ****************************************************************************************************
 // **********************************************************************************************************
@@ -39,47 +50,22 @@ startButton = {
 
 
 
-startTime = seconds();
 
 
-createimage("obfuscate", 256, 256);
 
-thresholdObject = {
-  "value": 1;
+
+
+createimage("target1", imagesize("img1").x, imagesize("img1").y);
+testImageA = {
+  "pos": canvascenter + [-10, -4],
+  "size": 20,
+  "source": "img1",
+  "target": "target1"
 };
 
 
 
-backgroundShader(uv) := (
-  coords = [13 * uv.x, 2.5 * uv.y];
-  cutoff = (1 - voronoiNoise(coords)) * (1 - uv.x);
 
-  if(cutoff < thresholdObject.value, 1, 0) * (1, 1, 1, 0);
-);
-
-
-
-
-
-
-text = "We want $\sum_{k=0}^n q^n = \frac{q^n - 1}{q - 1}$";
-
-
-origin = canvascenter + [-3, -3];
-
-function(x) := x^2;
-
-testGraph = createRootStrokeObject(origin, aliceColor("blue"), aliceColor("blue"), 0);
-testGraph.arrow = true;
-testGraph.stroke = sampleCircle(2, 2*pi);
-testGraph.stroke = sampleFunctionGraph("function", -2, 3);
-
-
-testLine = createRootStrokeObject(origin + [-3, -2], aliceColor("red"), aliceColor("red"), 0);
-testLineOldStroke = sampleBezierLin([0,0], [7,2]);
-testLineNewStroke = sampleBezierCube([0,0], [1,2], [4, 0], [7,2]);
-testLine.stroke = testLineOldStroke;
-testLine.arrow = true;
 
 animationTrack1 = setupAnimationTrack(0, 3);
 animationTrack2 = setupAnimationTrack(1, 2);
@@ -97,18 +83,14 @@ animationTrack2 = setupAnimationTrack(1, 2);
 
 
 <script id='draw' type='text/x-cindyscript'>
-drawtext(canvascorners_1 + (1, -3), text, size->30, family->"Palatino");
+//colorplot((0,0), (1,0), "obfuscate", backgroundShader(#));
 
-colorplot((0,0), (1,0), "obfuscate", backgroundShader(#));
-repaint();
-drawimage(canvascorners_1 + (1,-4), canvascorners_1 + (1,-4) + (13, 0), canvascorners_1 + (1,-4) + (0, 2.5), "obfuscate");
+
 
 
 drawButton(startButton);
   
-//drawStrokeObject(testGraph);
-//drawStrokeObject(testLine);
-
+drawImageObject(testImageA);
 </script>
 
 
@@ -119,22 +101,19 @@ drawButton(startButton);
   updateAnimationTrack(animationTrack2, delta);
 
 
-  constructStrokeDraw(testGraph, 5, 0.5, animationTrack1);  
-  constructStrokeDraw(testLine, 5, 0.5, animationTrack1);  
-  
-  tween(testLine, "stroke", testLineOldStroke, testLineNewStroke, animationTrack2);
 
-  tween(thresholdObject, "value", 1, 0, animationTrack1, "easeInOutQuad");
+
+
 </script>
 
 
 
 <script id='mouse_down' type='text/x-cindyscript'>
   if(mouseInButton(startButton),
-  startButton.pressed = true;
-  
-  playanimation();
-  setupTime();
+    startButton.pressed = true;
+    
+    playanimation();
+    setupTime();
   );  
   
 </script>
@@ -162,9 +141,8 @@ drawButton(startButton);
                 mouseupscript:"mouse_up",
                 tickscript:"tick",
                 images: {
-                   runner1: "runner_1.jpg",
-                   runner2: "runner_2.jpg",
-                   runner3: "runner_3.jpg",
+                   img1: "img1.png",
+                   img2: "img2.png"
                 }
                });
   
