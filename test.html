@@ -52,7 +52,7 @@ thresholdObject = {
 
 backgroundShader(uv) := (
   coords = [13 * uv.x, 2.5 * uv.y];
-  cutoff = (1 - voronoiNoise(3*coords)) * (1 - uv.x);
+  cutoff = (1 - voronoiNoise(coords)) * (1 - uv.x);
 
   if(cutoff < thresholdObject.value, 1, 0) * (1, 1, 1, 0);
 );
