@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <title>Egdod test</title>
     <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/CindyGL.js"></script>
   </head>
 
 <body style="font-family:Palatino; margin:0; font-size:16pt">
@@ -18,11 +19,11 @@
 <script id='init' type='text/x-cindyscript'>
 
 
-getColor(img, pos) := imagergb([0,0], [0,1], img, pos, interpolate->false, repeat->false);
+getColor(img, pos) := imagergb([0,0], [446,0], img, pos, interpolate->false, repeat->false);
 
 drawImageObject(obj) := (
-  colorplot([0,0], [0,obj.size], obj.target,
-  imagergb([0,0], [0,obj.size], obj.source, #, interpolate->false, repeat->false);
+  colorplot([0,0], [1, 0], obj.target,
+    perlinNoise(10*#);
   );
 
   drawimage(obj.pos, obj.pos + [obj.size, 0], obj.target);
@@ -54,8 +55,7 @@ startButton = {
 
 
 
-
-createimage("target1", imagesize("img1").x, imagesize("img1").y);
+createimage("target1", 446, 115);
 testImageA = {
   "pos": canvascenter + [-10, -4],
   "size": 20,
@@ -83,11 +83,8 @@ animationTrack2 = setupAnimationTrack(1, 2);
 
 
 <script id='draw' type='text/x-cindyscript'>
-//colorplot((0,0), (1,0), "obfuscate", backgroundShader(#));
 
-
-
-
+  println(getColor("img1", [4,4]));
 drawButton(startButton);
   
 drawImageObject(testImageA);
