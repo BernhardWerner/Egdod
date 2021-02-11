@@ -68,11 +68,11 @@
 		    if(button.pressed,
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y), button.size.x, button.size.y, button.corner), color -> (button.colors)_2);
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y) + (0, -0.2), button.size.x, button.size.y, button.corner), color -> (button.colors)_1);
-		            drawtext(button.position + (0, -0.6 * button.textSize / 35) + (0, -0.2), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
+		            drawtext(button.position + (0, -0.5 * button.textSize / 35) + (0, -0.2), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
 		    , // else //
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y) + (0, -0.2), button.size.x, button.size.y, button.corner), color -> (button.colors)_3);
 		        fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y), button.size_1, button.size_2, button.corner), color -> (button.colors)_2);
-		        drawtext(button.position + (0, -0.6 * button.textSize / 35), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
+		        drawtext(button.position + (0, -0.5 * button.textSize / 35), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
 		    );
 		);
 
