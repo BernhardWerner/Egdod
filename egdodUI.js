@@ -103,6 +103,42 @@
 
 
 
+		// *************************************************************************************************
+		// Draws text over multiple lines with given line length.
+		// *************************************************************************************************
+		drawWrappedText(pos, txt, lineLength, lineHeight, size, align, color, family) := (
+			regional(lines);
+
+			lines = splitString(txt, lineLength);
+			forall(1..length(lines),
+				drawtext(pos + [0, -(# - 1) * lineHeight], lines_#, size->size, align->align, color->color, family->family);
+			);
+		);
+		splitString(string, subLength) := (
+			regional(totalSplit, result, candidate);
+
+			totalSplit = tokenize(string, " ");
+
+			result = [""];
+
+
+			while(length(totalSplit) > 0,
+				candidate = result_(-1) + totalSplit_1;
+				
+				if(length(candidate) <= subLength,
+					result_(-1) = candidate + " ";
+				, // else //
+					result = result :> totalSplit_1 + " ";
+				);
+
+				totalSplit = bite(totalSplit);
+			);
+
+			result;
+		);
+
+
+
 
 
 		// *************************************************************************************************
@@ -173,8 +209,8 @@
 		  , // else //
 		    [1.2 * slider.bulbSize, -0.015 * slider.labelSize];
 		  );
-		  drawtext(endPoints_1 + startOffset, slider.startLabel, align -> if(slider.vertical, "mid", "right"), size -> slider.labelSize, slider.fontfamily);
-		  drawtext(endPoints_2 + endOffset,   slider.endLabel,   align -> if(slider.vertical, "mid", "left"),   size -> slider.labelSize, slider.fontfamily);
+		  drawtext(endPoints_1 + startOffset, slider.startLabel, align -> if(slider.vertical, "mid", "right"), size -> slider.labelSize, family->slider.fontfamily);
+		  drawtext(endPoints_2 + endOffset,   slider.endLabel,   align -> if(slider.vertical, "mid", "left"),   size -> slider.labelSize, family->slider.fontfamily);
 		);
 
 		catchSlider(slider) := (

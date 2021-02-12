@@ -19,16 +19,6 @@
 <script id='init' type='text/x-cindyscript'>
 
 
-getColor(img, pos) := imagergb([0,0], [446,0], img, pos, interpolate->false, repeat->false);
-
-drawImageObject(obj) := (
-  colorplot([0,0], [1, 0], obj.target,
-    perlinNoise(10*#);
-  );
-
-  drawimage(obj.pos, obj.pos + [obj.size, 0], obj.target);
-);
-
 // **********************************************************************************************************
 // Start ****************************************************************************************************
 // **********************************************************************************************************
@@ -36,7 +26,7 @@ canvascorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
 canvascenter  = 0.5 * canvascorners_1 + 0.5 * canvascorners_3;
 canvaswidth   = dist(canvascorners_1, canvascorners_2);
 canvasheight  = dist(canvascorners_1, canvascorners_4);
-
+screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - canvascorners_1.y) / canvasheight];
 
 
 startButton = {
@@ -54,14 +44,9 @@ startButton = {
 
 
 
+testText = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem, dolor beatae architecto impedit minus, magnam dolorem eos eligendi nam possimus tenetur nesciunt placeat maxime repellat hic laudantium quo, sequi assumenda? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem, dolor beatae architecto impedit minus, magnam dolorem eos eligendi nam possimus tenetur nesciunt placeat maxime repellat hic laudantium quo, sequi assumenda? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem, dolor beatae architecto impedit minus, magnam dolorem eos eligendi nam possimus tenetur nesciunt placeat maxime repellat hic laudantium quo, sequi assumenda?";
 
-createimage("target1", 446, 115);
-testImageA = {
-  "pos": canvascenter + [-10, -4],
-  "size": 20,
-  "source": "img1",
-  "target": "target1"
-};
+
 
 
 
@@ -83,11 +68,9 @@ animationTrack2 = setupAnimationTrack(1, 2);
 
 
 <script id='draw' type='text/x-cindyscript'>
-
-  println(getColor("img1", [4,4]));
 drawButton(startButton);
   
-drawImageObject(testImageA);
+drawWrappedText(canvascorners_1 + (1,-1), testText, round(lerp(5, 100, screenMouse().x)), 1, 20, "left", (0,0,0), "Palatino");
 </script>
 
 

@@ -15,9 +15,6 @@
 		    expandrect(bl, diag.x, diag.y);
 		);
 
-		
-
-
 `);
 
 
