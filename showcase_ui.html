@@ -1,0 +1,165 @@
+  <!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Egdod test</title>
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/CindyGL.js"></script>
+  </head>
+
+<body style="font-family:Palatino; margin:0; font-size:16pt">
+
+
+
+
+
+
+
+<script id='init' type='text/x-cindyscript'>
+
+
+// **********************************************************************************************************
+// Start ****************************************************************************************************
+// **********************************************************************************************************
+canvascorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+canvascenter  = 0.5 * canvascorners_1 + 0.5 * canvascorners_3;
+canvaswidth   = dist(canvascorners_1, canvascorners_2);
+canvasheight  = dist(canvascorners_1, canvascorners_4);
+screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - canvascorners_1.y) / canvasheight];
+
+
+clickButton = {
+  "position": (canvascorners_3 + [-3, 2]),
+  "size":     [4, 2],
+  "label":    "Click",
+  "textSize": 20,
+  "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
+  "corner":   1,
+  "pressed":  false
+};
+
+
+
+toggleButton = {
+  "position": (canvascorners_3 + [-3, 5]),
+  "size":     [4, 2],
+  "label":    "Toggle",
+  "textSize": 20,
+  "colors":   (apply(0..2, aliceColor("orange", 1 - #))),
+  "corner":   0.5,
+  "pressed":  false
+};
+
+
+
+slider = {
+  "position":    (canvascorners_1 + (1.5, -2.5)),
+  "length":      10,
+  "size":        20,
+  "vertical":    true,
+  "color":       aliceColor("teal", 1),
+  "startLabel":  "high",
+  "endLabel":    "low",
+  "labelSize":   20,
+  "value":       0.3,
+  "bulbSize":    0.7
+};
+
+
+selector = {
+  "position":    (canvascorners_1 + (5.5, -3.5)),
+  "length":      10,
+  "size":        30,
+  "vertical":    false,
+  "color":       aliceColor("violet", 2),
+  "textSize":    17,
+  "content":		 [1,2,3,4,5,6,7],
+  "index":       3,
+  "bulbSize":    0.9
+};
+
+
+
+</script>
+<script src="egdodMath.js" data-scriptid="init"></script>
+<script src="egdodColor.js" data-scriptid="init"></script>
+<script src="egdodUI.js" data-scriptid="init"></script>
+
+
+
+
+
+<script id='draw' type='text/x-cindyscript'>
+  drawButton(clickButton);
+
+  drawButton(toggleButton);
+  
+  drawSlider(slider);
+
+  drawSelector(selector);
+</script>
+
+
+
+<script id='mouse_down' type='text/x-cindyscript'>
+  if(mouseInButton(clickButton),
+  clickButton.pressed = true;
+);
+
+if(mouseInButton(toggleButton),
+  toggleButton.pressed = !toggleButton.pressed;
+);
+
+catchSlider(slider);
+
+catchSelector(selector);
+</script>
+
+
+<script id='mouse_drag' type='text/x-cindyscript'>
+catchSlider(slider);
+catchSelector(selector);
+</script>
+  
+
+
+<script id='mouse_up' type='text/x-cindyscript'>
+if(mouseInButton(clickButton) & clickButton.pressed,
+  clickButton.corner = 1 - clickButton.corner;
+);
+clickButton.pressed = false;
+
+catchSlider(slider);
+
+catchSelector(selector);
+</script>
+
+
+<div id="canvasesdiv" style="position:relative; width:500px; height:500px; border:2px solid #000000;">
+<canvas id="CSCanvas" align="left" valign="top" width="500" height="500" style="border:2px solid #000000;"></canvas>
+</div>
+
+
+
+
+<script>
+  cindy = createCindy({canvasname:"CSCanvas",
+                drawscript:"draw",
+                initscript:"init",
+                mousedownscript:"mouse_down",
+                mousedragscript: "mouse_drag",
+                mouseupscript:"mouse_up"
+               });
+  
+</script>
+
+
+
+
+
+
+
+</body>
+
+</html>
