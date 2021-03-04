@@ -24,6 +24,8 @@
 		actualTime_1 * 3600 + actualTime_2 * 60 + actualTime_3 + actualTime_4 * 0.001;
 	);
 
+	timeBufferEABOW = 0;
+	scriptStartTimeEABOW = 0;
 	// ************************************************************************************************
 	// Sets up time-keeping variables. Will be automatically called when included.
 	// Has to be called together with playanimation()!

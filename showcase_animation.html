@@ -1,0 +1,120 @@
+  <!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Egdod test</title>
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/CindyGL.js"></script>
+  </head>
+
+<body style="font-family:Palatino; margin:0; font-size:16pt">
+
+
+
+
+
+
+
+<script id='init' type='text/x-cindyscript'>
+
+
+// **********************************************************************************************************
+// Start ****************************************************************************************************
+// **********************************************************************************************************
+canvascorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+canvascenter  = 0.5 * canvascorners_1 + 0.5 * canvascorners_3;
+canvaswidth   = dist(canvascorners_1, canvascorners_2);
+canvasheight  = dist(canvascorners_1, canvascorners_4);
+screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - canvascorners_1.y) / canvasheight];
+
+
+point = canvascorners_1 + [1, -1];
+
+
+setupAnimation() := (
+  animationTrack1 = setupAnimationTrack(0, 1);
+  animationTrack1.looping = true;
+  setupTime();  
+);
+
+
+playanimation();
+setupAnimation();
+
+</script>
+<script src="egdodMath.js" data-scriptid="init"></script>
+<script src="egdodColor.js" data-scriptid="init"></script>
+<script src="egdodAnim.js" data-scriptid="init"></script>
+
+
+
+
+
+<script id='draw' type='text/x-cindyscript'>
+draw(point, size->5, color->aliceColor("blue"));
+</script>
+
+<script id='tick' type='text/x-cindyscript'>
+delta = deltaTime();
+
+updateAnimationTrack(animationTrack1, delta);
+
+point_1 = canvascorners_1.x + lerp(1, 10, 1 - animationTrack1.timeLeft / animationTrack1.duration);
+</script>
+
+
+
+
+<script id='mouse_down' type='text/x-cindyscript'>
+
+  
+
+</script>
+
+
+<script id='mouse_drag' type='text/x-cindyscript'>
+
+  
+
+</script>
+
+
+  
+
+
+<script id='mouse_up' type='text/x-cindyscript'>
+
+  
+
+</script>
+
+
+<div id="canvasesdiv" style="position:relative; width:500px; height:500px; border:2px solid #000000;">
+<canvas id="CSCanvas" align="left" valign="top" width="500" height="500" style="border:2px solid #000000;"></canvas>
+</div>
+
+
+
+
+<script>
+  cindy = createCindy({canvasname:"CSCanvas",
+                drawscript:"draw",
+                initscript:"init",
+                tickscript:"tick",
+                mousedownscript:"mouse_down",
+                mousedragscript: "mouse_drag",
+                mouseupscript:"mouse_up"
+               });
+  
+</script>
+
+
+
+
+
+
+
+</body>
+
+</html>
