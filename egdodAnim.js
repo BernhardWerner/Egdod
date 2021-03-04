@@ -132,16 +132,16 @@
 	tween(obj, prop, from, to, track, easing) := (
 		regional(t);
 
-		t = 1 - track.timeLeft / track.duration;
+		if(track.running,
+			t = 1 - track.timeLeft / track.duration;
 
-		if(easing != "none",
-			t = parse(easing + "(" + t + ")");
-		);
-
-		if(contains(keys(obj), prop),
-			if(track.running, 
-				obj_prop = lerp(from, to, t);
+			if(easing != "none",
+				t = parse(easing + "(" + t + ")");
 			);
+	
+			if(contains(keys(obj), prop),
+				obj_prop = lerp(from, to, t);
+			);	
 		);
 	);
 	tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");

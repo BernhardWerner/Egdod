@@ -139,6 +139,12 @@ drawStrokeObject(strokeObject);
   
   constructStrokeDraw(strokeObject, 5, 0, animationTrack2);
   
+  tween(strokeObject, "pos", strokeEnd, origin, animationTrack6, "easeInOutCubic");
+  tween(strokeObject, "lineColor", aliceColor("teal"), aliceColor("red"), animationTrack6, "easeInOutCubic");
+  tween(strokeObject, "fillColor", aliceColor("teal"), (1,1,1), animationTrack6, "easeOutCirc");
+  tween(strokeObject, "fillAlpha", 0.5, 0, animationTrack6, "easeOutCirc");
+  tween(strokeObject, "stroke", triangleStroke, functionStroke, animationTrack6, "easeInOutCubic");
+
   tween(strokeObject, "pos", strokeStart, strokeEnd, animationTrack3, "easeInOutCubic");
   tween(strokeObject, "lineColor", aliceColor("orange"), aliceColor("teal"), animationTrack3, "easeInOutCubic");
   tween(strokeObject, "fillColor", aliceColor("orange"), aliceColor("teal"), animationTrack3, "easeInOutCubic");
@@ -146,18 +152,13 @@ drawStrokeObject(strokeObject);
   
   constructStrokeDraw(axisX, 4, 0.5, animationTrack4);
   constructStrokeDraw(axisY, 4, 0.5, animationTrack4);
-
+  
   forall(1..4,
     constructStrokeDraw(gridH_#, 2, 0, animationCascade5_#);
     constructStrokeDraw(gridV_#, 2, 0, animationCascade5_#);
-  );  
-
-
-  tween(strokeObject, "pos", strokeEnd, origin, animationTrack6, "easeInOutCubic");
-  tween(strokeObject, "lineColor", aliceColor("teal"), aliceColor("red"), animationTrack6, "easeInOutCubic");
-  tween(strokeObject, "fillColor", aliceColor("teal"), (1,1,1), animationTrack6, "easeOutCirc");
-  tween(strokeObject, "fillAlpha", 0.5, 0, animationTrack6, "easeOutCirc");
-  tween(strokeObject, "stroke", triangleStroke, functionStroke, animationTrack6, "easeInOutCubic");
+    );  
+    
+    
 
   if(computerSeconds() - scriptStartTimeEABOW > 12, setupAnimation());
 </script>
