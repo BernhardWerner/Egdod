@@ -31,9 +31,9 @@ screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - ca
 
 clickButton = {
   "position": (canvascorners_3 + [-3, 2]),
-  "size":     [4, 2],
-  "label":    "Click",
-  "textSize": 20,
+  "size":     [5, 2],
+  "label":    "Click Mode",
+  "textSize": 17,
   "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
   "corner":   1,
   "pressed":  false
@@ -43,9 +43,9 @@ clickButton = {
 
 toggleButton = {
   "position": (canvascorners_3 + [-3, 5]),
-  "size":     [4, 2],
-  "label":    "Toggle",
-  "textSize": 20,
+  "size":     [5, 2],
+  "label":    "Toggle Mode",
+  "textSize": 17,
   "colors":   (apply(0..2, aliceColor("orange", 1 - #))),
   "corner":   0.5,
   "pressed":  false
@@ -80,6 +80,28 @@ selector = {
 };
 
 
+toggleA = {
+  "position":   canvascenter + (-1, 0),
+  "radius":     2,
+  "lineSize":   1,
+  "label":      "Option A",
+  "textSize":   17,
+  "color":      aliceColor("green"),
+  "pressed":    false
+};
+
+toggleB = {
+  "position":   canvascenter + (4, 0),
+  "radius":     2,
+  "lineSize":   1,
+  "label":      "Option B",
+  "textSize":   17,
+  "color":      aliceColor("red"),
+  "pressed":    true
+};
+
+
+
 
 </script>
 <script src="egdodMath.js" data-scriptid="init"></script>
@@ -98,6 +120,10 @@ selector = {
   drawSlider(slider);
 
   drawSelector(selector);
+
+  drawToggle(toggleA);
+
+  drawToggle(toggleB);
 </script>
 
 
@@ -114,6 +140,9 @@ if(mouseInButton(toggleButton),
 catchSlider(slider);
 
 catchSelector(selector);
+
+catchToggle(toggleA);
+catchToggle(toggleB);
 </script>
 
 

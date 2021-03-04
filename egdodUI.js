@@ -90,6 +90,33 @@
 
 
 
+		// ************************************************************************************************
+		// Draws and handles toggles. They have to be a JSON with the following keys and value-types:
+		// toggle = {
+		//   "position":   (2D vector),
+		//   "radius":     (float),
+		//   "lineSize":   (float),
+		//   "label":      (String),
+		//   "textSize":   (float),
+		//   "color":      (3D Vector),
+		//   "pressed":    (bool),
+		//   "fontFamily": (String)
+		// };
+		// ************************************************************************************************
+		drawToggle(toggle) := (
+			fillcircle(toggle.position, toggle.radius, size->toggle.lineSize, color->(1,1,1));
+			if(toggle.pressed,
+				drawcircle(toggle.position, toggle.radius, size->5 * toggle.lineSize, color->toggle.color);
+			, // else //
+				drawcircle(toggle.position, toggle.radius, size->toggle.lineSize, color->(0,0,0));
+			);
+			drawtext(toggle.position + [0, -0.015 * toggle.textSize], toggle.label, size->toggle.textSize, align->"mid", family->toggle.fontFamily);
+		  );
+
+		  catchToggle(toggle) := if(dist(mouse().xy, toggle.position) < toggle.radius, toggle.pressed = !toggle.pressed);
+  
+
+
 
 		// *************************************************************************************************
 		// Draws text with border.
