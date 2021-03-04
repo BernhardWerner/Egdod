@@ -191,7 +191,7 @@
 
 
 	// ************************************************************************************************
-	// Circle object needs
+	// Stroke object needs
 	// pos
 	// stroke (list of points, relative to pos)
 	// drawPercent
@@ -253,7 +253,7 @@
 	// ************************************************************************************************
 	createRootStrokeObject(pos, lineColor, fillColor, fillAlpha) := {
 		"pos": pos,
-		"stroke": apply(1..strokeSampleRateEABOW, [1,0]),
+		"stroke": apply(1..strokeSampleRateEABOW, [0,0]),
 		"drawPercent": 0,
 		"lineSize": 0,
 		"lineColor": lineColor,
@@ -273,6 +273,7 @@
 	// Creates stroke around a circle.
 	// ************************************************************************************************
 	sampleCircle(rad, angle) := apply(0..strokeSampleRateEABOW - 1, rad * [cos(angle * # / (strokeSampleRateEABOW - 1)), sin(angle * # / (strokeSampleRateEABOW - 1))]);
+	
 	
 	// ************************************************************************************************
 	// Subdivides the distance between two points.

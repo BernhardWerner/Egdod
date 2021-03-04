@@ -29,12 +29,74 @@ canvasheight  = dist(canvascorners_1, canvascorners_4);
 screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - canvascorners_1.y) / canvasheight];
 
 
-point = canvascorners_1 + [1, -1];
+
+timeRect = rect(canvascorners_4.x, canvascorners_4.y, 1, 0.2);
+
+func(x) := 2 * sin(x) + 1;
+
+strokeStart = canvascenter + (-5, 0);
+strokeEnd = canvascorners_2 + (-1, -1);
+circleStroke = sampleCircle(2, 2*pi);
+triangleStroke = samplePolygon([(0,0), (-4, 0), (0, -5)]);
+functionStroke = 2 * sampleFunctionGraph("func", -1.2, 4.2);
+strokeObject = createRootStrokeObject(strokeStart, aliceColor("orange"), aliceColor("orange"), 0.5);
+strokeObject.stroke = circleStroke;
+
+
+
+origin = canvascenter + (-6, -3);
+axisX = createRootStrokeObject(origin, (0,0,0), (1,1,1), 0);
+axisY = createRootStrokeObject(origin, (0,0,0), (1,1,1), 0);
+axisX.stroke = sampleBezierLin((-1, 0), (10, 0));
+axisY.stroke = sampleBezierLin((0, -1), (0, 10));
+axisX.arrow = true;
+axisY.arrow = true;
+
+gridH = apply(1..4,
+  new = createRootStrokeObject(origin + (0, 2 * #), 0.7 * (1,1,1), (1,1,1), 0);
+  new.stroke = axisX.stroke;
+
+  new;
+);
+
+gridV = apply(1..4,
+  new = createRootStrokeObject(origin + (2 * #, 0), 0.7 * (1,1,1), (1,1,1), 0);
+  new.stroke = axisY.stroke;
+
+  new;
+);
+
+
+
+
+
+
+
+
 
 
 setupAnimation() := (
   animationTrack1 = setupAnimationTrack(0, 1);
   animationTrack1.looping = true;
+  
+  animationTrack2 = setupAnimationTrack(2, 3);
+  animationTrack3 = setupAnimationTrack(4, 6);
+  animationTrack4 = setupAnimationTrack(7, 8);
+  animationCascade5 = setupAnimationCascade(4, 7.1, 1, 0.1);
+  animationTrack6 = setupAnimationTrack(9.5, 10.5);
+
+  tracks = [
+    animationTrack1,
+    animationTrack2,
+    animationTrack3,
+    animationTrack4,
+    animationTrack6
+  ];
+  cascades = [
+    animationCascade5
+
+  ];
+  
   setupTime();  
 );
 
@@ -42,25 +104,62 @@ setupAnimation() := (
 playanimation();
 setupAnimation();
 
+
 </script>
 <script src="egdodMath.js" data-scriptid="init"></script>
 <script src="egdodColor.js" data-scriptid="init"></script>
 <script src="egdodAnim.js" data-scriptid="init"></script>
+<script src="egdodUI.js" data-scriptid="init"></script>
 
 
 
 
 
 <script id='draw' type='text/x-cindyscript'>
-draw(point, size->5, color->aliceColor("blue"));
+
+fillrect(timeRect, aliceColor("blue", 2), 1.0);
+
+
+forall(gridH, drawStrokeObject(#));
+forall(gridV, drawStrokeObject(#));
+drawStrokeObject(axisX);
+drawStrokeObject(axisY);
+
+drawStrokeObject(strokeObject);
 </script>
 
 <script id='tick' type='text/x-cindyscript'>
-delta = deltaTime();
+  delta = deltaTime();
+  forall(tracks, updateAnimationTrack(#, delta));
+  forall(cascades, updateAnimationCascade(#, delta));
 
-updateAnimationTrack(animationTrack1, delta);
+  
 
-point_1 = canvascorners_1.x + lerp(1, 10, 1 - animationTrack1.timeLeft / animationTrack1.duration);
+  tween(timeRect, "w", 0, canvaswidth, animationTrack1);
+  
+  constructStrokeDraw(strokeObject, 5, 0, animationTrack2);
+  
+  tween(strokeObject, "pos", strokeStart, strokeEnd, animationTrack3, "easeInOutCubic");
+  tween(strokeObject, "lineColor", aliceColor("orange"), aliceColor("teal"), animationTrack3, "easeInOutCubic");
+  tween(strokeObject, "fillColor", aliceColor("orange"), aliceColor("teal"), animationTrack3, "easeInOutCubic");
+  tween(strokeObject, "stroke", circleStroke, triangleStroke, animationTrack3, "easeInOutCubic");
+  
+  constructStrokeDraw(axisX, 4, 0.5, animationTrack4);
+  constructStrokeDraw(axisY, 4, 0.5, animationTrack4);
+
+  forall(1..4,
+    constructStrokeDraw(gridH_#, 2, 0, animationCascade5_#);
+    constructStrokeDraw(gridV_#, 2, 0, animationCascade5_#);
+  );  
+
+
+  tween(strokeObject, "pos", strokeEnd, origin, animationTrack6, "easeInOutCubic");
+  tween(strokeObject, "lineColor", aliceColor("teal"), aliceColor("red"), animationTrack6, "easeInOutCubic");
+  tween(strokeObject, "fillColor", aliceColor("teal"), (1,1,1), animationTrack6, "easeOutCirc");
+  tween(strokeObject, "fillAlpha", 0.5, 0, animationTrack6, "easeOutCirc");
+  tween(strokeObject, "stroke", triangleStroke, functionStroke, animationTrack6, "easeInOutCubic");
+
+  if(computerSeconds() - scriptStartTimeEABOW > 12, setupAnimation());
 </script>
 
 
