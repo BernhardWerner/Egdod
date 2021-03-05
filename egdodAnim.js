@@ -108,6 +108,7 @@
 		"end":      e,
 		"duration": e - s,
 		"timeLeft": e - s,
+		"progress": 0,
 		"running":  true,
 		"looping":  false
 	}; 
@@ -118,6 +119,7 @@
 	updateAnimationTrack(track, delta) := (
 		if(track.running & trackStarted(track),
 			track.timeLeft = track.timeLeft - delta;	
+			track.progress = 1 - track.timeLeft / track.duration;
 			if(track.timeLeft <= 0,
 				if(track.looping,
 					track.timeLeft = track.end - track.start;
@@ -133,7 +135,7 @@
 		regional(t);
 
 		if(track.running,
-			t = 1 - track.timeLeft / track.duration;
+			t = track.progress;
 
 			if(easing != "none",
 				t = parse(easing + "(" + t + ")");

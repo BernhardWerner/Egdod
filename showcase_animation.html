@@ -30,7 +30,7 @@ screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - ca
 
 
 
-timeRect = rect(canvascorners_4.x, canvascorners_4.y, 1, 0.2);
+timeRect = rect(canvascorners_4, 1, 0.2);
 
 func(x) := 2 * sin(x) + 1;
 
@@ -69,7 +69,8 @@ gridV = apply(1..4,
 
 
 
-
+fadeoutRect = rect(canvascorners_4, canvaswidth, canvasheight);
+fadeoutTime = 0;
 
 
 
@@ -84,13 +85,16 @@ setupAnimation() := (
   animationTrack4 = setupAnimationTrack(7, 8);
   animationCascade5 = setupAnimationCascade(4, 7.1, 1, 0.1);
   animationTrack6 = setupAnimationTrack(9.5, 10.5);
+  animationTrack7 = setupAnimationTrack(11.5, 12.5);
+
 
   tracks = [
     animationTrack1,
     animationTrack2,
     animationTrack3,
     animationTrack4,
-    animationTrack6
+    animationTrack6,
+    animationTrack7
   ];
   cascades = [
     animationCascade5
@@ -116,16 +120,16 @@ setupAnimation();
 
 
 <script id='draw' type='text/x-cindyscript'>
-
-fillrect(timeRect, aliceColor("blue", 2), 1.0);
-
-
-forall(gridH, drawStrokeObject(#));
-forall(gridV, drawStrokeObject(#));
-drawStrokeObject(axisX);
-drawStrokeObject(axisY);
-
-drawStrokeObject(strokeObject);
+  forall(gridH, drawStrokeObject(#));
+  forall(gridV, drawStrokeObject(#));
+  drawStrokeObject(axisX);
+  drawStrokeObject(axisY);
+  
+  drawStrokeObject(strokeObject);
+  
+  fillrect(fadeoutRect, (1,1,1), fadeoutTime);
+  
+  fillrect(timeRect, aliceColor("blue", 2), 1.0);
 </script>
 
 <script id='tick' type='text/x-cindyscript'>
@@ -156,11 +160,14 @@ drawStrokeObject(strokeObject);
   forall(1..4,
     constructStrokeDraw(gridH_#, 2, 0, animationCascade5_#);
     constructStrokeDraw(gridV_#, 2, 0, animationCascade5_#);
-    );  
+  );  
     
-    
+  fadeoutTime = animationTrack7.progress;
 
-  if(computerSeconds() - scriptStartTimeEABOW > 12, setupAnimation());
+  if(computerSeconds() - scriptStartTimeEABOW > 12.5, 
+    fadeoutTime = 1;
+    setupAnimation();
+  );
 </script>
 
 
@@ -190,8 +197,8 @@ drawStrokeObject(strokeObject);
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:500px; height:500px; border:2px solid #000000;">
-<canvas id="CSCanvas" align="left" valign="top" width="500" height="500" style="border:2px solid #000000;"></canvas>
+<div id="canvasesdiv" style="position:relative; width:500px; height:500px; border:1px solid #000000;">
+<canvas id="CSCanvas" align="left" valign="top" width="500" height="500" style="border:1px solid #000000;"></canvas>
 </div>
 
 
