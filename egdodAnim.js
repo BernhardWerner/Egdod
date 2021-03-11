@@ -124,8 +124,8 @@
 				if(track.looping,
 					track.timeLeft = track.end - track.start;
 				, // else //
-					track.timeLeft = 0;
-					track.running = false;		
+					//track.timeLeft = 0;
+					//track.running = false;		
 				);
 			);
 		);
@@ -134,13 +134,13 @@
 	tween(obj, prop, from, to, track, easing) := (
 		regional(t);
 
-		if(track.running,
-			t = track.progress;
-
+		t = track.progress;
+		
+		if(t <= 1,
 			if(easing != "none",
 				t = parse(easing + "(" + t + ")");
 			);
-	
+		
 			if(contains(keys(obj), prop),
 				obj_prop = lerp(from, to, t);
 			);	
@@ -148,6 +148,24 @@
 	);
 	tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");
 
+	tweenMany(list, prop, from, to, track, delay, easing) := (
+		regional(t);
+
+		forall(1..length(list),
+			t = 1 - (track.timeLeft + (# - 1) * delay) / track.duration;
+			
+			if(t <= 1,
+				if(easing != "none",
+					t = parse(easing + "(" + t + ")");
+				);
+			
+				if(contains(keys(list_#), prop),
+					list_#_prop = lerp(from, to, t);
+				);	
+			);
+		);
+	);
+	tweenMany(list, prop, from, to, track, delay) := tweenMany(list, prop, from, to, track, delay, "none");
 
 	// ************************************************************************************************
 	// Setting up several animation tracks with delay.
@@ -358,9 +376,13 @@
 	constructStrokeDraw(obj, lineSize, arrowSize, track) := (
 		tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
 		tween(obj, "drawPercent", 0, 1, track, "easeInOutCubic");
-		if(obj.arrow,
-			tween(obj, "arrowSize", 0, arrowSize, track);	
+		tween(obj, "arrowSize", 0, arrowSize, track);	
 		);
+	
+	constructStrokeDrawMany(list, lineSize, arrowSize, track, delay) := (
+		tweenMany(list, "lineSize", 0, lineSize, track, delay, "easeOutCirc");
+		tweenMany(list, "drawPercent", 0, 1, track, delay, "easeInOutCubic");
+		tweenMany(list, "arrowSize", 0, arrowSize, track, delay);	
 	);
 
 	// ************************************************************************************************
