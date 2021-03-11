@@ -66,7 +66,8 @@ gridV = apply(1..4,
   new;
 );
 
-grid = flatten(zip(gridH, gridV));
+grid = randomsort(gridH ++ gridV);
+//grid = flatten(zip(gridH, gridV));
 
 
 
@@ -155,13 +156,8 @@ setupAnimation();
   
   constructStrokeDraw(axisX, 4, 0.5, animationTrack4);
   constructStrokeDraw(axisY, 4, 0.5, animationTrack4);
-  
-  forall(1..4,
-    //constructStrokeDraw(gridH_#, 2, 0, animationCascade5_#);
-    //constructStrokeDraw(gridV_#, 2, 0, animationCascade5_#);
-  );  
 
-  constructStrokeDrawMany(grid, 2, 0, animationTrack5, 0.1);
+  constructStrokeDrawMany(grid, 2, 0, animationTrack5, 0.05);
 
     
   fadeoutTime = animationTrack7.progress;
