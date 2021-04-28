@@ -16,7 +16,33 @@
 
 
 
-<script id='init' type='text/x-cindyscript'>
+<script id='csinit' type='text/x-cindyscript'>
+  // ************************************************************************************************
+  // Gets the ALICE and Toolbox colours.
+  // ************************************************************************************************
+  toolColorTable = dict(blue      -> [(2, 88,155),  (0, 70,124),  (0, 50, 89),   (0, 27, 48),   (0,  5,  9)]   / 255,
+                        red       -> [(255,193,148), (247,156, 90),   (227,114, 34),   (172, 76,  8),   (114, 47,  0)]    / 255,
+                        green     -> [(237,247, 81),  (215,228, 15),   (162,173,  0),   (119,127,  0),   (61, 65,  0)]   / 255,
+                        grey      -> [(224,224,224), (172,172,172), (128,128,128), (78,78,78),   (35,35,35)]   / 255
+  );
+  toolColor(name, bright) := get(toolColorTable, name)_(3 - bright);
+  toolColor(name)         := get(toolColorTable, name)_3;
+
+  aliceColorTable = dict(blue      -> [(82,136,188),  (48,110,171),  (12,90,166),   (9,69,128),   (5,54,100)]   / 255,
+                         orange    -> [(255,185,99),  (255,166,57),  (255,140,0),   (197,108,0),  (155,85,0)]   / 255,
+                         violet    -> [(179,109,212), (158,62,204),  (145,19,204),  (123,5,178),  (95,3,138)]   / 255,
+                         turquoise -> [(90,177,171),  (24,156,146),  (0,128,119),   (0,95,88),    (0,60,56)]    / 255,
+                         teal      -> [(90,177,171),  (24,156,146),  (0,128,119),   (0,95,88),    (0,60,56)]    / 255,
+                         red       -> [(253,105,109), (236,62,66),   (215,19,24),   (173,6,10),   (133,0,3)]    / 255,
+                         green     -> [(131,222,92),  (99,204,53),   (67,186,16),   (48,150,5),   (34,116,0)]   / 255,
+                         minion    -> [(255,242,153), (255,237,114), (245,224,80),  (221,198,44), (170,151,22)] / 255,
+                         brown     -> [(186,104,43),  (152,74,16),   (117,50,0),    (80,34,0),    (42,18,0)]    / 255,
+                         pink      -> [(255,246,255), (253,181,253), (248,131,248), (240,90,240), (225,52,225)] / 255,
+                         grey      -> [(224,224,224), (172,172,172), (128,128,128), (78,78,78),   (36,35,35)]   / 255
+  );
+  aliceColor(name, bright) := get(aliceColorTable, name)_(3 - bright);
+  aliceColor(name)         := get(aliceColorTable, name)_3;
+  
 // **********************************************************************************************************
 // Start ****************************************************************************************************
 // **********************************************************************************************************
@@ -54,26 +80,38 @@ animationTrack1 = setupAnimationTrack(0, 3);
 animationTrack2 = setupAnimationTrack(1, 2);
 
 </script>
-<script src="egdodColor.js" data-scriptid="init"></script>
-<script src="egdodArray.js" data-scriptid="init"></script>
-<script src="egdodUI.js" data-scriptid="init"></script>
-<script src="egdodMath.js" data-scriptid="init"></script>
-<script src="egdodAnim.js" data-scriptid="init"></script>
-<script src="egdodShader.js" data-scriptid="init"></script>
+<script src="egdodColor.js"></script>
+<script src="egdodArray.js"></script>
+<script src="egdodUI.js"></script>
+<script src="egdodMath.js"></script>
+<script src="egdodAnim.js"></script>
+<script src="egdodShader.js"></script>
 
 
 
 
 
-<script id='draw' type='text/x-cindyscript'>
-drawButton(startButton);
-  
-drawWrappedText(canvascorners_1 + (1,-1), testText, round(lerp(5, 100, screenMouse().x)), 1, 20, "left", (0,0,0), "Palatino");
+<div id='cindyScripts'>
+  <script id='csdraw' type='text/x-cindyscript'>
+  drawButton(startButton);
+    
+  drawWrappedText(canvascorners_1 + (1,-1), testText, round(lerp(5, 100, screenMouse().x)), 1, 20, "left", (0,0,0), "Palatino");
+  </script>
+</div>
+
+<script type='text/javascript'>
+scriptList = [
+    "init",
+    "draw",
+];
+
+
 </script>
 
 
 
-<script id='tick' type='text/x-cindyscript'>
+
+<script id='cstick' type='text/x-cindyscript'>
   delta = deltaTime();
   updateAnimationTrack(animationTrack1, delta);
   updateAnimationTrack(animationTrack2, delta);
@@ -86,7 +124,7 @@ drawWrappedText(canvascorners_1 + (1,-1), testText, round(lerp(5, 100, screenMou
 
 
 
-<script id='mouse_down' type='text/x-cindyscript'>
+<script id='csmousedown' type='text/x-cindyscript'>
   if(mouseInButton(startButton),
     startButton.pressed = true;
     
@@ -96,33 +134,26 @@ drawWrappedText(canvascorners_1 + (1,-1), testText, round(lerp(5, 100, screenMou
   
 </script>
 
-<script id='mouse_drag' type='text/x-cindyscript'>
+<script id='csmousedrag' type='text/x-cindyscript'>
 </script>
 
-<script id='mouse_up' type='text/x-cindyscript'>
+<script id='csmouseup' type='text/x-cindyscript'>
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:800px; height:600px; border:0px solid #000000;">
-<canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="z-index: 2; position:absolute; left: 0px; top: 0px"></canvas>
-</div>
+<canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="border:0px solid #000000;"></canvas>
 
 
 
 
 <script>
   cindy = createCindy({canvasname:"CSCanvas",
-                drawscript:"draw",
-                initscript:"init",
-                mousedownscript:"mouse_down",
-                mousedragscript:"mouse_drag",
-                mouseupscript:"mouse_up",
-                tickscript:"tick",
-                images: {
-                   img1: "img1.png",
-                   img2: "img2.png"
-                }
-               });
+    scripts: "cs*",
+    images: {
+        img1: "img1.png",
+        img2: "img2.png"
+    }
+  });
   
 </script>
 
