@@ -144,6 +144,18 @@
 		// Lerp relative to t in interval [a, b].
 		lerp(x, y, t, a, b) := lerp(x, y, inverseLerp(a, b, t));
 
+		slerp(u, v, t) := (
+			regional(angle);
+
+			angle = arccos(u * v);
+
+			if(angle ~= 0,
+				u;
+			, // else //
+				(sin((1 - t) * angle) * u + sin(t * angle) * v) / sin(angle);
+			);
+		);
+
 
 
 
