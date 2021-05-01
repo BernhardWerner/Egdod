@@ -34,7 +34,7 @@
 		timeBufferEABOW = computerSeconds();
 		scriptStartTimeEABOW = timeBufferEABOW;
 	);
-
+	now() := computerSeconds() - scriptStartTimeEABOW;
 
 	// ************************************************************************************************
 	// Returns the duration ofthe last frame/tick in seconds.
@@ -113,7 +113,7 @@
 		"looping":  false
 	}; 
 
-	trackStarted(track) := computerSeconds() - scriptStartTimeEABOW >= track.start;
+	trackStarted(track) := now() >= track.start;
 
 	// Needs to run on every frame!
 	updateAnimationTrack(track, delta) := (
