@@ -149,13 +149,22 @@
 			mink = convexHull(flatten(apply(shapeA, a, apply(shapeB, b, b - a))));
 
 			result = true;
-			forall(consecutive(mink),
+			forall(cycle(mink),
 				result = result & (triangleheight(#_1, #_2, (0,0)) >= 0);
 			);
 
 			result;
 		);
 
+		pointInPolygon(point, poly) := (
+			regional(result);
+
+			result = true;
+			forall(cycle(poly),
+				result = result & (triangleheight(#_1, #_2, point) >= 0);
+			);
+			result;
+		);
 		
 
 					
