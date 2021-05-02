@@ -368,6 +368,13 @@
 			(t, parse(func + "(" + t + ")"));	
 		);
 	);
+	sampleCurve(curve, start, end) := (
+		apply(0..strokeSampleRateEABOW-1,
+			t = lerp(start, end, #, 0, strokeSampleRateEABOW-1);
+
+			parse(curve + "(" + t + ")");	
+		);
+	)
 
 
 	// ************************************************************************************************
