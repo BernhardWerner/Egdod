@@ -17,6 +17,8 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
+<<<<<<< HEAD
+=======
   // ************************************************************************************************
   // Gets the ALICE and Toolbox colours.
   // ************************************************************************************************
@@ -43,18 +45,21 @@
   aliceColor(name, bright) := get(aliceColorTable, name)_(3 - bright);
   aliceColor(name)         := get(aliceColorTable, name)_3;
   
+>>>>>>> origin/main
 // **********************************************************************************************************
 // Start ****************************************************************************************************
 // **********************************************************************************************************
-canvascorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
-canvascenter  = 0.5 * canvascorners_1 + 0.5 * canvascorners_3;
-canvaswidth   = dist(canvascorners_1, canvascorners_2);
-canvasheight  = dist(canvascorners_1, canvascorners_4);
+canvasCorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+canvasCenter  = 0.5 * canvasCorners_1 + 0.5 * canvasCorners_3;
+canvasWidth   = dist(canvasCorners_1, canvasCorners_2);
+canvasHeight  = dist(canvasCorners_1, canvasCorners_4); 
+[canvasLeft, canvasTop] = canvasCorners_1;
+[canvasRight, canvasBottom] = canvasCorners_3;
 screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - canvascorners_1.y) / canvasheight];
 
 
 startButton = {
-  "position": (canvascorners_3 + [-4, 2]),
+  "position": (canvasCorners_3 + [-4, 2]),
   "size":     [2.5, 1.5],
   "label":    "play",
   "textSize": 20,
@@ -63,23 +68,42 @@ startButton = {
   "pressed":  false
 };
 
+basePoly = [(2,1), (-1, 5), (-3,-3)];
+polyA = [];
+updatePolyA() := (
+  polyA = apply(basePoly, mouse().xy + #);
+);
+updatePolyA();
+
+polyB = apply([(5,0), (3,3), (-1,2), (-4,0), (0,-3)], canvasCenter + (6,6) + #);
 
 
+col = (0,0,1);
 
-
-
-testText = "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem, dolor beatae architecto impedit minus, magnam dolorem eos eligendi nam possimus tenetur nesciunt placeat maxime repellat hic laudantium quo, sequi assumenda? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem, dolor beatae architecto impedit minus, magnam dolorem eos eligendi nam possimus tenetur nesciunt placeat maxime repellat hic laudantium quo, sequi assumenda? Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quidem, dolor beatae architecto impedit minus, magnam dolorem eos eligendi nam possimus tenetur nesciunt placeat maxime repellat hic laudantium quo, sequi assumenda?";
-
-
-
-
-
-
-
-animationTrack1 = setupAnimationTrack(0, 3);
-animationTrack2 = setupAnimationTrack(1, 2);
 
 </script>
+<script src="egdodColor.js"></script>
+<script src="egdodArray.js"></script>
+<script src="egdodUI.js"></script>
+<script src="egdodMath.js"></script>
+<script src="egdodAnim.js"></script>
+<script src="egdodShader.js"></script>
+
+
+
+
+
+<script id='csdraw' type='text/x-cindyscript'>
+  fillpoly(polyB, alpha->0.5, color->col);
+  fillpoly(polyA, alpha->0.5, color->col);
+
+</script>
+<<<<<<< HEAD
+
+
+
+<script id='cstick' type='text/x-cindyscript'>
+=======
 <script src="egdodColor.js"></script>
 <script src="egdodArray.js"></script>
 <script src="egdodUI.js"></script>
@@ -106,10 +130,20 @@ scriptList = [
 ];
 
 
+>>>>>>> origin/main
 </script>
 
 
+<script id='csmousemove' type='text/x-cindyscript'>
+  updatePolyA();
 
+<<<<<<< HEAD
+  lazyCollision(polyA, polyB);
+  
+  lazyCollision(polyA, polyB);
+  lazyCollision(polyA, polyB);
+  lazyCollision(polyA, polyB);
+=======
 
 <script id='cstick' type='text/x-cindyscript'>
   delta = deltaTime();
@@ -118,10 +152,15 @@ scriptList = [
 
 
 
+>>>>>>> origin/main
 
 
+  col = if(lazyCollision(polyA, polyB), (1,0,0), (0,0,1));
 </script>
 
+<<<<<<< HEAD
+<script id='csmousedown' type='text/x-cindyscript'>
+=======
 
 
 <script id='csmousedown' type='text/x-cindyscript'>
@@ -132,6 +171,7 @@ scriptList = [
     setupTime();
   );  
   
+>>>>>>> origin/main
 </script>
 
 <script id='csmousedrag' type='text/x-cindyscript'>
@@ -148,12 +188,21 @@ scriptList = [
 
 <script>
   cindy = createCindy({canvasname:"CSCanvas",
+<<<<<<< HEAD
+                scripts:"cs*",
+
+                images: {
+
+                }
+               });
+=======
     scripts: "cs*",
     images: {
         img1: "img1.png",
         img2: "img2.png"
     }
   });
+>>>>>>> origin/main
   
 </script>
 

@@ -34,6 +34,133 @@
 		    );
 		);
 
+
+		// *************************************************************************************************
+		// Computes the convexhulls of a list of points
+		// *************************************************************************************************
+		cross(o, a, b) := (
+			(a.x - o.x) * (b.y - o.y) - (a.y - o.y) * (b.x - o.x)
+		  );
+		convexHull(points) := (
+			regional(ordered, upper, lower);
+		  
+			ordered = set(sort(points));
+			if(length(ordered) <= 3,
+			  ordered;
+			, // else //
+			  lower = [];
+			  forall(ordered,
+				while((length(lower) > 1) & (cross(lower_(-2), lower_(-1), #) <= 0),
+				  lower = pop(lower);
+				);
+				lower = lower :> #;
+			  );
+			  upper = [];
+			  forall(reverse(ordered),
+				while((length(upper) > 1) & (cross(upper_(-2), upper_(-1), #) <= 0),
+				  upper = pop(upper);
+				);
+				upper = upper :> #;
+			  );
+		  
+			  pop(lower) ++ pop(upper);
+			);
+		  );
+		
+
+
+
+		// *************************************************************************************************
+		// Area of a (simple?) polygon.
+		// *************************************************************************************************
+		areaOfPolygon(points) := (
+			0.5 * abs(sum(apply(1..(length(points) - 1),
+			  (points_#).x * (points_(# + 1)).y - (points_(# + 1)).x * (points_#).y;
+			)));
+		  );
+
+
+
+
+		// *************************************************************************************************
+		// The GJK collison detection algorithm for finite convex polygons in 2D.
+		// *************************************************************************************************
+		/*
+		GJKcollision(shapeA, shapeB) := (
+			regional(dir, simplex, found, a, b, c, perpB, perpC);
+
+			if(shapeA == [] % shapeB == [],
+				false;
+			, // else //
+				dir = sum(shapeB) / length(shapeB) - sum(shapeA) / length(shapeA);
+				simplex = [polySupport(shapeA, shapeB, dir)];
+				dir = (0,0) - simplex_1;
+
+				result = false;
+				searching = true;
+				while(searching,
+					a = polySupport(shapeA, shapeB, dir);
+					if(a * dir < 0,
+						searching = false;
+					, // else //
+						simplex = simplex :> a;
+						if(length(simplex) == 2,
+							[b, a] = simplex;
+							if(triangleheight(a,b,(0,0)) ~= 0,
+								result = true;
+								searching = false;
+							, // else // 
+								dir = perp(b-a) * sign(triangleheight(a,b,(0,0)));
+							);
+						, // else //
+							[c, b, a] = simplex;
+							if(triangleheight(a,b,(0,0)) * triangleheight(a,c,(0,0)) * triangleheight(b,c,(0,0)) ~= 0,
+								result = true;
+								searching = false;
+							, // else // 
+								perpB = perp(b-a) * sign(triangleheight(a,b,(0,0)));
+								perpC = perp(c-a) * sign(triangleheight(a,c,(0,0)));
+
+								 if(perpB * a < 0,
+									simplex = simplex_[2,3];
+									dir = perpB;
+								,if(perpC * a < 0,
+									simplex = simplex_[1,3];
+									dir = perpC;
+								, // else //
+									result = true;
+									searching = false;
+								));
+							);
+						);
+					);
+				);
+
+				result;
+			);
+		);
+		polySupport(shape, dir) := sort(shape, # * dir)_(-1);
+		polySupport(shapeA, shapeB, dir) := polySupport(shapeA, dir) - polySupport(shapeB, -dir);
+		*/
+
+		lazyCollision(shapeA, shapeB) := (
+			regional(mink);
+			
+			mink = convexHull(flatten(apply(shapeA, a, apply(shapeB, b, b - a))));
+
+			result = true;
+			forall(consecutive(mink),
+				result = result & (triangleheight(#_1, #_2, (0,0)) >= 0);
+			);
+
+			result;
+		);
+
+		
+
+					
+
+
 		// *************************************************************************************************
 		// Computes the angle at q from p to r. The result lies in [0, 2 * pi].
 		// *************************************************************************************************
@@ -49,6 +176,11 @@
 		     if(perp(x) * y >= 0, w, 2*pi - w);
 		);
 
+
+		// *************************************************************************************************
+		// The sign of a number x.
+		// *************************************************************************************************
+		sign(x) := if(abs(x) == 0, 0, x / abs(x));
 
 
 		// *************************************************************************************************
