@@ -250,7 +250,7 @@
 	// index
 	// ************************************************************************************************
 	drawFlipbookObject(obj) := (
-		drawimage(obj.pos + obj.scale * 0.5 * [-1, -1], obj.pos + obj.scale * 0.5 * [1, -1], obj.flipbook_(obj.index));
+		drawimage(obj.pos, obj.flipbook_(obj.index), scale->obj.scale, rotation->obj.rotation, flipx->obj.flipx, flipy->obj.flipy);
 	);
 	
 
@@ -262,7 +262,7 @@
 		regional(n);
 		n = length(obj.flipbook);
 
-		obj.index = floor(lerp(1, n + 0.9999, track.timeLeft, track.start, track.end));
+		obj.index = floor(lerp(1, n + 0.9999, track.timeLeft, track.end, track.start));
 	);
 
 
