@@ -156,15 +156,21 @@
 			result;
 		);
 
+		// CONVEX POLYGONS ONLY!!!
 		pointInPolygon(point, poly) := (
-			regional(result);
+			regional(resultForwards, resultBackwards);
 
-			result = true;
+			resultForwards = true;
+			resultForwards = true;
 			forall(cycle(poly),
-				result = result & (triangleheight(#_1, #_2, point) >= 0);
+				resultForwards  = resultForwards  & (triangleheight(#_1, #_2, point) >= 0);
+				resultBackwards = resultBackwards & (triangleheight(#_1, #_2, point) <= 0);
 			);
-			result;
+
+
+			resultForwards % resultBackwards;
 		);
+		
 		
 
 					
