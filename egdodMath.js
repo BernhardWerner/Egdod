@@ -161,19 +161,16 @@
 			regional(resultForwards, resultBackwards);
 
 			resultForwards = true;
-			resultForwards = true;
+			resultBackwards = true;
 			forall(cycle(poly),
-				resultForwards  = resultForwards  & (triangleheight(#_1, #_2, point) >= 0);
-				resultBackwards = resultBackwards & (triangleheight(#_1, #_2, point) <= 0);
+				resultForwards  = and(resultForwards , triangleheight(#_1, #_2, point) >= 0);
+				resultBackwards = and(resultBackwards, triangleheight(#_1, #_2, point) <= 0);
 			);
 
 
-			resultForwards % resultBackwards;
+			or(resultForwards, resultBackwards);
 		);
-		
-		
-
-					
+				
 
 
 		// *************************************************************************************************
