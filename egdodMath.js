@@ -316,6 +316,7 @@
 
 
 
+		lissajoue(a, b, d, t) := [sin(a * t + d), cos(b * t)];
 
 
 
