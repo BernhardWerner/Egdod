@@ -149,7 +149,7 @@
 				);
 		);
 
-		randchoose(list)    := randsort(list, 1);
+		randchoose(list) := randchoose(list, 1)_1;
 
 
 
