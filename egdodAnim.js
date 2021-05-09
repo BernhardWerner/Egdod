@@ -227,8 +227,14 @@
 		absoluteStroke = apply(obj.stroke, obj.pos + #);
 		ratio = 1..ceil(obj.drawPercent * length(absoluteStroke));
 		fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
-		connect(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor);
-		if(obj.arrow & length(ratio) > 3, connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.arrowSize), size->obj.lineSize, color->obj.lineColor));
+		connect(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+		if(obj.arrow, 
+			if(length(ratio) >= 3,
+				connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.arrowSize), size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+			, // else //
+			connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_1), obj.arrowSize), size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+			);
+		);
 	);
 	arrowTipAngleEABOW = pi/ 6;
 	arrowTip(tipPos, dir, size) := (
