@@ -229,11 +229,11 @@
 		fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
 		connect(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
 		if(obj.arrow, 
-			if(length(ratio) >= 3,
+			 if(length(ratio) >= 3,
 				connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.arrowSize), size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-			, // else //
-			connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_1), obj.arrowSize), size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-			);
+			,if(length(ratio) >= 2,
+				connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-2)), obj.arrowSize), size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+			));
 		);
 	);
 	arrowTipAngleEABOW = pi/ 6;
