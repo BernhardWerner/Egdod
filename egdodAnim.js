@@ -254,6 +254,10 @@
 	// scale
 	// flipbook
 	// index
+	// flipx
+	// flipy
+	// scale
+	// rotation
 	// ************************************************************************************************
 	drawFlipbookObject(obj) := (
 		drawimage(obj.pos, obj.flipbook_(obj.index), scale->obj.scale, rotation->obj.rotation, flipx->obj.flipx, flipy->obj.flipy);
