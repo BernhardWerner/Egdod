@@ -83,8 +83,8 @@ animationTrack1.looping = true;
 
 setupAnimation() := (
   
-  animationTrack2 = setupAnimationTrack(2, 3);
-  animationTrack3 = setupAnimationTrack(4, 6);
+  animationTrack2 = setupAnimationTrack(1, 2);
+  animationTrack3 = setupAnimationTrack(3, 6);
   animationTrack4 = setupAnimationTrack(7, 8);
   animationTrack5 = setupAnimationTrack(7.1, 8.1);
   animationTrack6 = setupAnimationTrack(9.5, 10.5);
@@ -110,12 +110,7 @@ setupAnimation();
 
 
 </script>
-<script src="egdodMath.js" data-scriptid="init"></script>
-<script src="egdodArray.js" data-scriptid="init"></script>
-<script src="egdodColor.js" data-scriptid="init"></script>
-<script src="egdodAnim.js" data-scriptid="init"></script>
-<script src="egdodUI.js" data-scriptid="init"></script>
-
+<script src="egdod.js" data-scriptid="init"></script>
 
 
 
@@ -162,7 +157,7 @@ setupAnimation();
     
   fadeoutTime = animationTrack7.progress;
 
-  if(computerSeconds() - scriptStartTimeEABOW > 12.5 & animationTrack1.progress > 0.99, 
+  if(computerSeconds() - scriptStartTimeEBOW > 12.5 & animationTrack1.progress > 0.99, 
     fadeoutTime = 1;
     setupAnimation();
   );
