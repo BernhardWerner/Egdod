@@ -73,29 +73,21 @@ fadeoutTime = 0;
 
 
 
+
 animationTrack1 = setupAnimationTrack(0, 1);
 animationTrack1.looping = true;
 
 setupAnimation() := (
-  
-  animationTrack2 = setupAnimationTrack(1, 2);
-  animationTrack3 = setupAnimationTrack(3, 6);
-  animationTrack4 = setupAnimationTrack(7, 8);
-  animationTrack5 = setupAnimationTrack(7.1, 8.1);
-  animationTrack6 = setupAnimationTrack(9.5, 10.5);
-  animationTrack7 = setupAnimationTrack(11.5, 12.5);
-
-
   tracks = [
     animationTrack1,
-    animationTrack2,
-    animationTrack3,
-    animationTrack4,
-    animationTrack5,
-    animationTrack6,
-    animationTrack7
+    setupAnimationTrack(1, 2),
+    setupAnimationTrack(3, 6),
+    setupAnimationTrack(7, 8),
+    setupAnimationTrack(7.1, 8.1),
+    setupAnimationTrack(9.5, 10.5),
+    setupAnimationTrack(11.5, 12.5)
   ];
-  
+
   setupTime();  
 );
 
@@ -129,30 +121,30 @@ setupAnimation();
 
   
 
-  tween(timeRect, "w", 0, canvasWidth, animationTrack1);
+  tween(timeRect, "w", 0, canvasWidth, tracks_1);
   
-  constructStrokeDraw(strokeObject, 5, 0, animationTrack2);
+  constructStrokeDraw(strokeObject, 5, 0, tracks_2);
   
-  tween(strokeObject, "pos", strokeEnd, origin, animationTrack6, "easeInOutCubic");
-  tween(strokeObject, "lineColor", aliceColor("teal"), aliceColor("red"), animationTrack6, "easeInOutCubic");
-  tween(strokeObject, "fillColor", aliceColor("teal"), (1,1,1), animationTrack6, "easeOutCirc");
-  tween(strokeObject, "fillAlpha", 0.5, 0, animationTrack6, "easeOutCirc");
-  tween(strokeObject, "stroke", triangleStroke, functionStroke, animationTrack6, "easeInOutCubic");
+  tween(strokeObject, "pos", strokeEnd, origin, tracks_6, "easeInOutCubic");
+  tween(strokeObject, "lineColor", aliceColor("teal"), aliceColor("red"), tracks_6, "easeInOutCubic");
+  tween(strokeObject, "fillColor", aliceColor("teal"), (1,1,1), tracks_6, "easeOutCirc");
+  tween(strokeObject, "fillAlpha", 0.5, 0, tracks_6, "easeOutCirc");
+  tween(strokeObject, "stroke", triangleStroke, functionStroke, tracks_6, "easeInOutCubic");
 
-  tween(strokeObject, "pos", strokeStart, strokeEnd, animationTrack3, "easeInOutCubic");
-  tween(strokeObject, "lineColor", aliceColor("orange"), aliceColor("teal"), animationTrack3, "easeInOutCubic");
-  tween(strokeObject, "fillColor", aliceColor("orange"), aliceColor("teal"), animationTrack3, "easeInOutCubic");
-  tween(strokeObject, "stroke", circleStroke, triangleStroke, animationTrack3, "easeInOutCubic");
+  tween(strokeObject, "pos", strokeStart, strokeEnd, tracks_3, "easeInOutCubic");
+  tween(strokeObject, "lineColor", aliceColor("orange"), aliceColor("teal"), tracks_3, "easeInOutCubic");
+  tween(strokeObject, "fillColor", aliceColor("orange"), aliceColor("teal"), tracks_3, "easeInOutCubic");
+  tween(strokeObject, "stroke", circleStroke, triangleStroke, tracks_3, "easeInOutCubic");
   
-  constructStrokeDraw(axisX, 4, 0.5, animationTrack4);
-  constructStrokeDraw(axisY, 4, 0.5, animationTrack4);
+  constructStrokeDraw(axisX, 4, 0.5, tracks_4);
+  constructStrokeDraw(axisY, 4, 0.5, tracks_4);
 
-  constructStrokeDrawMany(grid, 2, 0, animationTrack5, 0.05);
+  constructStrokeDrawMany(grid, 2, 0, tracks_5, 0.05);
 
     
-  fadeoutTime = animationTrack7.progress;
+  fadeoutTime = tracks_7.progress;
 
-  if(computerSeconds() - scriptStartTimeEBOW > 12.5 & animationTrack1.progress > 0.99, 
+  if(computerSeconds() - scriptStartTimeEBOW > 12.5 & tracks_1.progress > 0.99, 
     fadeoutTime = 1;
     setupAnimation();
   );
