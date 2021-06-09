@@ -31,9 +31,11 @@ func(x) := 2 * sin(x) + 1;
 
 strokeStart = canvasCenter + (-5, 0);
 strokeEnd = canvasCorners_2 + (-1, -1);
+
 circleStroke = sampleCircle(2, 2*pi);
 triangleStroke = samplePolygon([(0,0), (-4, 0), (0, -5)]);
 functionStroke = 2 * sampleFunctionGraph("func", -1.2, 4.2);
+
 strokeObject = createRootStrokeObject(strokeStart, aliceColor("orange"), aliceColor("orange"), 0.5);
 strokeObject.stroke = circleStroke;
 
@@ -46,6 +48,7 @@ axisX.stroke = sampleBezierLin((-1, 0), (10, 0));
 axisY.stroke = sampleBezierLin((0, -1), (0, 10));
 axisX.arrow = true;
 axisY.arrow = true;
+
 
 gridH = apply(1..4,
   new = createRootStrokeObject(origin + (0, 2 * #), 0.7 * (1,1,1), (1,1,1), 0);
@@ -117,9 +120,8 @@ setupAnimation();
 
 <script id='tick' type='text/x-cindyscript'>
   delta = deltaTime();
-  forall(tracks, updateAnimationTrack(#, delta));
 
-  
+  forall(tracks, updateAnimationTrack(#, delta));
 
   tween(timeRect, "w", 0, canvasWidth, tracks_1);
   

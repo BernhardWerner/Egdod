@@ -226,6 +226,7 @@
 	// stroke (list of points, relative to pos)
 	// drawPercent
 	// lineColor
+	// lineAlpha
 	// lineSize
 	// fillColor
 	// fillAlpha
