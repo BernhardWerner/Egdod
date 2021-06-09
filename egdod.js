@@ -3,6 +3,17 @@
  */
 (function(){
 	var code = document.createTextNode(`
+
+	canvasCorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+	canvasCenter  = 0.5 * canvasCorners_1 + 0.5 * canvasCorners_3;
+	canvasWidth   = dist(canvasCorners_1, canvasCorners_2);
+	canvasHeight  = dist(canvasCorners_1, canvasCorners_4);
+	[canvasLeft, canvasTop] = canvasCorners_1;
+	[canvasRight, canvasBottom] = canvasCorners_3;
+	screenMouse() := [(mouse().x - canvasCorners_1.x) / canvaswidth, (mouse().y - canvasCorners_1.y) / canvasheight];
+	
+
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// This library needs egdodMath to work!
 	///////////////////////////////////////////////////////////////////////////////////////////////////

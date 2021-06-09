@@ -22,20 +22,15 @@
 // **********************************************************************************************************
 // Start ****************************************************************************************************
 // **********************************************************************************************************
-canvascorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
-canvascenter  = 0.5 * canvascorners_1 + 0.5 * canvascorners_3;
-canvaswidth   = dist(canvascorners_1, canvascorners_2);
-canvasheight  = dist(canvascorners_1, canvascorners_4);
-screenMouse() := [(mouse().x - canvascorners_1.x) / canvaswidth, (mouse().y - canvascorners_1.y) / canvasheight];
 
 
 
-timeRect = rect(canvascorners_4, 1, 0.2);
+timeRect = rect(canvasCorners_4, 1, 0.2);
 
 func(x) := 2 * sin(x) + 1;
 
-strokeStart = canvascenter + (-5, 0);
-strokeEnd = canvascorners_2 + (-1, -1);
+strokeStart = canvasCenter + (-5, 0);
+strokeEnd = canvasCorners_2 + (-1, -1);
 circleStroke = sampleCircle(2, 2*pi);
 triangleStroke = samplePolygon([(0,0), (-4, 0), (0, -5)]);
 functionStroke = 2 * sampleFunctionGraph("func", -1.2, 4.2);
@@ -44,7 +39,7 @@ strokeObject.stroke = circleStroke;
 
 
 
-origin = canvascenter + (-6, -3);
+origin = canvasCenter + (-6, -3);
 axisX = createRootStrokeObject(origin, (0,0,0), (1,1,1), 0);
 axisY = createRootStrokeObject(origin, (0,0,0), (1,1,1), 0);
 axisX.stroke = sampleBezierLin((-1, 0), (10, 0));
@@ -71,7 +66,7 @@ grid = randsort(gridH ++ gridV);
 
 
 
-fadeoutRect = rect(canvascorners_4, canvaswidth, canvasheight);
+fadeoutRect = rect(canvasCorners_4, canvasWidth, canvasHeight);
 fadeoutTime = 0;
 
 
@@ -134,7 +129,7 @@ setupAnimation();
 
   
 
-  tween(timeRect, "w", 0, canvaswidth, animationTrack1);
+  tween(timeRect, "w", 0, canvasWidth, animationTrack1);
   
   constructStrokeDraw(strokeObject, 5, 0, animationTrack2);
   
