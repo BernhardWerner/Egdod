@@ -146,7 +146,7 @@
 
 		t = track.progress;
 		
-		if(t <= 1,
+		if(t < 1,
 			if(easing != "none",
 				t = parse(easing + "(" + t + ")");
 			);
@@ -154,7 +154,11 @@
 			if(contains(keys(obj), prop),
 				obj_prop = lerp(from, to, t);
 			);	
-		);
+		,if(t >= 1,
+			if(contains(keys(obj), prop),
+				obj_prop = to;
+			);	
+		));
 	);
 	tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");
 
@@ -299,6 +303,7 @@
 		"drawPercent": 0,
 		"lineSize": 0,
 		"lineColor": lineColor,
+		"lineAlpha": 1,
 		"fillColor": fillColor,
 		"fillAlpha": fillAlpha,
 		"arrow": false,
@@ -354,30 +359,39 @@
 	// ************************************************************************************************
 	// Creates stroke as Bezier curves.
 	// ************************************************************************************************
-	sampleBezierLin(a, b) := (
+	bezier(controls, t) := (
+		regional(n);
+
+		n = length(controls);
+
+		sum(apply(0..n - 1, binom(n, #) * t^# * (1 - t)^(n - #) * controls_(# + 1)));
+	);
+
+	sampleBezierCurve(controls) := (
 		regional(t);
 		apply(0..strokeSampleRateEBOW - 1, 
 			t = # / (strokeSampleRateEBOW - 1);
 
-			t*b + (1-t)*a;
+			bezier(controls, t);
 		);
 	);
-	sampleBezierQuad(a, b, c) := (
+
+			
+
+	// ************************************************************************************************
+	// Creates stroke as Catmull-Rom curves.
+	// ************************************************************************************************
+	catmullRom(controls, t) := [1, t, t^2, t^3] * [[0, 1, 0, 0], [-0.5, 0, 0.5, 0], [1, -2.5, 2, -0.5], [-0.5, 1.5, -1.5, 0.5]] * controls;
+	
+	sampleCatmullRomCurve(controls) := (
 		regional(t);
 		apply(0..strokeSampleRateEBOW - 1, 
 			t = # / (strokeSampleRateEBOW - 1);
 
-			t^2*c + 2*t*(1-t)*b + (1-t)^2*a;
+			catmullRom(controls, t);
 		);
 	);
-	sampleBezierCube(a, b, c, d) := (
-		regional(t);
-		apply(0..strokeSampleRateEBOW - 1, 
-			t = # / (strokeSampleRateEBOW - 1);
-
-			t^3*d + 3*t^2*(1-t)*c + 3*t*(1-t)^2*b + (1-t)^3*a;
-		);
-	);
+	
 
 
 	// ************************************************************************************************
