@@ -294,7 +294,6 @@
 
 
 	
-	//if(isundefined(strokeSampleRateEBOW), println("test"); strokeSampleRateEBOW = 64);
 	strokeSampleRateEBOW = 64;
 	// ************************************************************************************************
 	// Setting up a stroke object.
@@ -353,7 +352,7 @@
 
 		splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers);
 		
-		flatten(apply(1..length(pairs), pairs_#_1 <: subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_#))) ++ if(closed, [poly_1], []);
+		flatten(apply(1..length(pairs), pairs_#_1 <: subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_#))) ++ if(closed, [poly_1], [poly_(-1)]);
 	);
 	samplePolygon(poly) := 	samplePolygon(poly, true);
 		
@@ -902,7 +901,7 @@
 
 			[start, end] = [min(points).x, max(points).x];
 
-			samples = samplePolygon(apply(1..length(cutTimes), [(# - 1) / (length(cutTimes) - 1), cutTimes_#]));
+			samples = samplePolygon(apply(1..length(cutTimes), [(# - 1) / (length(cutTimes) - 1), cutTimes_#]), false);
 			samples = apply(samples, lerp(start, end, #.x));
 			apply(samples, [#, lagrange(points, #)]);
 		);
