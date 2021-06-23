@@ -146,19 +146,21 @@
 
 		t = track.progress;
 		
-		if(t < 1,
-			if(easing != "none",
-				t = parse(easing + "(" + t + ")");
-			);
-		
-			if(contains(keys(obj), prop),
-				obj_prop = lerp(from, to, t);
-			);	
-		,if(t >= 1,
-			if(contains(keys(obj), prop),
-				obj_prop = to;
-			);	
-		));
+		if(trackStarted(track),
+			if(t < 1,
+				if(easing != "none",
+					t = parse(easing + "(" + t + ")");
+				);
+			
+				if(contains(keys(obj), prop),
+					obj_prop = lerp(from, to, t);
+				);	
+			,if(t >= 1,
+				if(contains(keys(obj), prop),
+					obj_prop = to;
+				);	
+			));
+		);
 	);
 	tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");
 
@@ -376,7 +378,11 @@
 		);
 	);
 
-			
+	// ************************************************************************************************
+	// Discrete derivative of a discrete curve
+	// ************************************************************************************************
+	derive(curve) := apply(consecutive(curve), #_2 - #_1);
+
 
 	// ************************************************************************************************
 	// Creates stroke as Catmull-Rom curves.
@@ -389,6 +395,34 @@
 			t = # / (strokeSampleRateEBOW - 1);
 
 			catmullRom(controls, t);
+		);
+	);
+			
+	sampleCatmullRomSpline(points) := (
+		regional(dists, traj, before, after, cutTimes, piece, controls, t);
+
+		dists    = apply(derive(points), abs(#));
+		traj     = sum(dists);
+		before   = 2 * points_1    - points_2;
+		after    = 2 * points_(-1) - points_(-2);
+		cutTimes = 0 <: apply(1..(length(dists) - 1), sum(dists_(1..#))) / traj;
+	  
+		apply(0..(strokeSampleRateEBOW - 1), i,
+		  piece = select(1..(length(points) - 1), cutTimes_# * (strokeSampleRateEBOW - 1) <= i)_(-1);
+	  
+		
+		  if(piece == 1,
+			controls = [before, points_1, points_2, points_3];
+			t = i / (strokeSampleRateEBOW - 1) * traj / dists_1;
+		  ,if(piece == length(points) - 1,
+			controls = [points_(-3), points_(-2), points_(-1), after];
+			t = (i / (strokeSampleRateEBOW - 1) - cutTimes_(-1)) * traj / dists_(-1);
+		  , // else //
+			controls = [points_(piece - 1), points_(piece), points_(piece + 1), points_(piece + 2)];
+			t = (i / (strokeSampleRateEBOW - 1) - cutTimes_piece) * traj / dists_piece;
+		  ));
+
+		  catmullRom(controls, t);
 		);
 	);
 	
@@ -858,6 +892,20 @@
 		lagrange(list, x) := sum(apply(list, p,
 			p.y * product(apply(list -- [p], q, (x - q.x) / (p.x - q.x)));
 		));
+
+		sampleLagrangeInterpolation(points) := (
+			regional(dists, traj, cutTimes, piece, t, start, end);
+	
+			dists    = apply(derive(points), abs(#));
+			traj     = sum(dists);
+			cutTimes = 0 <: apply(1..length(dists), sum(dists_(1..#))) / traj;
+
+			[start, end] = [min(points).x, max(points).x];
+
+			samples = samplePolygon(apply(1..length(cutTimes), [(# - 1) / (length(cutTimes) - 1), cutTimes_#]));
+			samples = apply(samples, lerp(start, end, #.x));
+			apply(samples, [#, lagrange(points, #)]);
+		);
 
 
 
