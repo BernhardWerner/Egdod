@@ -326,7 +326,7 @@
 	// ************************************************************************************************
 	// Subdivides the distance between two points.
 	// ************************************************************************************************
-	subdivideSegment(p, q, n) := apply(1..n, lerp(p, q, # / (n + 1)));
+	subdivideSegment(p, q, n) := apply(1..n, lerp(p, q, #, 1, n));
 	
 	// ************************************************************************************************
 	// Creates stroke around a polygon.
@@ -347,7 +347,7 @@
 		splitNumbers = [];
 
 		forall(1..length(poly) - 1,
-			splitNumbers = splitNumbers :> floor(effectiveNumber * dists_# / totalDist);	
+			splitNumbers = splitNumbers :> round(effectiveNumber * dists_# / totalDist);	
 		);
 
 		splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers);
