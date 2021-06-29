@@ -12,7 +12,7 @@
 	[canvasRight, canvasBottom] = canvasCorners_3;
 	screenMouse() := [(mouse().x - canvasCorners_1.x) / canvaswidth, (mouse().y - canvasCorners_1.y) / canvasheight];
 	
-
+	strokeSampleRateEBOW = 64;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	// This library needs egdodMath to work!
@@ -294,7 +294,7 @@
 
 
 	
-	strokeSampleRateEBOW = 64;
+	
 	// ************************************************************************************************
 	// Setting up a stroke object.
 	// ************************************************************************************************
@@ -331,31 +331,62 @@
 	// ************************************************************************************************
 	// Creates stroke around a polygon.
 	// ************************************************************************************************
-	samplePolygon(poly, closed) := (
-		regional(pairs, dists, totalDist, effectiveNumber, splitNumbers, stepSize);
+	samplePolygonFREE(poly, nop, closed) := (
+		regional(pairs, dists, totalDist, effectiveNumber, splitNumbers, stepSize, index);
 		
 		if(closed, 
-			pairs = cycle(poly);
-		, // else //
-			pairs = consecutive(poly);
+			poly = poly :> poly_1;
 		);
+		pairs = consecutive(poly);
 		
 		dists = apply(pairs, dist(#_1, #_2));
 		totalDist = sum(dists);
 		
-		effectiveNumber = strokeSampleRateEBOW - length(poly) - 1;
-		splitNumbers = [];
+		effectiveNumber = nop - length(poly);
 
-		forall(1..length(poly) - 1,
-			splitNumbers = splitNumbers :> round(effectiveNumber * dists_# / totalDist);	
-		);
+		splitNumbers = apply(dists, round((nop - 1) * # / totalDist));
 
-		splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers);
-		
-		flatten(apply(1..length(pairs), pairs_#_1 <: subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_#))) ++ if(closed, [poly_1], [poly_(-1)]);
+
+		// if(closed, 
+		// 	splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers)
+		// );
+		// forall(1..nop - 1 - sum(splitNumbers),
+		// 	index = randchoose(1..length(splitNumbers));
+		// 	splitNumbers_# = splitNumbers_# + 1;
+		// );
+
+
+		flatten(apply(1..length(pairs), pop(subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_# + 2)) )) :> poly_(-1);
+	
 	);
-	samplePolygon(poly) := 	samplePolygon(poly, true);
+	samplePolygonFREE(poly, nop) :=	samplePolygonFREE(poly, nop, true);
+
+	samplePolygon(poly) := samplePolygonFREE(poly, strokeSampleRateEBOW);
+	samplePolygon(poly, closed) := samplePolygonFREE(poly, strokeSampleRateEBOW, closed);
+
+	
+
 		
+	// ************************************************************************************************
+	// Resamples a stroke pseudo-equidistantly.
+	// ************************************************************************************************
+	resample(stroke, factor) := (
+		regional(n);
+
+		n = length(stroke);
+
+		stroke = samplePolygonFREE(stroke, factor * (n - 1) + 1, false);
+		stroke;
+	);
+
+
+
+
+
+
+
+
+
 
 	// ************************************************************************************************
 	// Creates stroke as Bezier curves.
@@ -426,6 +457,8 @@
 	);
 	
 
+
+	
 
 	// ************************************************************************************************
 	// Creates a stroke based on a function graph.
@@ -895,15 +928,19 @@
 		sampleLagrangeInterpolation(points) := (
 			regional(dists, traj, cutTimes, piece, t, start, end);
 	
-			dists    = apply(derive(points), abs(#));
-			traj     = sum(dists);
-			cutTimes = 0 <: apply(1..length(dists), sum(dists_(1..#))) / traj;
+			// dists    = apply(derive(points), abs(#));
+			// traj     = sum(dists);
+			// cutTimes = 0 <: apply(1..length(dists), sum(dists_(1..#))) / traj;
+
+			// [start, end] = [min(points).x, max(points).x];
+
+			// samples = samplePolygon(apply(1..length(cutTimes), [(# - 1) / (length(cutTimes) - 1), cutTimes_#]), false);
+			// samples = apply(samples, lerp(start, end, #.x));
+			// apply(samples, [#, lagrange(points, #)]);
 
 			[start, end] = [min(points).x, max(points).x];
 
-			samples = samplePolygon(apply(1..length(cutTimes), [(# - 1) / (length(cutTimes) - 1), cutTimes_#]), false);
-			samples = apply(samples, lerp(start, end, #.x));
-			apply(samples, [#, lagrange(points, #)]);
+			sampleCatmullRomSpline(apply(1..strokeSampleRateEBOW, [lerp(start, end, #, 1, strokeSampleRateEBOW), lagrange(points, lerp(start, end, #, 1, strokeSampleRateEBOW))] ));
 		);
 
 
