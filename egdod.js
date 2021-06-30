@@ -344,16 +344,14 @@
 		
 		effectiveNumber = nop - length(poly);
 
-		splitNumbers = apply(dists, round((nop - 1) * # / totalDist));
+		splitNumbers = apply(dists, floor((nop - 1) * # / totalDist));
 
 
-		// if(closed, 
-		// 	splitNumbers = splitNumbers :> effectiveNumber - sum(splitNumbers)
-		// );
-		// forall(1..nop - 1 - sum(splitNumbers),
-		// 	index = randchoose(1..length(splitNumbers));
-		// 	splitNumbers_# = splitNumbers_# + 1;
-		// );
+		
+		forall(1..nop - 1 - sum(splitNumbers),
+			index = randchoose(1..length(splitNumbers));
+			splitNumbers_# = splitNumbers_# + 1;
+		);
 
 
 		flatten(apply(1..length(pairs), pop(subDivideSegment(pairs_#_1, pairs_#_2, splitNumbers_# + 2)) )) :> poly_(-1);
@@ -369,7 +367,10 @@
 
 
 
-
+	// ************************************************************************************************
+	// Resampling via centripetal Catmull-Rom splines.
+	// ************************************************************************************************
+	resample(stroke, nop) := sampleCatmullRomSplineFREE(stroke, nop);
 
 
 
@@ -403,18 +404,39 @@
 	// ************************************************************************************************
 	// Creates stroke as Catmull-Rom curves.
 	// ************************************************************************************************
-	catmullRom(controls, t) := [1, t, t^2, t^3] * [[0, 1, 0, 0], [-0.5, 0, 0.5, 0], [1, -2.5, 2, -0.5], [-0.5, 1.5, -1.5, 0.5]] * controls;
+	catmullRom(controls, alpha, t) := (
+		regional(a, b, c, p, q, knots);
+
+		knots = [0];
+		forall(2..4,
+			knots = knots :> knots_(-1)	+ dist(controls_#, controls_(# - 1))^alpha;
+		);
+		t = lerp(knots_2, knots_3, t);
+
+		a = lerp(controls_1, controls_2, t, knots_1, knots_2);
+		b = lerp(controls_2, controls_3, t, knots_2, knots_3);
+		c = lerp(controls_3, controls_4, t, knots_3, knots_4);
+
+		p = lerp(a, b, t, knots_1, knots_3);
+		q = lerp(b, c, t, knots_2, knots_4);
+
+		lerp(p, q, t, knots_2, knots_3);
+	);
+
+
 	
-	sampleCatmullRomCurve(controls) := (
+	
+	sampleCatmullRomCurve(controls, alpha) := (
 		regional(t);
 		apply(0..strokeSampleRateEBOW - 1, 
 			t = # / (strokeSampleRateEBOW - 1);
 
-			catmullRom(controls, t);
+			catmullRom(controls, alpha, t);
 		);
 	);
+	sampleCatmullRomCurve(controls) := sampleCatmullRomCurve(controls, 0.5);
 			
-	sampleCatmullRomSplineFREE(points, nop) := (
+	sampleCatmullRomSplineGeneralFREE(points, alpha, nop) := (
 		regional(dists, traj, before, after, cutTimes, piece, controls, t);
 
 		dists    = apply(derive(points), abs(#));
@@ -438,10 +460,12 @@
 			t = (i / (nop - 1) - cutTimes_piece) * traj / dists_piece;
 		  ));
 
-		  catmullRom(controls, t);
+		  catmullRom(controls, alpha, t);
 		);
 	);
-	sampleCatmullRomSpline(points) := sampleCatmullRomSplineFREE(points, strokeSampleRateEBOW);
+	sampleCatmullRomSplineGeneral(points, alpha) := sampleCatmullRomSplineGeneralFREE(points, alpha, strokeSampleRateEBOW);
+	sampleCatmullRomSplineFREE(points, nop)      := sampleCatmullRomSplineGeneralFREE(points, 0.5, nop);
+	sampleCatmullRomSpline(points)               := sampleCatmullRomSplineGeneralFREE(points, 0.5, strokeSampleRateEBOW);
 	
 
 
@@ -917,14 +941,14 @@
 	
 			[start, end] = [min(points).x, max(points).x];
 
-			sampleCatmullRomSpline(apply(1..64, [lerp(start, end, #, 1, 64), lagrange(points, lerp(start, end, #, 1, 64))] ));
+			apply(1..strokeSampleRateEBOW, [lerp(start, end, #, 1, strokeSampleRateEBOW), lagrange(points, lerp(start, end, #, 1, strokeSampleRateEBOW))] );
 		);
 		sampleLagrangeInterpolationFREE(points, nop) := (
 			regional(dists, traj, cutTimes, piece, t, start, end);
 
 			[start, end] = [min(points).x, max(points).x];
 
-			sampleCatmullRomSplineFREE(apply(1..64, [lerp(start, end, #, 1, 64), lagrange(points, lerp(start, end, #, 1, 64))] ), nop);
+			apply(1..nop, [lerp(start, end, #, 1, nop), lagrange(points, lerp(start, end, #, 1, nop))] );
 		);
 
 
@@ -1131,7 +1155,7 @@
 		// Linear interpolation between x and y.
 		// *************************************************************************************************
 		lerp(x, y, t) := t * y + (1 - t) * x;
-		inverseLerp(x, y, p) := if(dist(y, x) != 0, min(1, max(0, dist(p, x) / dist(y, x))), 0);
+		inverseLerp(x, y, p) := if(dist(y, x) != 0, (p - x) / (y - x), 0);
 		// Lerp relative to t in interval [a, b].
 		lerp(x, y, t, a, b) := lerp(x, y, inverseLerp(a, b, t));
 
