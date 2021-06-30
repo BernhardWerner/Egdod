@@ -366,20 +366,6 @@
 
 	
 
-		
-	// ************************************************************************************************
-	// Resamples a stroke pseudo-equidistantly.
-	// ************************************************************************************************
-	resample(stroke, factor) := (
-		regional(n);
-
-		n = length(stroke);
-
-		stroke = samplePolygonFREE(stroke, factor * (n - 1) + 1, false);
-		stroke;
-	);
-
-
 
 
 
@@ -428,7 +414,7 @@
 		);
 	);
 			
-	sampleCatmullRomSpline(points) := (
+	sampleCatmullRomSplineFREE(points, nop) := (
 		regional(dists, traj, before, after, cutTimes, piece, controls, t);
 
 		dists    = apply(derive(points), abs(#));
@@ -437,24 +423,25 @@
 		after    = 2 * points_(-1) - points_(-2);
 		cutTimes = 0 <: apply(1..(length(dists) - 1), sum(dists_(1..#))) / traj;
 	  
-		apply(0..(strokeSampleRateEBOW - 1), i,
-		  piece = select(1..(length(points) - 1), cutTimes_# * (strokeSampleRateEBOW - 1) <= i)_(-1);
+		apply(0..(nop - 1), i,
+		  piece = select(1..(length(points) - 1), cutTimes_# * (nop - 1) <= i)_(-1);
 	  
 		
 		  if(piece == 1,
 			controls = [before, points_1, points_2, points_3];
-			t = i / (strokeSampleRateEBOW - 1) * traj / dists_1;
+			t = i / (nop - 1) * traj / dists_1;
 		  ,if(piece == length(points) - 1,
 			controls = [points_(-3), points_(-2), points_(-1), after];
-			t = (i / (strokeSampleRateEBOW - 1) - cutTimes_(-1)) * traj / dists_(-1);
+			t = (i / (nop - 1) - cutTimes_(-1)) * traj / dists_(-1);
 		  , // else //
 			controls = [points_(piece - 1), points_(piece), points_(piece + 1), points_(piece + 2)];
-			t = (i / (strokeSampleRateEBOW - 1) - cutTimes_piece) * traj / dists_piece;
+			t = (i / (nop - 1) - cutTimes_piece) * traj / dists_piece;
 		  ));
 
 		  catmullRom(controls, t);
 		);
 	);
+	sampleCatmullRomSpline(points) := sampleCatmullRomSplineFREE(points, strokeSampleRateEBOW);
 	
 
 
@@ -926,21 +913,18 @@
 		));
 
 		sampleLagrangeInterpolation(points) := (
-			regional(dists, traj, cutTimes, piece, t, start, end);
+			regional(start, end);
 	
-			// dists    = apply(derive(points), abs(#));
-			// traj     = sum(dists);
-			// cutTimes = 0 <: apply(1..length(dists), sum(dists_(1..#))) / traj;
+			[start, end] = [min(points).x, max(points).x];
 
-			// [start, end] = [min(points).x, max(points).x];
-
-			// samples = samplePolygon(apply(1..length(cutTimes), [(# - 1) / (length(cutTimes) - 1), cutTimes_#]), false);
-			// samples = apply(samples, lerp(start, end, #.x));
-			// apply(samples, [#, lagrange(points, #)]);
+			sampleCatmullRomSpline(apply(1..64, [lerp(start, end, #, 1, 64), lagrange(points, lerp(start, end, #, 1, 64))] ));
+		);
+		sampleLagrangeInterpolationFREE(points, nop) := (
+			regional(dists, traj, cutTimes, piece, t, start, end);
 
 			[start, end] = [min(points).x, max(points).x];
 
-			sampleCatmullRomSpline(apply(1..strokeSampleRateEBOW, [lerp(start, end, #, 1, strokeSampleRateEBOW), lagrange(points, lerp(start, end, #, 1, strokeSampleRateEBOW))] ));
+			sampleCatmullRomSplineFREE(apply(1..64, [lerp(start, end, #, 1, 64), lagrange(points, lerp(start, end, #, 1, 64))] ), nop);
 		);
 
 

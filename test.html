@@ -17,17 +17,29 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
-strokeSampleRateEBOW = 128;
-forall(1..6,
-    createpoint("P" + #, [lerp(canvasLeft, canvasRight, #, 1, 6), canvasCenter.y + 2 * random() - 1]);
+strokeSampleRateEBOW = 256;
+forall(1..8,
+    createpoint("P" + #, [lerp(canvasLeft, canvasRight, #, 0, 9), canvasCenter.y + 2 * random() - 1]);
 );
 
-forall(allpoints(), #.labeled = false);
+forall(allpoints(), 
+  #.labeled = false;
+  #.color = aliceColor("blue");
+  #.size = 3;
+);
 
 
 sample() := (
-  stroke = resample(sampleLagrangeInterpolation(apply(allpoints(), #.xy)), 1);
+  if(mode,
+    stroke = sampleLagrangeInterpolation(apply(allpoints(), #.xy));
+    markers = sampleLagrangeInterpolationFREE(apply(allpoints(), #.xy), 5);
+  , // else //
+    stroke = sampleCatmullRomSpline(apply(allpoints(), #.xy));
+    markers = sampleCatmullRomSplineFREE(apply(allpoints(), #.xy), 5);
+  );
 );
+
+mode = true;
 
 sample();
 
@@ -40,7 +52,12 @@ sample();
 
 <script id='csdraw' type='text/x-cindyscript'>
 sample();
-drawall(stroke, size->1);
+connect(stroke, size -> 3, color -> aliceColor("blue"));
+forall(markers,
+  fillcircle(#, 0.3, color -> aliceColor("red"));
+);
+
+
 </script>
 
 
@@ -59,6 +76,10 @@ drawall(stroke, size->1);
 </script>
 
 <script id='csmouseup' type='text/x-cindyscript'>
+</script>
+
+<script id='cskeydown' type='text/x-cindyscript'>
+  if(key() == " ", mode = !mode);
 </script>
 
 
