@@ -71,6 +71,8 @@ tracks = [
   setupAnimationTrack(0, 3);
 ];
 
+fpsLabel = 0;
+fpsHistory = [];
 
 playanimation();
 setupTime();
@@ -87,12 +89,17 @@ connect(stroke, size -> 3, color -> strokeColors_rollIndex);
 forall(markers,
   fillcircle(#, 0.3, color -> aliceColor("red"));
 );
+
+drawtext(canvasCorners_2 + (-2, -2), fpsLabel);
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
   delta = deltaTime();
+  fpsHistory = fpsHistory :> 1 / delta;
+  if(length(fpsHistory) > 60, fpsHistory = bite(fpsHistory));
+  fpsLabel = 0.1 * round(10 * sum(fpsHistory) / length(fpsHistory));
 
   updateAnimationCascade(tracks, delta);
 

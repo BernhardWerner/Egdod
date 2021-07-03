@@ -59,13 +59,7 @@
 		result;
 	);
 
-	// ************************************************************************************************
-	// Returns the current FPS with a given precision.
-	// ************************************************************************************************
-	fps(digits) := (
-		0.1^digits * round(10^digits / deltaTime());
-	);
-	fps() := fps(0);
+
 
 
 	// ************************************************************************************************
@@ -371,6 +365,7 @@
 	// Resampling via centripetal Catmull-Rom splines.
 	// ************************************************************************************************
 	resample(stroke, nop) := sampleCatmullRomSplineFREE(stroke, nop);
+	resample(stroke) := sampleCatmullRomSplineFREE(stroke, strokeSampleRateEBOW);
 
 
 
