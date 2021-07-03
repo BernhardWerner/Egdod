@@ -10,7 +10,7 @@
 	canvasHeight  = dist(canvasCorners_1, canvasCorners_4);
 	[canvasLeft, canvasTop] = canvasCorners_1;
 	[canvasRight, canvasBottom] = canvasCorners_3;
-	screenMouse() := [(mouse().x - canvasCorners_1.x) / canvaswidth, (mouse().y - canvasCorners_1.y) / canvasheight];
+	screenMouse() := [(mouse().x - canvasCorners_1.x) / canvasWidth, (mouse().y - canvasCorners_1.y) / canvasHeight];
 	
 	strokeSampleRateEBOW = 64;
 
