@@ -342,9 +342,17 @@
 
 
 		
-		forall(1..nop - 1 - sum(splitNumbers),
-			index = randchoose(1..length(splitNumbers));
-			splitNumbers_# = splitNumbers_# + 1;
+		if(sum(splitNumbers) < effectiveNumber,
+			forall(1..effectiveNumber - sum(splitNumbers),
+				index = randchoose(1..length(splitNumbers));
+				splitNumbers_index = splitNumbers_index + 1;
+			);
+		);
+		if(sum(splitNumbers) > effectiveNumber,
+			forall(1..sum(splitNumbers) - effectiveNumber,
+				index = randchoose(1..length(splitNumbers));
+				splitNumbers_index = splitNumbers_index - 1;
+			);
 		);
 
 
@@ -378,7 +386,7 @@
 
 		n = length(controls);
 
-		sum(apply(0..n - 1, binom(n, #) * t^# * (1 - t)^(n - #) * controls_(# + 1)));
+		sum(apply(1..n, binom(n - 1, # - 1) * t^(# - 1) * (1 - t)^(n - #) * controls_#));
 	);
 
 	sampleBezierCurve(controls) := (
