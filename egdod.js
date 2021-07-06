@@ -961,13 +961,7 @@
 			p.y * product(apply(list -- [p], q, (x - q.x) / (p.x - q.x)));
 		));
 
-		sampleLagrangeInterpolation(points) := (
-			regional(start, end);
-	
-			[start, end] = [min(points).x, max(points).x];
-
-			apply(1..strokeSampleRateEBOW, [lerp(start, end, #, 1, strokeSampleRateEBOW), lagrange(points, lerp(start, end, #, 1, strokeSampleRateEBOW))] );
-		);
+		
 		sampleLagrangeInterpolationFREE(points, nop) := (
 			regional(dists, traj, cutTimes, piece, t, start, end);
 
@@ -975,7 +969,7 @@
 
 			apply(1..nop, [lerp(start, end, #, 1, nop), lagrange(points, lerp(start, end, #, 1, nop))] );
 		);
-
+		sampleLagrangeInterpolation(points) := sampleLagrangeInterpolationFREE(points, strokeSampleRateEBOW);
 
 
 		// *************************************************************************************************
