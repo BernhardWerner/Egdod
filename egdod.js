@@ -237,7 +237,8 @@
 	// Stroke object needs
 	// pos
 	// stroke (list of points, relative to pos)
-	// drawPercent
+	// drawStart
+	// drawEnd
 	// scale
 	// lineColor
 	// lineAlpha
@@ -248,11 +249,13 @@
 	// arrowSize
 	// ************************************************************************************************
 	drawStrokeObject(obj) := (
-		regional(absoluteStroke, ratio);
+		regional(absoluteStroke, ratio, n);
 		
 		if(obj.scale ~!= 0,
 			absoluteStroke = apply(obj.stroke, obj.pos + obj.scale * #);
-			ratio = 1..ceil(obj.drawPercent * length(absoluteStroke));
+			n = length(absoluteStroke);
+
+			ratio = max(1,floor(obj.drawStart * n))..min(n, ceil(obj.drawEnd * n));
 			fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
 			connect(absoluteStroke_ratio, size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
 			if(obj.arrow, 
@@ -312,7 +315,8 @@
 	createRootStrokeObject(pos, lineColor, fillColor, fillAlpha) := {
 		"pos": pos,
 		"stroke": apply(1..strokeSampleRateEBOW, [0,0]),
-		"drawPercent": 0,
+		"drawStart": 0,
+		"drawEnd": 0,
 		"scale": 1,
 		"lineSize": 0,
 		"lineColor": lineColor,
@@ -516,18 +520,39 @@
 	// ************************************************************************************************
 	constructStrokeDraw(obj, lineSize, arrowSize, track) := (
 		tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
-		tween(obj, "drawPercent", 0, 1, track, "easeInOutCubic");
+		tween(obj, "drawEnd", 0, 1, track, "easeInOutCubic");
 		tween(obj, "arrowSize", 0, arrowSize, track);	
-		);
-	destroyStrokeDraw(obj, lineSize, arrowSize, track) := (
+	);
+	destroyStrokeDrawBackwards(obj, lineSize, arrowSize, track) := (
 		tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
-		tween(obj, "drawPercent", 1, 0, track, "easeInOutCubic");
+		tween(obj, "drawEnd", 1, 0, track, "easeInOutCubic");
 		tween(obj, "arrowSize", arrowSize, 0, track);	
 	);
+	destroyStrokeDrawForwards(obj, lineSize, arrowSize, track) := (
+		tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
+		tween(obj, "drawStart", 0, 1, track, "easeInOutCubic");
+		tween(obj, "arrowSize", arrowSize, 0, track);	
+	);
+
+
+
+	wormStrokeDraw(obj, lineSize, arrowSize, wormSize, track) := (
+		if(track.progress <= 0.5,
+			tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
+			tween(obj, "arrowSize", 0, arrowSize, track, "easeOutCirc");
+		, // else //
+			tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
+			tween(obj, "arrowSize", arrowSize, 0, track, "easeInCirc");
+		);
+		tween(obj, "drawEnd", 0, 1 + wormSize, track, "easeInOutQuad");
+		obj.drawStart = obj.drawEnd - wormSize;
+			
+	);
+
 	
 	constructStrokeDrawMany(list, lineSize, arrowSize, track, delay) := (
 		tweenMany(list, "lineSize", 0, lineSize, track, delay, "easeOutCirc");
-		tweenMany(list, "drawPercent", 0, 1, track, delay, "easeInOutCubic");
+		tweenMany(list, "drawEnd", 0, 1, track, delay, "easeInOutCubic");
 		tweenMany(list, "arrowSize", 0, arrowSize, track, delay);	
 	);
 

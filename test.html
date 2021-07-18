@@ -17,21 +17,32 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
-strokeSampleRateEBOW = 128;
+strokeSampleRateEBOW = 256;
 
 
 dots = apply(1..10,
-  createRootStrokeObject([lerp(canvasLeft, canvasRight, #, 0, 11), canvasCenter.y + random() * 2 - 1], aliceColor.red, aliceColor.red, 1);
+  createRootStrokeObject([lerp(canvasLeft, canvasRight, #, 0, 11), canvasCenter.y + 3 * (random() * 2 - 1)], aliceColor.red, aliceColor.red, 1);
 );
 forall(dots,
   #.stroke = sampleCircle(0.4, 2*pi);
   #.lineSize = 0;
   #.scale = 0;
-  #.drawPercent = 1;
+  #.drawEnd = 1;
 );
 
+curve = createRootStrokeObject([0,0], aliceColor.blue, (1,1,1), 0);
+curve.stroke = sampleCatmullRomSpline(apply(dots, #.pos));
+
+curve.lineSize = 7;
+
+
+
+
+
+
 tracks = [
-  setupAnimationTrack(0, 1);
+  setupAnimationTrack(0, 0.3),
+  setupAnimationTrack(1.5, 4.5)
 ];
 
 playanimation();
@@ -44,6 +55,7 @@ setupTime();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
+drawStrokeObject(curve);
 forall(dots, drawStrokeObject(#));
 
 </script>
@@ -56,6 +68,8 @@ forall(dots, drawStrokeObject(#));
   updateAnimationCascade(tracks, delta);
 
   constructStrokeGrowMany(dots, tracks_1, 0.1);
+
+  wormStrokeDraw(curve, 7, 0, 0.5, tracks_2);
 
 </script>
 
