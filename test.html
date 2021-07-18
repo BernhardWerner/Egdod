@@ -18,61 +18,21 @@
 
 <script id='csinit' type='text/x-cindyscript'>
 strokeSampleRateEBOW = 128;
-generatePoints() := (
-  forall(1..5,
-    createpoint("P" + #, [lerp(canvasLeft, canvasRight, #, 0, 6), canvasCenter.y + (2 * random() - 1) * 8]);
-  );  
-  P1.y = canvasCenter.y;
-  P5.y = canvasCenter.y;
-  P3.xy = canvasCenter + (0, 3);
 
+
+dots = apply(1..10,
+  createRootStrokeObject([lerp(canvasLeft, canvasRight, #, 0, 11), canvasCenter.y + random() * 2 - 1], aliceColor.red, aliceColor.red, 1);
 );
-generatePoints();
-forall(allpoints(), 
-  #.labeled = false;
-  #.color = aliceColor("blue");
-  #.size = 3;
-  #.alpha = 0;
+forall(dots,
+  #.stroke = sampleCircle(0.4, 2*pi);
+  #.lineSize = 0;
+  #.scale = 0;
+  #.drawPercent = 1;
 );
-
-
-
-
-
-
-
-strokeColors = [
-  aliceColor.orange,
-  aliceColor.turquoise,
-  aliceColor.violet
-];
-
-
-
-
-rollIndex = 1;
-
-
-
-
-sample() := (
-  points = apply(allpoints(), #.xy);
-  if(rollIndex == 1, stroke = samplePolygon(points, false));    
-  if(rollIndex == 2, stroke = sampleCatmullRomSpline(points));    
-  if(rollIndex == 3, stroke = sampleLagrangeInterpolation(points));    
-
-  markers = resample(stroke, 5);
-);
-
-
-sample();
 
 tracks = [
-  setupAnimationTrack(0, 3);
+  setupAnimationTrack(0, 1);
 ];
-
-fpsLabel = 0;
-fpsHistory = [];
 
 playanimation();
 setupTime();
@@ -84,33 +44,19 @@ setupTime();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-sample();
-connect(stroke, size -> 3, color -> strokeColors_rollIndex);
-forall(markers,
-  fillcircle(#, 0.3, color -> aliceColor("red"));
-);
+forall(dots, drawStrokeObject(#));
 
-drawtext(canvasCorners_2 + (-2, -2), fpsLabel);
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
   delta = deltaTime();
-  fpsHistory = fpsHistory :> 1 / delta;
-  if(length(fpsHistory) > 60, fpsHistory = bite(fpsHistory));
-  fpsLabel = 0.1 * round(10 * sum(fpsHistory) / length(fpsHistory));
 
   updateAnimationCascade(tracks, delta);
 
-  P3.xy = canvasCenter + 3 * [sin(tracks_1.progress * 2 * pi), cos(tracks_1.progress * 2 * pi)];
+  constructStrokeGrowMany(dots, tracks_1, 0.1);
 
-  if(now() > 4,
-  rollIndex = rollIndex + 1;
-  if(rollIndex > 3, rollIndex = 1);
-  generatePoints();
-  setupTime();
-  );
 </script>
 
 

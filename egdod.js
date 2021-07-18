@@ -3,22 +3,22 @@
  */
 (function(){
 	var code = document.createTextNode(`
-
 	canvasCorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
-	canvasCenter  = 0.5 * canvasCorners_1 + 0.5 * canvasCorners_3;
-	canvasWidth   = dist(canvasCorners_1, canvasCorners_2);
-	canvasHeight  = dist(canvasCorners_1, canvasCorners_4);
-	[canvasLeft, canvasTop] = canvasCorners_1;
-	[canvasRight, canvasBottom] = canvasCorners_3;
-	screenMouse() := [(mouse().x - canvasCorners_1.x) / canvasWidth, (mouse().y - canvasCorners_1.y) / canvasHeight];
+	canvasCorners = {
+		"tl": canvasCorners_1,
+		"tr": canvasCorners_2,
+		"br": canvasCorners_3,
+		"bl": canvasCorners_4
+	};
+	canvasCenter  = 0.5 * canvasCorners.tl + 0.5 * canvasCorners.br;
+	canvasWidth   = dist(canvasCorners.tl, canvasCorners.tr);
+	canvasHeight  = dist(canvasCorners.tl, canvasCorners.bl);
+	[canvasLeft, canvasTop] = canvasCorners.tl;
+	[canvasRight, canvasBottom] = canvasCorners.br;
+	screenMouse() := [(mouse().x - canvasCorners.tl.x) / canvasWidth, (mouse().y - canvasCorners.tl.y) / canvasHeight];
 	
 	strokeSampleRateEBOW = 64;
 
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-	// This library needs egdodMath to work!
-	///////////////////////////////////////////////////////////////////////////////////////////////////
-
-	
 
 
 
@@ -158,23 +158,36 @@
 	);
 	tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");
 
+	
 	tweenMany(list, prop, from, to, track, delay, easing) := (
 		regional(t);
 
-		forall(1..length(list),
-			t = 1 - (track.timeLeft + (# - 1) * delay) / track.duration;
-			
-			if(t <= 1,
-				if(easing != "none",
-					t = parse(easing + "(" + t + ")");
+
+			forall(1..length(list),
+				t = 1 - (track.timeLeft + (# - 1) * delay) / track.duration;
+				
+				if(trackStarted(track),
+					if(track.timeLeft < track.duration - (# - 1) * delay,
+						if(track.timeLeft > - (# - 1) * delay,
+							if(easing != "none",
+								t = parse(easing + "(" + t + ")");
+							);
+						
+							if(contains(keys(list_#), prop),
+								list_#_prop = lerp(from, to, t);
+							);	
+						,if(track.timeLeft <= - (# - 1) * delay,
+							if(contains(keys(list_#), prop),
+								list_#_prop = to;
+							);	
+						));
+					);
 				);
-			
-				if(contains(keys(list_#), prop),
-					list_#_prop = lerp(from, to, t);
-				);	
 			);
-		);
+
 	);
+
+
 	tweenMany(list, prop, from, to, track, delay) := tweenMany(list, prop, from, to, track, delay, "none");
 
 	// ************************************************************************************************
@@ -225,6 +238,7 @@
 	// pos
 	// stroke (list of points, relative to pos)
 	// drawPercent
+	// scale
 	// lineColor
 	// lineAlpha
 	// lineSize
@@ -235,16 +249,19 @@
 	// ************************************************************************************************
 	drawStrokeObject(obj) := (
 		regional(absoluteStroke, ratio);
-		absoluteStroke = apply(obj.stroke, obj.pos + #);
-		ratio = 1..ceil(obj.drawPercent * length(absoluteStroke));
-		fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
-		connect(absoluteStroke_ratio, size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-		if(obj.arrow, 
-			 if(length(ratio) >= 3,
-				connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.arrowSize), size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-			,if(length(ratio) >= 2,
-				connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-2)), obj.arrowSize), size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-			));
+		
+		if(obj.scale ~!= 0,
+			absoluteStroke = apply(obj.stroke, obj.pos + obj.scale * #);
+			ratio = 1..ceil(obj.drawPercent * length(absoluteStroke));
+			fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
+			connect(absoluteStroke_ratio, size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+			if(obj.arrow, 
+				if(length(ratio) >= 3,
+					connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+				,if(length(ratio) >= 2,
+					connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-2)), obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+				));
+			);
 		);
 	);
 	arrowTipAngleEBOW = pi/ 6;
@@ -296,6 +313,7 @@
 		"pos": pos,
 		"stroke": apply(1..strokeSampleRateEBOW, [0,0]),
 		"drawPercent": 0,
+		"scale": 1,
 		"lineSize": 0,
 		"lineColor": lineColor,
 		"lineAlpha": 1,
@@ -514,13 +532,16 @@
 	);
 
 	// ************************************************************************************************
-	// Grows a circle.
+	// Grows a stroke.
 	// ************************************************************************************************
-	constructCircleGrow(obj, rad, lineSize, track) := (
-		tween(obj, "lineSize", 0, lineSize, track);
-		obj.stroke = sampleCircle(lerp(0, rad, 1 - easeOutQuad(track.timeLeft / track.duration)), 2 * pi);
+	constructStrokeGrow(obj, track) := (
+		tween(obj, "scale", 0, 1, track, "easeOutBack");
 	);
-		
+
+	constructStrokeGrowMany(list, track, delay) := (
+		tweenMany(list, "scale", 0, 1, track, delay, "easeOutBack");
+	);
+
 		
 	
 	// ************************************************************************************************
