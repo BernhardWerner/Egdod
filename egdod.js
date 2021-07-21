@@ -117,7 +117,13 @@
 		"looping":  false
 	}; 
 
-	trackStarted(track) := now() >= track.start;
+	trackStarted(track, delay) := now() >= track.start + delay;
+	trackEnded(track, delay) := now() > track.end + delay;
+	trackRunning(track, delay) := and(trackStarted(track, delay), not(trackEnded(track, delay)));
+	trackStarted(track) := trackStarted(track, 0);	
+	trackEnded(track) := trackEnded(track, 0);
+	trackRunning(track) := trackRunning(track, 0);
+
 
 	// Needs to run on every frame!
 	updateAnimationTrack(track, delta) := (
