@@ -561,6 +561,17 @@
 		tweenMany(list, "drawEnd", 0, 1, track, delay, "easeInOutCubic");
 		tweenMany(list, "arrowSize", 0, arrowSize, track, delay);	
 	);
+	destroyStrokeDrawBackwardsMany(obj, lineSize, arrowSize, track, delay) := (
+		tweenMany(obj, "lineSize", lineSize, 0, track, delay, "easeInCirc");
+		tweenMany(obj, "drawEnd", 1, 0, track, delay, "easeInOutCubic");
+		tweenMany(obj, "arrowSize", arrowSize, 0, track, delay);	
+	);
+	destroyStrokeDrawForwardsMany(obj, lineSize, arrowSize, track, delay) := (
+		tweenMany(obj, "lineSize", lineSize, 0, track, delay, "easeInCirc");
+		tweenMany(obj, "drawStart", 0, 1, track, delay, "easeInOutCubic");
+		tweenMany(obj, "arrowSize", arrowSize, 0, track, delay);	
+	);
+
 
 	// ************************************************************************************************
 	// Grows a stroke.
@@ -573,6 +584,14 @@
 		tweenMany(list, "scale", 0, 1, track, delay, "easeOutBack");
 	);
 
+	destroyStrokeShrink(obj, track) := (
+		tween(obj, "scale", 1, 0, track, "easeInBack");
+	);
+
+	destroyStrokeShrinkMany(list, track, delay) := (
+		tweenMany(list, "scale", 1, 0, track, delay, "easeInBack");
+	);
+
 		
 	
 	// ************************************************************************************************
@@ -581,7 +600,10 @@
 	rotation(alpha) := [[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]];
 
 	
+	rotate(point, alpha, center) := rotation(alpha) * (point - center) + center;
+	rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
+	
 
 
 
@@ -815,7 +837,7 @@
 			"green": (67,186,16) / 255,
 			"minion": (245,224,80) / 255,
 			"brown": (117,50,0) / 255,
-			"pink": (248,131,24) / 255,
+			"pink": (248,131,248) / 255,
 			"grey": (128,128,12) / 255
 		};
 
