@@ -20,20 +20,21 @@
 strokeSampleRateEBOW = 256;
 
 
-dots = apply(1..10,
-  createRootStrokeObject([lerp(canvasLeft, canvasRight, #, 0, 11), canvasCenter.y + 3 * (random() * 2 - 1)], aliceColor.red, aliceColor.red, 1);
+dots = apply(1..6,
+  createRootStrokeObject([lerp(canvasLeft, canvasRight, #, 0, 7), canvasCenter.y + 3 * (random() * 2 - 1)], aliceColor.red, aliceColor.red, 1);
 );
 forall(dots,
   #.stroke = sampleCircle(0.4, 2*pi);
   #.lineSize = 0;
-  #.scale = 0;
+  #.scale = 1;
   #.drawEnd = 1;
 );
 
 curve = createRootStrokeObject([0,0], aliceColor.blue, (1,1,1), 0);
 curve.stroke = sampleCatmullRomSpline(apply(dots, #.pos));
 
-curve.lineSize = 7;
+curve.lineSize = 5;
+curve.drawEnd = 1;
 
 
 
@@ -41,10 +42,24 @@ curve.lineSize = 7;
 
 
 tracks = [
-  setupAnimationTrack(0, 0.3),
-  setupAnimationTrack(1.5, 4.5)
+  setupAnimationTrack(0, 1)
 ];
 
+
+polyCoeffs = dividedDifferences(apply(dots, #.pos));
+polyFunc(x) := horner(polyCoeffs, x);
+
+
+println(polyCoeffs);
+
+fpsHistory = [];
+fpsMemoryLength = 60;
+fpsPrecision = 2;
+
+fpsDisplay = {
+  "pos": canvasCorners.tr + (-3, -3),
+  "text": 0
+};
 playanimation();
 setupTime();
 </script>
@@ -58,18 +73,34 @@ setupTime();
 drawStrokeObject(curve);
 forall(dots, drawStrokeObject(#));
 
+
+drawtext(fpsDisplay.pos, fpsDisplay.text,size->30);
+
+
+
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
   delta = deltaTime();
+  fpsHistory = fpsHistory :> 1 / delta;
+  if(length(fpsHistory) >= fpsMemoryLength,
+    fpsHistory = bite(fpsHistory);
+  );
+  fpsDisplay.text = format(sum(fpsHistory) / length(fpsHistory), fpsPrecision);
+
+  
 
   updateAnimationCascade(tracks, delta);
 
-  constructStrokeGrowMany(dots, tracks_1, 0.1);
+  dots_1.pos = dots_1.pos + (0, cos(now()) * delta);
+  dots_3.pos = dots_3.pos + (0, 2 * cos(now()) * delta);
+  dots_5.pos = dots_5.pos + (0, 0.5 * cos(now()) * delta);
+  dots_(-1).pos = dots_(-1).pos + (0, 2 * sin(now()) * cos(now()) * delta);
 
-  wormStrokeDraw(curve, 7, 0, 0.5, tracks_2);
+  polyCoeffs = dividedDifferences(apply(dots, #.pos));
+  curve.stroke = sampleFunctionGraph("polyFunc", canvasLeft, canvasRight);
 
 </script>
 

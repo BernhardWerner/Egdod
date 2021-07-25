@@ -18,6 +18,8 @@
 	screenMouse() := [(mouse().x - canvasCorners.tl.x) / canvasWidth, (mouse().y - canvasCorners.tl.y) / canvasHeight];
 	
 	strokeSampleRateEBOW = 64;
+	lineSampleRateEBOW = 64;
+
 
 
 
@@ -354,19 +356,22 @@
 	// Creates stroke around a polygon.
 	// ************************************************************************************************
 	samplePolygonFREE(poly, nop, closed) := (
-		regional(pairs, dists, totalDist, effectiveNumber, splitNumbers, stepSize, index);
+		regional(pairs, dists, totalDist, effectiveNumber, splitNumbers, stepSize, index, sr);
 		
 		if(closed, 
 			poly = poly :> poly_1;
 		);
+		
+		sr = if(length(poly) == 2, lineSampleRateEBOW, nop);
+		
 		pairs = consecutive(poly);
 		
 		dists = apply(pairs, dist(#_1, #_2));
 		totalDist = sum(dists);
 		
-		effectiveNumber = nop - length(poly);
+		effectiveNumber = sr - length(poly);
 
-		splitNumbers = apply(dists, floor((nop - 1) * # / totalDist));
+		splitNumbers = apply(dists, floor((sr - 1) * # / totalDist));
 
 
 		
@@ -418,9 +423,11 @@
 	);
 
 	sampleBezierCurve(controls) := (
-		regional(t);
-		apply(0..strokeSampleRateEBOW - 1, 
-			t = # / (strokeSampleRateEBOW - 1);
+		regional(t, sr);
+
+		sr = if(length(controls) == 2, lineSampleRateEBOW, strokeSampleRateEBOW);
+		apply(0..sr - 1, 
+			t = # / (sr - 1);
 
 			bezier(controls, t);
 		);
@@ -1046,7 +1053,39 @@
 		sampleLagrangeInterpolation(points) := sampleLagrangeInterpolationFREE(points, strokeSampleRateEBOW);
 
 
+
+
 		// *************************************************************************************************
+		// Computes coefficients of polynomial interpolation via Newton basis / divided differences.
+		// Output are coefficients of interpolation polynomials ordered from lowest to highest degree.
+		// *************************************************************************************************
+		dividedDifferences(points) := (
+			regional(recurMatrix, n);
+
+			n = length(points);
+
+			recurMatrix = zeromatrix(n, n);
+
+			forall(1..n, i, forall(1..i, j,
+				recurMatrix_i_j = if(j == 1,
+					points_i.y;
+				, // else //
+					(recurMatrix_i_(j - 1) - recurMatrix_(i - 1)_(j - 1)) / (points_i.x - points_(i - j + 1).x);
+				);
+			));
+
+			apply(1..n, recurMatrix_#_#);
+		);
+
+		// *************************************************************************************************
+		// Evaluates polynomial given by list of coefficients via Horner scheme at value x.
+		// Coefficients have to be sorted from lowest to highest degree!
+		// *************************************************************************************************
+		horner(coeffs, x) := if(length(coeffs) == 1, coeffs_1, horner(bite(coeffs), x) * x + coeffs_1);
+
+
+		// *************************************************************************************************
+		// W.I.P. - DOESN'T WORK!!
 		// The GJK collison detection algorithm for finite convex polygons in 2D.
 		// *************************************************************************************************
 		/*
