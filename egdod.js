@@ -1057,7 +1057,7 @@
 
 		// *************************************************************************************************
 		// Computes coefficients of polynomial interpolation via Newton basis / divided differences.
-		// Output are coefficients of interpolation polynomials ordered from lowest to highest degree.
+		// Output are coefficients for Newton basis ordered from lowest to highest degree.
 		// *************************************************************************************************
 		dividedDifferences(points) := (
 			regional(recurMatrix, n);
@@ -1076,6 +1076,15 @@
 
 			apply(1..n, recurMatrix_#_#);
 		);
+
+		// *************************************************************************************************
+		// Evaluates polynomial given by list of coefficients of Newton basis at value x.
+		// Coefficients have to be sorted from lowest to highest degree!
+		// *************************************************************************************************
+		newtonInterpolation(points, coeffs, x) := if(length(coeffs) == 1, coeffs_1, 
+			newtonInterpolation(bite(points), bite(coeffs), x) * (x - points_1.x) + coeffs_1;
+		);
+
 
 		// *************************************************************************************************
 		// Evaluates polynomial given by list of coefficients via Horner scheme at value x.

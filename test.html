@@ -20,8 +20,8 @@
 strokeSampleRateEBOW = 256;
 
 
-dots = apply(1..6,
-  createRootStrokeObject([lerp(canvasLeft, canvasRight, #, 0, 7), canvasCenter.y + 3 * (random() * 2 - 1)], aliceColor.red, aliceColor.red, 1);
+dots = apply(1..10,
+  createRootStrokeObject([lerp(canvasLeft, canvasRight, #, 0, 11), canvasCenter.y + 3 * (random() * 2 - 1)], aliceColor.red, aliceColor.red, 1);
 );
 forall(dots,
   #.stroke = sampleCircle(0.4, 2*pi);
@@ -29,9 +29,16 @@ forall(dots,
   #.scale = 1;
   #.drawEnd = 1;
 );
+polyCoeffs = dividedDifferences(apply(dots, #.pos));
+
+
+polyFunc(x) := newtonInterpolation(apply(dots, #.pos), polyCoeffs, x);
+
+
 
 curve = createRootStrokeObject([0,0], aliceColor.blue, (1,1,1), 0);
-curve.stroke = sampleCatmullRomSpline(apply(dots, #.pos));
+curve.stroke = sampleFunctionGraph("polyFunc", canvasLeft, canvasRight);
+
 
 curve.lineSize = 5;
 curve.drawEnd = 1;
@@ -46,11 +53,8 @@ tracks = [
 ];
 
 
-polyCoeffs = dividedDifferences(apply(dots, #.pos));
-polyFunc(x) := horner(polyCoeffs, x);
 
 
-println(polyCoeffs);
 
 fpsHistory = [];
 fpsMemoryLength = 60;
