@@ -30,7 +30,6 @@ tracks = [
 
 
 
-
 playanimation();
 setupTime();
 </script>
@@ -48,6 +47,7 @@ forall(allpoints(),
   draw([#.xy, (0,0)]);
 );
 
+println(inverseSlerp(U.xy / abs(U.xy), V.xy / abs(V.xy), W.xy / abs(W.xy)));
 </script>
 
 

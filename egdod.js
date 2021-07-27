@@ -1315,7 +1315,14 @@
 				(sin((1 - t) * angle) * u + sin(t * angle) * v) / sin(angle);
 			);
 		);
-		inverseSlerp(u, v, w) := inverseLerp(arctan2(u.x, u.y), arctan2(v.x, v.y), arctan2(w.x, w.y));
+		inverseSlerp(u, v, w) := (
+			regional(result);
+
+			result = abs(min(inverseLerp(arctan2(u.x, u.y), arctan2(v.x, v.y), arctan2(w.x, w.y)), inverseLerp(arctan2(u.x, u.y) + 2*pi, arctan2(v.x, v.y), arctan2(w.x, w.y))));
+
+			if(result > 1, 2 - result, result);
+
+		);
 		
 		eerp(x, y, t) := x^(1 - t) * y^t;
 		inverseEerp(x, y, p) := inverseLerp(log(x), log(y), log(p));
