@@ -1316,6 +1316,8 @@
 			);
 		);
 
+		
+
 
 
 
@@ -1573,7 +1575,7 @@
 		  
 			  convertTexDelimiters(
 				  sum(string_(1..startIndex - 1)) 
-				+ if(buffer > 0, "", "\\color{white}{")
+				+ if(buffer > 0, "", "\\phantom{")
 				+ sum(string_(startIndex + 1 .. endIndex - 1))
 				+ if(buffer > 0, "", "}") 
 				+ sum(string_(endIndex + 1 .. length(string)))
@@ -1584,6 +1586,7 @@
 		  );
 		  parseTex(string) := apply(0..frequency(tokenize(string, ""), texDelimitersEBOW_1), convertTexDelimiters(string, #));
 
+		  
 
 		// ************************************************************************************************
 		// Draws tex formula. Needs to have
