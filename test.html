@@ -19,29 +19,24 @@
 <script id='csinit' type='text/x-cindyscript'>
 
 
-inputString = "$\displaystyle@\int@_{@i@@=@@1@}^@n@@\sin@@(@@x@@)@\enspace @d@@x@$";
-//inputString = "$\left(\begin{matrix}@1@&@2@&@3@\\@4@&@5@&@6@\\@7@&@8@&@9@\end{matrix}\right)$";
-//inputString = "$\displaystyle@\sum@_{@i@@=@@0@}^@\infty@\:@q@^@i@@=@\frac{@1@}{@1@@-@@q@}$";
+inputString1 = "$\displaystyle@\int€_{@0€}^{@2€@\pi€}@\sin€@(€@x€@)€\enspace @d€@x€$";
+inputString2 = "$@\begin{pmatrix}@1€&@2€&@3€\\@4€&@5€&@6€\\@7€&@8€&@9€\end{pmatrix}€$";
+inputString3 = "$\displaystyle@\sum€_{@i€@=€@0€}^@\infty€\:@q€^@i€@=€@\frac{@1€}{@1€@-€@q€}€$";
+inputString4 = "$@3€ + @4€$";
 
-texProgress = 0;
+inputString = inputString1 + "$\enspace @\vee€\enspace$"  + inputString2 + "$\enspace@\wedge€\enspace$" + inputString3;
 
-typeTex(string, progress) := (
-  regional(cut, n, inserts, k);
-  
-  cut = tokenize(string, "@");
-  n = floor(length(cut) / 2);
-  k = round(lerp(n, 0, clamp(progress, 0, 1)));
 
-  inserts = const(2 * n - 2 * k, "") ++ flatten(zip(const(k, "\color{white}{"), const(k, "}"))) :> "";
-  
-  sum(flatten(zip(cut, inserts)));
-);
 
-outputString = typeTex(inputString, texProgress);
+
+
+formula = createTexObject([canvasLeft + 1, canvasCenter.y], inputString, 30);
+
+
 
 
 tracks = [
-  setupAnimationTrack(1, 2)
+  setupAnimationTrack(1, 3)
 ];
 
 
@@ -56,7 +51,7 @@ setupTime();
 
 <script id='csdraw' type='text/x-cindyscript'>
 
-drawtext(canvasCenter, outputString, size->50);
+drawTexObject(formula);
 
 </script>
 
@@ -67,7 +62,7 @@ delta = deltaTime();
 
 updateAnimationCascade(tracks, delta);
 
-outputString = typeTex(inputString, tracks_1.progress);
+typeTex(formula, tracks_1);
 
 </script>
 
@@ -88,7 +83,7 @@ outputString = typeTex(inputString, tracks_1.progress);
 </script> -->
 
 
-<canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="border:1px solid #000000;"></canvas>
+<canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="border:0px solid #000000;"></canvas>
 
 
 

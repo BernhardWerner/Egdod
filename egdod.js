@@ -19,10 +19,13 @@
 	
 	strokeSampleRateEBOW = 64;
 	lineSampleRateEBOW = 64;
+	texDelimitersEBOW = ["@", "€"];
 
 
-
-
+	// ************************************************************************************************
+	// Reverts a string.
+	// ************************************************************************************************
+	reverseString(string) := sum(tokenize(string, ""));
 
 
 	// ************************************************************************************************
@@ -334,6 +337,7 @@
 		"arrow": false,
 		"arrowSize": 0
 	};
+	createRootStrokeObject(pos, lineColor) := createRootStrokeObject(pos, lineColor, (1,1,1), 0);
 	
 	// ************************************************************************************************
 	// Zero strokes.
@@ -1488,7 +1492,7 @@
 		// *************************************************************************************************
 		// Draws text with border.
 		// *************************************************************************************************
-		drawwithborder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
+		drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
 		  forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
 		         drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align, family -> family);
 		        );
@@ -1536,6 +1540,85 @@
 		createRootTexObject(position, string, size, color) := {
 
 		};
+
+
+
+		// *************************************************************************************************
+		// Handles typing effect for LaTeX formulas.
+		// *************************************************************************************************
+		convertTexDelimiters(string, buffer) := (
+			regional(startIndex, endIndex, innerCount, foundEnd);
+		  
+			startIndex = indexof(string, texDelimitersEBOW_1);
+			if(startIndex == 0,
+			  string;
+			, // else //
+			  endIndex = startIndex;
+			  innerCount = 0;
+			  foundEnd = false;
+			  while(not(foundEnd),
+				endIndex = endIndex + 1;
+				if(endIndex == length(string),
+				  foundEnd = true;
+				, // else //
+				  if(string_endIndex == texDelimitersEBOW_1, innerCount = innerCount + 1);
+				  if(string_endIndex == texDelimitersEBOW_2, 
+					innerCount = innerCount - 1;
+					if(innerCount == -1,
+					  foundEnd = true;            
+					);
+				  );
+				)
+			  );
+		  
+			  convertTexDelimiters(
+				  sum(string_(1..startIndex - 1)) 
+				+ if(buffer > 0, "", "\\color{white}{")
+				+ sum(string_(startIndex + 1 .. endIndex - 1))
+				+ if(buffer > 0, "", "}") 
+				+ sum(string_(endIndex + 1 .. length(string)))
+			  , buffer - 1);
+			  
+		  
+			);
+		  );
+		  parseTex(string) := apply(0..frequency(tokenize(string, ""), texDelimitersEBOW_1), convertTexDelimiters(string, #));
+
+
+		// ************************************************************************************************
+		// Draws tex formula. Needs to have
+		// toggle = {
+		//   "pos":        (2D vector),
+		//   "pyramid":    (Array of strings), 
+		//   "size":       (float),
+		//   "size":       (float),
+		//   "color":      (3D Vector),
+		//   "align":      (String)
+		// };
+		// ************************************************************************************************
+		drawTexObject(obj) := drawtext(obj.pos, obj.outputString, size->obj.size, color->obj.color, align->obj.align);
+
+		createTexObject(pos, inputString, size) := (
+			regional(pyramid);
+			
+			pyramid = parseTex(inputString);
+
+			{
+				"pos": pos,
+				"inputString": inputString,
+				"pyramid": pyramid,
+				"outputString": pyramid_1,
+				"finalString": pyramid_(-1),
+				"progress": 0,
+				"size": size,
+				"align": "left",
+				"color": (0,0,0)
+			};
+		);
+		typeTex(obj, track) := (
+			obj.progress = clamp(track.progress, 0, 1);
+			obj.outputString = obj.pyramid_(round(lerp(1, length(obj.pyramid), obj.progress)));
+		);
 
 
 
