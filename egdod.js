@@ -15,7 +15,7 @@
 	canvasHeight  = dist(canvasCorners.tl, canvasCorners.bl);
 	[canvasLeft, canvasTop] = canvasCorners.tl;
 	[canvasRight, canvasBottom] = canvasCorners.br;
-	screenMouse() := [(mouse().x - canvasCorners.tl.x) / canvasWidth, (mouse().y - canvasCorners.tl.y) / canvasHeight];
+	screenMouse() := [(mouse().x - canvasLeft) / canvasWidth, (mouse().y - canvasBottom) / canvasHeight];
 	
 	strokeSampleRateEBOW = 64;
 	lineSampleRateEBOW = 64;
@@ -944,7 +944,30 @@
 			[r + m, g + m, b + m];
 		);
 		
+		deca2hexa(digit) := ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]_(digit + 1);
+		hexa2deca(digit) := findin(["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"], digit) - 1;
 
+		rgb2hex(vec) := (
+			regional(a, b);
+			vec = round(255 * vec);
+
+			sum(apply(vec,
+				a = mod(#, 16);
+				b = (# - a) / 16;
+				deca2hexa(a) + deca2hexa(b);
+			));			
+		);
+
+	
+
+		hex2rgb(string) := (
+			regional(digits);
+
+			digits = tokenize(string, "");
+			apply([1,3,5],
+				16 * hexa2deca(text(digits_#)) + hexa2deca(text(digits_(# + 1)));
+			);
+		);
 
 
 

@@ -19,14 +19,19 @@
 <script id='csinit' type='text/x-cindyscript'>
 
 
-createpoint("U", [1, 0]);
-createpoint("V", [0, 1]);
-createpoint("W", [1, 1]);
-
 
 tracks = [
   setupAnimationTrack(1, 3)
 ];
+
+
+
+
+
+
+
+
+
 
 
 
@@ -43,11 +48,6 @@ setupTime();
 
 
 
-forall(allpoints(),
-  draw([#.xy, (0,0)]);
-);
-
-println(inverseSlerp(U.xy / abs(U.xy), V.xy / abs(V.xy), W.xy / abs(W.xy)));
 </script>
 
 
@@ -77,7 +77,7 @@ updateAnimationCascade(tracks, delta);
 </script> -->
 
 
-<canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="border:0px solid #000000;"></canvas>
+<canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="border:1px solid #000000;"></canvas>
 
 
 
