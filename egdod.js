@@ -235,12 +235,13 @@
 	// text
 	// percentVisible
 	// size
+	// alpha
 	// color 
 	// fontFamily
 	// align
 	// ************************************************************************************************
 	drawTextObject(obj) := (
-		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily, align->obj.align);
+		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily, align->obj.align, alpha->obj.alpha);
 	);
 
 
@@ -1627,11 +1628,12 @@
 		//   "pyramid":    (Array of strings), 
 		//   "size":       (float),
 		//   "size":       (float),
+		//   "alpha":      (float),
 		//   "color":      (3D Vector),
 		//   "align":      (String)
 		// };
 		// ************************************************************************************************
-		drawTexObject(obj) := drawtext(obj.pos, obj.outputString, size->obj.size, color->obj.color, align->obj.align);
+		drawTexObject(obj) := drawtext(obj.pos, obj.outputString, size->obj.size, color->obj.color, align->obj.align, alpha->obj.alpha);
 
 		createTexObject(pos, inputString, size) := (
 			regional(pyramid);
@@ -1647,6 +1649,7 @@
 				"progress": 0,
 				"size": size,
 				"align": "left",
+				"alpha": 1,
 				"color": (0,0,0)
 			};
 		);
