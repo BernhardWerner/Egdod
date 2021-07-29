@@ -3,12 +3,12 @@
  */
 (function(){
 	var code = document.createTextNode(`
-	canvasCorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+	canvasRect = apply(screenbounds(), #.xy); //LO, RO, RU, LU
 	canvasCorners = {
-		"tl": canvasCorners_1,
-		"tr": canvasCorners_2,
-		"br": canvasCorners_3,
-		"bl": canvasCorners_4
+		"tl": canvasRect_1,
+		"tr": canvasRect_2,
+		"br": canvasRect_3,
+		"bl": canvasRect_4
 	};
 	canvasCenter  = 0.5 * canvasCorners.tl + 0.5 * canvasCorners.br;
 	canvasWidth   = dist(canvasCorners.tl, canvasCorners.tr);
@@ -946,7 +946,14 @@
 		);
 		
 		deca2hexa(digit) := ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]_(digit + 1);
-		hexa2deca(digit) := findin(["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"], digit) - 1;
+		hexa2deca(digit) := (
+			regional(x, y);
+
+			x = findin(["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"], digit) - 1;
+			y = findin(["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"], digit) - 1;
+
+			if(x == -1, y, x);
+		);
 
 		rgb2hex(vec) := (
 			regional(a, b);
@@ -955,7 +962,7 @@
 			sum(apply(vec,
 				a = mod(#, 16);
 				b = (# - a) / 16;
-				deca2hexa(a) + deca2hexa(b);
+				deca2hexa(b) + deca2hexa(a);
 			));			
 		);
 
@@ -967,8 +974,9 @@
 			digits = tokenize(string, "");
 			apply([1,3,5],
 				16 * hexa2deca(text(digits_#)) + hexa2deca(text(digits_(# + 1)));
-			);
+			) / 255;
 		);
+
 
 
 
