@@ -862,6 +862,24 @@
 			"grey": (128,128,128) / 255 
 		};
 
+		sapColor = {
+			"black":       hex2rgb("000000"),
+			"darkGrey":    hex2rgb("7f7f7f"),
+			"grey":        hex2rgb("aaaaaa"),
+			"lightGrey":   hex2rgb("d4d4d4"),
+			"white":       hex2rgb("ffffff"),
+			"orange":      hex2rgb("ff8c00"),
+			"lightOrange": hex2rgb("ffe54f"),
+			"lightGreen":  hex2rgb("b0eb44"),
+			"green":       hex2rgb("43ba10"),
+			"lightBlue":   hex2rgb("39c0d5"),
+			"blue":        hex2rgb("0c5aa6"),
+			"background":  hex2rgb("1a2345"),
+			"violet":      hex2rgb("9e3ecc"),
+			"lightViolet": hex2rgb("ee9cff"),
+			"lightRed":    hex2rgb("fd6886"),
+			"red":         hex2rgb("d71318")
+		}
 
 
 
