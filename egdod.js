@@ -879,7 +879,7 @@
 			"lightViolet": hex2rgb("ee9cff"),
 			"lightRed":    hex2rgb("fd6886"),
 			"red":         hex2rgb("d71318")
-		}
+		};
 
 
 
