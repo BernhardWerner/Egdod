@@ -232,6 +232,7 @@
 	// ************************************************************************************************
 	// Text objects needs
 	// pos
+	// offset
 	// text
 	// percentVisible
 	// size
@@ -241,8 +242,66 @@
 	// align
 	// ************************************************************************************************
 	drawTextObject(obj) := (
-		drawtext(obj.pos, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily, align->obj.align, alpha->obj.alpha);
+		drawtext(obj.pos + obj.offset, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily, align->obj.align, alpha->obj.alpha);
 	);
+
+
+	createTextObject(pos, text, size) := {
+		"pos": pos,
+		"offset": [0,0],
+		"text": text,
+		"percentVisible": 1,
+		"size": size,
+		"alpha": 1,
+		"color ": (0,0,0),
+		"align": "left"
+	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	slideIn(obj, dir, dist, track) := (
+		if(dir != [0,0],
+			dir = dir / abs(dir);
+			tween(obj, "offset", dist * dir, [0,0], track, "easeInOutBack");	
+		);
+	);
+	slideOut(obj, dir, dist, track) := (
+		if(dir != [0,0],
+			dir = dir / abs(dir);
+			tween(obj, "offset", [0,0], dist * dir, track, "easeInOutBack");	
+		);
+	);
+
+	fadeIn(obj, dir, dist, track) := (
+		slideIn(obj, dir, dist, track);
+		tween(obj, "alpha", 0, 1, track, "easeInQuint");
+	);
+	fadeOut(obj, dir, dist, track) := (
+		slideOut(obj, dir, dist, track);
+		tween(obj, "alpha", 1, 0, track, "easeOutQuint");
+	);
+
+
+
+
 
 
 	// ************************************************************************************************
@@ -264,7 +323,7 @@
 		regional(absoluteStroke, ratio, n);
 		
 		if(obj.scale ~!= 0,
-			absoluteStroke = apply(obj.stroke, obj.pos + obj.scale * #);
+			absoluteStroke = apply(obj.stroke, obj.pos + obj.offset + obj.scale * #);
 			n = length(absoluteStroke);
 
 			ratio = max(1,floor(obj.drawStart * n))..min(n, ceil(obj.drawEnd * n));
@@ -294,6 +353,7 @@
 	// ************************************************************************************************
 	// Flipbook object needs
 	// pos
+	// offset
 	// scale
 	// flipbook
 	// index
@@ -303,7 +363,7 @@
 	// alpha
 	// ************************************************************************************************
 	drawFlipbookObject(obj) := (
-		drawimage(obj.pos, obj.flipbook_(obj.index), scale->obj.scale, rotation->obj.rotation, flipx->obj.flipx, flipy->obj.flipy, alpha->obj.alpha);
+		drawimage(obj.pos + obj.offset, obj.flipbook_(obj.index), scale->obj.scale, rotation->obj.rotation, flipx->obj.flipx, flipy->obj.flipy, alpha->obj.alpha);
 	);
 	
 
@@ -326,6 +386,7 @@
 	// ************************************************************************************************
 	createRootStrokeObject(pos, lineColor, fillColor, fillAlpha) := {
 		"pos": pos,
+		"offset": [0,0],
 		"stroke": apply(1..strokeSampleRateEBOW, [0,0]),
 		"drawStart": 0,
 		"drawEnd": 0,
@@ -1377,7 +1438,7 @@
 
 		    d     = 0.5 * [w, h];
 		    e     = (d_1, -d_2);
-		    shift = compass()_c;
+		    shift = -compass()_c;
 		    shift = (0.5 * w * shift.x, 0.5 * h * shift.y);
 		    apply([-d, e, d, -e], pos + # + shift); //LU, RU, RO, LO
 		);
@@ -1385,8 +1446,8 @@
 		// Uses rect object; see below.
 		expandrect(r) := expandrect(r.xy, r.c, r.w, r.h);
 
-		compass() := apply(directproduct([1, 0, -1], [1, 0, -1]), reverse(#));
-
+		compass() := -apply(directproduct([1, 0, -1], [1, 0, -1]), reverse(#));
+		
 		
 		
 		// ************************************************************************************************
@@ -1526,9 +1587,6 @@
 
 
 
-		createRootTexObject(position, string, size, color) := {
-
-		};
 
 
 
@@ -1579,6 +1637,7 @@
 		// Draws tex formula. Needs to have
 		// toggle = {
 		//   "pos":        (2D vector),
+		//   "offset":     (2D vector)
 		//   "pyramid":    (Array of strings), 
 		//   "size":       (float),
 		//   "size":       (float),
@@ -1587,7 +1646,7 @@
 		//   "align":      (String)
 		// };
 		// ************************************************************************************************
-		drawTexObject(obj) := drawtext(obj.pos, obj.outputString, size->obj.size, color->obj.color, align->obj.align, alpha->obj.alpha);
+		drawTexObject(obj) := drawtext(obj.pos + obj.offset, obj.outputString, size->obj.size, color->obj.color, align->obj.align, alpha->obj.alpha);
 
 		createTexObject(pos, inputString, size) := (
 			regional(pyramid);
@@ -1596,6 +1655,7 @@
 
 			{
 				"pos": pos,
+				"offset": [0,0],
 				"inputString": inputString,
 				"pyramid": pyramid,
 				"outputString": pyramid_1,

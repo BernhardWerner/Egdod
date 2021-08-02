@@ -20,17 +20,26 @@
 
 
 
+label = createTextObject(canvasCenter, "This is just a test.", 30);
+label.offset = 10 * compass()_4;
+label.alpha = 0;
+
+
+
+
+
+
+
+
+
+
+
+
+
 tracks = [
-  setupAnimationTrack(1, 3)
+  setupAnimationTrack(1, 2.5),
+  setupAnimationTrack(3.5, 5)
 ];
-
-
-
-
-
-
-
-
 
 
 
@@ -45,7 +54,7 @@ setupTime();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-
+drawTextObject(label);
 
 
 </script>
@@ -57,6 +66,8 @@ delta = deltaTime();
 
 updateAnimationCascade(tracks, delta);
 
+fadeIn(label, compass()_4, 10, tracks_1);
+slideOut(label, [1,2], 15, tracks_2);
 
 </script>
 
