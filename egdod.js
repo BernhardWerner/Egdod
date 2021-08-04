@@ -3,12 +3,12 @@
  */
 (function(){
 	var code = document.createTextNode(`
-	canvasRect = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+	canvasCorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
 	canvasCorners = {
-		"tl": canvasRect_1,
-		"tr": canvasRect_2,
-		"br": canvasRect_3,
-		"bl": canvasRect_4
+		"tl": canvasCorners_1,
+		"tr": canvasCorners_2,
+		"br": canvasCorners_3,
+		"bl": canvasCorners_4
 	};
 	canvasCenter  = 0.5 * canvasCorners.tl + 0.5 * canvasCorners.br;
 	canvasWidth   = dist(canvasCorners.tl, canvasCorners.tr);
@@ -16,6 +16,8 @@
 	[canvasLeft, canvasTop] = canvasCorners.tl;
 	[canvasRight, canvasBottom] = canvasCorners.br;
 	screenMouse() := [(mouse().x - canvasLeft) / canvasWidth, (mouse().y - canvasBottom) / canvasHeight];
+
+	
 	
 	strokeSampleRateEBOW = 64;
 	lineSampleRateEBOW = 64;
@@ -1259,6 +1261,63 @@
 
 
 
+
+
+		poissonDiscSampling(rect, d, numberOfPoints, searchThreshold) := (
+			regional(oldPoints, hSize, vSize, result, searching, i, j, candidate, candidateValid, rangeA, rangeB);
+
+			hSize = ceil(rect.w / d);
+			vSize = ceil(rect.h / d);
+			oldPoints = const((hSize + 1) * (vSize + 1), 0);
+
+			result = [];
+			
+			searching = true;
+			candidateValid = true;
+			numberOfSearches = 0;
+
+			while(and(searching, length(result) < numberOfPoints),
+				candidate = [random() * rect.w, random() * rect.h];
+				i = floor(candidate.x / d);
+				j = floor(candidate.y / d);
+
+				rangeA = max(i - 1, 0)..min(i + 1, hSize);
+				rangeB = max(j - 1, 0)..min(j + 1, vSize);
+				
+				
+
+				forall(rangeA, a, forall(rangeB, b,
+					
+					if(oldPoints_(a * vSize + b + 1) != 0, 
+						candidateValid = and(candidateValid,
+							dist(candidate, oldPoints_(a * vSize + b + 1)) > d;
+						);	
+					);
+				));
+
+				if(candidateValid,
+					oldPoints_(i * vSize + j + 1) = candidate;
+					result = result :> candidate;
+					numberOfSearches = 0;
+				, // else //		
+					numberOfSearches = numberOfSearches + 1;
+					if(numberOfSearches > searchThreshold,
+						searching = false;	
+					);
+					candidateValid = true;
+				);
+			);
+
+			apply(result, # + rect.xy);
+		);
+		poissonDiscSampling(rect, d, numberOfPoints) := poissonDiscSampling(rect, d, numberOfPoints, 32);
+
+
+
+
+
+
+
 		// *************************************************************************************************
 		// Checks, whether two line segments intersect.
 		// *************************************************************************************************
@@ -1543,11 +1602,17 @@
 		// Draws text with border.
 		// *************************************************************************************************
 		drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
-		  forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
-		         drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align, family -> family);
-		        );
-		  drawtext(pos, txt, color -> color, size -> size, align -> align, family -> family);
-		);
+			forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
+				   drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align, family -> family);
+				  );
+			drawtext(pos, txt, color -> color, size -> size, align -> align, family -> family);
+		  );
+		  drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize) := (
+			forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
+				   drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align);
+				  );
+			drawtext(pos, txt, color -> color, size -> size, align -> align);
+		  );
 
 
 
@@ -1985,7 +2050,7 @@
 
 
 
-
+		canvasRect = rect(canvasCorners.bl, canvasWidth, canvasHeight);
 
 
 

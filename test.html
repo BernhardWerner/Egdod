@@ -19,26 +19,17 @@
 <script id='csinit' type='text/x-cindyscript'>
 
 
+dist = 1;
+nop = 1000;
 
-label = createTextObject(canvasCenter, "This is just a test.", 30);
-label.offset = 10 * compass()_4;
-label.alpha = 0;
-
-
-
-
-
-
-
-
-
-
+t = now();
+points = poissonDiscSampling(canvasRect, dist, nop);
+println(now() - t);
 
 
 
 tracks = [
-  setupAnimationTrack(1, 2.5),
-  setupAnimationTrack(3.5, 5)
+  setupAnimationTrack(3, 10)
 ];
 
 
@@ -54,7 +45,9 @@ setupTime();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-drawTextObject(label);
+forall(points,
+  fillcircle(#, 0.5 * dist, color -> sapColor.blue);
+);
 
 
 </script>
@@ -66,13 +59,15 @@ delta = deltaTime();
 
 updateAnimationCascade(tracks, delta);
 
-fadeIn(label, compass()_4, 10, tracks_1);
-slideOut(label, [1,2], 15, tracks_2);
+  
+
+
 
 </script>
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
+  points = poissonDiscSampling(canvasRect, dist, nop);
 </script>
 
 <script id='csmousedown' type='text/x-cindyscript'>
