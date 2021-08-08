@@ -351,6 +351,19 @@
 		];		
 	);
 
+	
+
+
+	drawPointObject(obj) := (
+		fillcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.fillColor, alpha->obj.fillAlpha);
+		drawcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.lineColor, size->obj.lineSize * obj.scale, alpha->obj.lineAlpha);
+	);
+
+
+
+
+
+
 
 	// ************************************************************************************************
 	// Flipbook object needs
@@ -403,6 +416,25 @@
 	};
 	createRootStrokeObject(pos, lineColor) := createRootStrokeObject(pos, lineColor, (1,1,1), 0);
 	
+
+
+	createRootPointObject(pos, fillColor, lineColor, fillAlpha) := {
+		"pos": pos,
+		"offset": [0,0],
+		"rad": 0.5,
+		"scale": 0,
+		"lineSize": 3,
+		"lineColor": lineColor,
+		"lineAlpha": 1,
+		"fillColor": fillColor,
+		"fillAlpha": fillAlpha
+
+	};
+	createRootPointObject(pos, fillColor) := createRootPointObject(pos, fillColor, (0,0,0), 1);
+	
+
+
+
 	// ************************************************************************************************
 	// Zero strokes.
 	// ************************************************************************************************
@@ -651,19 +683,19 @@
 	// ************************************************************************************************
 	// Grows a stroke.
 	// ************************************************************************************************
-	constructStrokeGrow(obj, track) := (
+	constructGrow(obj, track) := (
 		tween(obj, "scale", 0, 1, track, "easeOutBack");
 	);
 
-	constructStrokeGrowMany(list, track, delay) := (
+	constructGrowMany(list, track, delay) := (
 		tweenMany(list, "scale", 0, 1, track, delay, "easeOutBack");
 	);
 
-	destroyStrokeShrink(obj, track) := (
+	destroyShrink(obj, track) := (
 		tween(obj, "scale", 1, 0, track, "easeInBack");
 	);
 
-	destroyStrokeShrinkMany(list, track, delay) := (
+	destroyShrinkMany(list, track, delay) := (
 		tweenMany(list, "scale", 1, 0, track, delay, "easeInBack");
 	);
 
@@ -1750,6 +1782,7 @@
 		rect(pos, w, h)  := rect(pos.x, pos.y, w, h);
 		drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect), size -> size, color -> color, alpha -> alpha);
 		fillRect(rect, color, alpha) := fillpoly(expandrect(rect), color -> color, alpha -> alpha);
+		fillRect(rect, color) := fillRect(rect, color, 1);
 
 		updateRectPos(rect, x, y) := (
 			rect.x = x;
