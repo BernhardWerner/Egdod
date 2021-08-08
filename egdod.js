@@ -355,8 +355,10 @@
 
 
 	drawPointObject(obj) := (
-		fillcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.fillColor, alpha->obj.fillAlpha);
-		drawcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.lineColor, size->obj.lineSize * obj.scale, alpha->obj.lineAlpha);
+		if(obj.scale > 0, 
+			fillcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.fillColor, alpha->obj.fillAlpha);
+			drawcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.lineColor, size->obj.lineSize * obj.scale, alpha->obj.lineAlpha);
+		);
 	);
 
 
