@@ -19,15 +19,11 @@
 <script id='csinit' type='text/x-cindyscript'>
 
 
-dist = 1;
-nop = 1000;
 
-t = now();
-points = poissonDiscSampling(canvasRect, dist, nop);
-println(now() - t);
+rectA = rect(canvasCenter - (3,5), 6, 10);
+rectB = rect(mouse().xy - (5,3), 10, 6);
 
-
-
+  
 tracks = [
   setupAnimationTrack(3, 10)
 ];
@@ -45,9 +41,15 @@ setupTime();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-forall(points,
-  fillcircle(#, 0.5 * dist, color -> sapColor.blue);
+fillrect(canvasRect, sapColor.background);
+intersect = intersectRects(rectA, rectB);
+
+if(intersect != 0,
+  fillrect(intersect, sapColor.lightGrey);
 );
+  
+drawrect(rectA, 4, sapColor.lightBlue);
+drawrect(rectB, 4, sapColor.lightBlue);
 
 
 </script>
@@ -60,14 +62,13 @@ delta = deltaTime();
 updateAnimationCascade(tracks, delta);
 
   
-
+updateRectPos(rectB, mouse().xy - (5,3));
 
 
 </script>
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
-  points = poissonDiscSampling(canvasRect, dist, nop);
 </script>
 
 <script id='csmousedown' type='text/x-cindyscript'>

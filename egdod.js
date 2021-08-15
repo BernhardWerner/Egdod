@@ -1783,6 +1783,7 @@
 		rect(x, y, w, h) := rect(x, y, 1, w, h);
 		rect(pos, w, h)  := rect(pos.x, pos.y, w, h);
 		drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect), size -> size, color -> color, alpha -> alpha);
+		drawRect(rect, size, color) := drawRect(rect, size, color, 1);
 		fillRect(rect, color, alpha) := fillpoly(expandrect(rect), color -> color, alpha -> alpha);
 		fillRect(rect, color) := fillRect(rect, color, 1);
 
@@ -1809,8 +1810,22 @@
 		);
 
 
+		// Returns 0 if they don't intersect
+		intersectRects(rectA, rectB) := (
+			regional(top, bottom, left, right);
 
+			right = min(rectA.x + rectA.w, rectB.x + rectB.w);
+			left = max(rectA.x, rectB.x);
 
+			if(left > right,
+				0;	
+			, // else //
+				top = min(rectA.y + rectA.h, rectB.y + rectB.h);
+				bottom = max(rectA.y, rectB.y);
+
+				rect(left, bottom, right - left, top - bottom);
+			);
+		);
 
 
 
