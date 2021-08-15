@@ -19,6 +19,32 @@
 <script id='csinit' type='text/x-cindyscript'>
 
 
+func(r, s) := (
+  regional(intersect, m);
+
+  intersect = intersectRects(r, s);
+
+  if(intersect == 0, 
+    0;
+  , // else //
+    m = dist(r.xy, centerOfRect(r)) + dist(s.xy, centerOfRect(s));
+    intersect.w * intersect.h * (m - dist(centerOfRect(r), centerOfRect(s)));
+  );
+);
+
+eps = 0.001;
+step = 0.001;
+
+
+gradient(r, s) := (
+  [
+    func(rect(r.xy + [eps, 0], r.w, r.h), s) - func(r, s),
+    func(rect(r.xy + [0, eps], r.w, r.h), s) - func(r, s),
+    func(r, rect(s.xy + [eps, 0], s.w, s.h)) - func(r, s),
+    func(r, rect(s.xy + [0, eps], s.w, s.h)) - func(r, s)
+  ] / eps;
+);
+
 
 rectA = rect(canvasCenter - (3,5), 6, 10);
 rectB = rect(mouse().xy - (5,3), 10, 6);
@@ -29,6 +55,7 @@ tracks = [
 ];
 
 
+running = false;
 
 
 playanimation();
@@ -61,17 +88,27 @@ delta = deltaTime();
 
 updateAnimationCascade(tracks, delta);
 
-  
-updateRectPos(rectB, mouse().xy - (5,3));
-
+println(func(rectA, rectB));
+if(running,
+  grad = gradient(rectA, rectB);
+  updateRectPos(rectA, rectA.xy - grad_[1,2] * step);
+  updateRectPos(rectB, rectB.xy - grad_[3,4] * step);
+  if(func(rectA, rectB) ~= 0,
+    running = false;
+  );
+);
 
 </script>
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
+if(not(running),
+  updateRectPos(rectB, mouse().xy - (5,3));
+);
 </script>
 
 <script id='csmousedown' type='text/x-cindyscript'>
+  running = not(running);
 </script>
 
 <script id='csmousedrag' type='text/x-cindyscript'>
@@ -84,7 +121,7 @@ updateRectPos(rectB, mouse().xy - (5,3));
 </script> -->
 
 
-<canvas id="CSCanvas" align="left" valign="top" width="800" height="600" style="border:1px solid #000000;"></canvas>
+<canvas id="CSCanvas" align="left" valign="top" width="1920" height="1080" style="border:0px solid #000000;"></canvas>
 
 
 

@@ -1816,19 +1816,18 @@
 
 			right = min(rectA.x + rectA.w, rectB.x + rectB.w);
 			left = max(rectA.x, rectB.x);
+			top = min(rectA.y + rectA.h, rectB.y + rectB.h);
+			bottom = max(rectA.y, rectB.y);
 
-			if(left > right,
+			if(or(left > right, bottom > top),
 				0;	
 			, // else //
-				top = min(rectA.y + rectA.h, rectB.y + rectB.h);
-				bottom = max(rectA.y, rectB.y);
-
 				rect(left, bottom, right - left, top - bottom);
 			);
 		);
 
 
-
+		centerOfRect(rect) := rect.xy + 0.5 * [rect.w, rect.h];
 
 
 
