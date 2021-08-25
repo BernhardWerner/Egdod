@@ -16,6 +16,7 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     let defOp = api.defineFunction;
 
 
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     // Helper functions
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -43,7 +44,6 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     // *************************************************************************************************
     defOp("sign", 1, function(args, modifs) {
         let x = evaluate(args[0]);   
-        console.log(x); 
         if(x.ctype == "number" && x.value.imag == 0) return cReal(Math.sign(x.value.real));
         console.log("Type missmatch in sign.");
         return nada;
