@@ -19,11 +19,10 @@
 <script id='csinit' type='text/x-cindyscript'>
 use("egdod");
 
-testTrack = setupAnimationTrack(2,3, looping->true);
+testTrack = setupAnimationTrack(2, 4);
 
-println(testTrack);
-updateAnimationTrack(testTrack, 0.1);
-println(testTrack);
+setupTime();
+playanimation();
 </script>
 
 
@@ -32,12 +31,18 @@ println(testTrack);
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-
+draw([canvas().tl, canvas().center]);
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
+delta = deltaTime();
+
+updateAnimationTrack(testTrack, delta);
+
+
+println(testTrack.progress);
 
 </script>
 
