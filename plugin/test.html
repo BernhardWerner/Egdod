@@ -19,7 +19,11 @@
 <script id='csinit' type='text/x-cindyscript'>
 use("egdod");
 
-println(canvas());
+testTrack = setupAnimationTrack(2,3, looping->true);
+
+println(testTrack);
+updateAnimationTrack(testTrack, 0.1);
+println(testTrack);
 </script>
 
 

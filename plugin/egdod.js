@@ -36,6 +36,10 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         return {ctype: "number", value: {real: x, imag: 0}}
     }
 
+    function cBool(x) {
+        return {ctype: "boolean", value: x}
+    }
+
     function cList(arr) {
         return {ctype: "list", value: arr}
     }
@@ -111,6 +115,39 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
                 bottom: cReal(points[2].y)
             }
         }
+    });
+
+
+    // *************************************************************************************************
+    // Sets up an animation track with given start and end time.
+    // *************************************************************************************************
+    defOp("setupAnimationTrack", 2, function(args, modifs) {
+        let s = evaluate(args[0]).value.real;
+        let e = evaluate(args[1]).value.real;
+
+        let looping = modifs.hasOwnProperty("looping") ? evaluate(modifs.looping) : cBool(false);
+        
+        
+        return {
+            ctype: "JSON",
+            value: {
+                start:    cReal(s),
+                end:      cReal(e),
+                duration: cReal(e - s),
+                timeLeft: cReal(e - s),
+                progress: cReal(0),
+                running:  cBool(true),
+                looping:  looping
+            }
+        }
+    });
+
+    defOp("updateAnimationTrack", 2, function(args, modifs) {
+        let track = evaluate(args[0]).value;
+        let delta = evaluate(args[1]).value.real;
+
+        track.duration.value.real -= delta;
+       
     });
 
 });
