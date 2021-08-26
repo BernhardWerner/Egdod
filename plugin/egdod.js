@@ -14,6 +14,8 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
 
     /** @type {function(string,number,CindyJS.op)} */
     let defOp = api.defineFunction;
+    
+    let extractPoint = api.extractPoint;
 
 
 
@@ -40,6 +42,11 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
 
     function cPoint(arr) {
         return cList([cReal(arr[0]), cReal(arr[1])])
+    }
+
+    function xy(p) {
+        if(p.ok) return [p.x, p.y]
+        return nada
     }
 
 
@@ -86,22 +93,22 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     // Information about the canvas.
     // *************************************************************************************************
     defOp("canvas", 0, function(args, modis) {
-        let points = call("screenbounds", [], {}).value.map(p => [p.value[0].value.real, p.value[1].value.real]);
+        let points = call("screenbounds", [], {}).value.map(p => extractPoint(p));
 
         return {
             ctype: "JSON",
             value: {
-                tl: cPoint(points[0]),
-                tr: cPoint(points[1]),
-                br: cPoint(points[2]),
-                bl: cPoint(points[3]),
-                center: cPoint([0.5 * (points[0][0] + points[2][0]), 0.5 * (points[0][1] + points[2][1])]),
-                width: cReal(points[1][0] - points[0][0]),
-                height: cReal(points[1][0] - points[2][0]),
-                left: cReal(points[0][0]),
-                top: cReal(points[0][1]),
-                right: cReal(points[2][0]),
-                bottom: cReal(points[2][1])
+                tl: cPoint(xy(points[0])),
+                tr: cPoint(xy(points[1])),
+                br: cPoint(xy(points[2])),
+                bl: cPoint(xy(points[3])),
+                center: cPoint([0.5 * (points[0].x + points[2].x), 0.5 * (points[0].y + points[2].y)]),
+                width: cReal(points[1].x - points[0].x),
+                height: cReal(points[1].x - points[2].x),
+                left: cReal(points[0].x),
+                top: cReal(points[0].y),
+                right: cReal(points[2].x),
+                bottom: cReal(points[2].y)
             }
         }
     });
