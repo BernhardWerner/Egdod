@@ -20,8 +20,40 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Helper variables and functions
+    // Internal helper stuff
     ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    class Rectangle {
+        constructor(x, y, w, h) {
+          this.x = x;
+          this.y = y;
+          this.h = h;
+          this.w = w;
+        }
+
+        get x {
+            return x;
+        }
+        get y {
+            return y;
+        }
+        get w {
+            return w;
+        }
+        get h {
+            return h;
+        }
+        get xy {
+            return [x,y];
+        }
+    }
+      
+
+
+
+
+
+
 
 
     // Calls a Cindyscript function
@@ -120,6 +152,12 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     function trackStarted(track, delay = 0) {
         return now() >= track.start.value.real + delay;
     }
+
+    function compass(int i) {
+        if(0 < i && i < 10) return [[-1,-1], [0,-1], [1,-1], [-1,0], [0,0], [1,0], [-1,1], [0,1], [1,1]][i - 1];
+        return [-1, -1]
+    }
+
 
 
 
@@ -247,12 +285,16 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         return cReal(result);
     });
 
+
+
     // *************************************************************************************************
     // Time since start. 
     // *************************************************************************************************
     defOp("now", 0, function(args, modifs) {
         return cReal(now());
     });
+
+
 
     // *************************************************************************************************
     // Sets up time variables. 
@@ -268,15 +310,16 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
 
 
 
-// if(track.running & trackStarted(track),
-//     track.timeLeft = track.timeLeft - delta;	
-//     track.progress = 1 - track.timeLeft / track.duration;
-//     if(track.timeLeft <= 0,
-//         if(track.looping,
-//             track.timeLeft = track.end - track.start;
-//         , // else //
-//             //track.timeLeft = 0;
-//             //track.running = false;		
-//         );
-//     );
-// );
+    // *************************************************************************************************
+    // Rectangle stuff
+    // *************************************************************************************************
+    defOp("rect", 4, function(args, modifs) {
+        var center = modifs.hasOwnProperty("center") ? evaluate(modifs.center.value.real : 1;
+        
+        var x = evaluate(args[0]).value.real;
+        var y = evaluate(args[1]).value.real;
+        var w = evaluate(args[2]).value.real;
+        var h = evaluate(args[3]).value.real;
+
+        rect = new Rectangle(x,y,w,h);
+    });

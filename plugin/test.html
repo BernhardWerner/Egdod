@@ -19,7 +19,6 @@
 <script id='csinit' type='text/x-cindyscript'>
 use("egdod");
 
-testTrack = setupAnimationTrack(2, 4);
 
 setupTime();
 playanimation();
@@ -31,7 +30,6 @@ playanimation();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-draw([canvas().tl, canvas().center]);
 </script>
 
 
@@ -39,10 +37,6 @@ draw([canvas().tl, canvas().center]);
 <script id='cstick' type='text/x-cindyscript'>
 delta = deltaTime();
 
-updateAnimationTrack(testTrack, delta);
-
-
-println(testTrack.progress);
 
 </script>
 
