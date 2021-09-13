@@ -337,44 +337,43 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         var numberOfPoints = evaluate(args[2]).value.real;
         var searchThreshold = modifs.hasOwnProperty("searchThreshold") ? evaluate(modifs.searchThreshold) : 32;
 
-        var hSize = Math.ceil(width / dist);
-        var vSize = Math.ceil(height / dist);
-        var oldPoints = new Array((hSize + 1) * (vSize + 1)).fill(null);
+        var cellSize = dist * 2;
+        var hSize = Math.ceil(width / cellSize);
+        var vSize = Math.ceil(height / cellSize);
+        var oldPoints = new Array(hSize * vSize).fill(null);
         var result = [];
 
 
+        
         var numberOfSearches = 0;
 
         while(result.length < numberOfPoints && numberOfSearches < searchThreshold) {
             var candidate = [lerp(0, width, Math.random()), lerp(0, height, Math.random())];
             var candidateValid = true;
-            var xIndex = Math.floor(candidate[0] / dist);
-            var yIndex = Math.floor(candidate[1] / dist);
+            var xIndex = Math.floor(candidate[0] / cellSize);
+            var yIndex = Math.floor(candidate[1] / cellSize);
 
 
             neighbors:
-            for(i = Math.max(xIndex - 1, 0); i <= Math.min(xIndex + 1, hSize); i++) {
-                for(j = Math.max(yIndex - 1, 0); j <= Math.min(yIndex + 1, vSize); j++) {
-                    
+            for(let i = Math.max(xIndex - 1, 0); i <= Math.min(xIndex + 1, hSize); i++) {
+                for(let j = Math.max(yIndex - 1, 0); j <= Math.min(yIndex + 1, vSize); j++) {
                     if(oldPoints[i * vSize + j] != null) {
                         if(Math.pow(oldPoints[i * vSize + j][0] - candidate[0], 2) + Math.pow(oldPoints[i * vSize + j][1] - candidate[1], 2) < Math.pow(dist, 2)) {
                             candidateValid = false;
                             break neighbors;
-                        }
+                        }   
                     }
                 }
             }        
             if(candidateValid) {
-                oldPoints[i * vSize + j] = candidate;
+                oldPoints[xIndex * vSize + yIndex] = candidate;
                 result.push(candidate);
                 numberOfSearches = 0;
             } else {
                 numberOfSearches++;
             }
+
         }
-
-
-        
 
 
         return cList(result.map(point => cList([point[0] + x, point[1] + y, 1].map(c => cReal(c)))))

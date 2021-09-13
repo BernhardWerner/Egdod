@@ -22,8 +22,8 @@ use("egdod");
 
 
 start = now();
-
-pts = poissonDiscSampling(canvas(), 0.3, 1000);
+dist = 3;
+pts = poissonDiscSampling(canvas(), dist, 100);
 
 println(now() - start);
 println(length(pts));
@@ -36,8 +36,9 @@ println(length(pts));
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-  drawall(pts);
-
+forall(pts,
+  fillcircle(#, dist / 2, color->(0,0,1), alpha->0.2);
+);
 </script>
 
 
