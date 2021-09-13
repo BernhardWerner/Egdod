@@ -20,13 +20,14 @@
 use("egdod");
 
 
-//poissonDiscSampling(canvas(), dist, numberOfPoints);
 
+start = now();
 
+pts = poissonDiscSampling(canvas(), 0.3, 1000);
 
+println(now() - start);
+println(length(pts));
 
-setupTime();
-playanimation();
 </script>
 
 
@@ -35,18 +36,21 @@ playanimation();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
+  drawall(pts);
+
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
-delta = deltaTime();
+
 
 
 </script>
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
+  
 
 </script>
 
