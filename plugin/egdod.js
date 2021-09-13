@@ -23,31 +23,11 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     // Internal helper stuff
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    class Rectangle {
-        constructor(x, y, w, h) {
-          this.x = x;
-          this.y = y;
-          this.h = h;
-          this.w = w;
-        }
 
-        get x {
-            return x;
-        }
-        get y {
-            return y;
-        }
-        get w {
-            return w;
-        }
-        get h {
-            return h;
-        }
-        get xy {
-            return [x,y];
-        }
-    }
-      
+
+
+
+
 
 
 
@@ -93,6 +73,8 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         return nada
     }
 
+
+    // Translates canvas (pixel) coordinates to Cindy coordinates
     function canvasToCindy(px, py) {
         var virtualwidth = 0;
         var virtualheight = 0;
@@ -153,7 +135,7 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         return now() >= track.start.value.real + delay;
     }
 
-    function compass(int i) {
+    function compass(i) {
         if(0 < i && i < 10) return [[-1,-1], [0,-1], [1,-1], [-1,0], [0,0], [1,0], [-1,1], [0,1], [1,1]][i - 1];
         return [-1, -1]
     }
@@ -213,17 +195,19 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         var points = getCanvasCoordinates();
 
         return cJSON({
-            tl: cPoint([points[0][0], points[1][1]]),
-            tr: cPoint(points[1]),
-            br: cPoint([points[1][0], points[0][1]]),
-            bl: cPoint(points[0]),
+            topLeft: cPoint([points[0][0], points[1][1], 1]),
+            topRight: cPoint(points[1].concat([1])),
+            bottomRight: cPoint([points[1][0], points[0][1], 1]),
+            bottomLeft: cPoint(points[0].concat([1])),
             center: cPoint([0.5 * (points[0][0] + points[1][0]), 0.5 * (points[0][1] + points[1][1]), 1]),
             width: cReal(points[1][0] - points[0][0]),
             height: cReal(points[1][1] - points[0][1]),
             left: cReal(points[0][0]),
             top: cReal(points[1][1]),
             right: cReal(points[1][0]),
-            bottom: cReal(points[0][1])
+            bottom: cReal(points[0][1]),
+            x: cReal(points[0][0]),
+            y: cReal(points[0][1])
         });
     });
 
@@ -277,6 +261,7 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
 
     // *************************************************************************************************
     // Computes time of last frame. 
+    // Has to run at every frame if it should be usedto control animations. Call it at top of tickscript.
     // *************************************************************************************************
     defOp("deltaTime", 0, function(args, modifs) {
         var result = computerSeconds() - timeBuffer;
@@ -304,22 +289,47 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         scriptStartTime = timeBuffer;
     });
 
+    // *************************************************************************************************
+    // Transforms a rectangle JSON with x, y, width, height into a polygon with its four vertices.
+    // Sorted bottom left, bottom right, top right, top left.
+    // *************************************************************************************************
+    defOp("expandRect", 1, function(args, modifs) {
+        var rect = evaluate(args[0]).value;
+        console.log(rect);
+        return cList([
+            cList([rect.x, rect.y, cReal(1)]),
+            cList([cReal(rect.x.value.real + rect.width.value.real), rect.y, cReal(1)]),
+            cList([cReal(rect.x.value.real + rect.width.value.real), cReal(rect.y.value.real + rect.height.value.real), cReal(1)]),
+            cList([rect.x, cReal(rect.y.value.real + rect.height.value.real), cReal(1)])
+        ]);
+    });
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 });
 
 
 
 
-    // *************************************************************************************************
-    // Rectangle stuff
-    // *************************************************************************************************
-    defOp("rect", 4, function(args, modifs) {
-        var center = modifs.hasOwnProperty("center") ? evaluate(modifs.center.value.real : 1;
-        
-        var x = evaluate(args[0]).value.real;
-        var y = evaluate(args[1]).value.real;
-        var w = evaluate(args[2]).value.real;
-        var h = evaluate(args[3]).value.real;
 
-        rect = new Rectangle(x,y,w,h);
-    });
