@@ -22,8 +22,8 @@ use("egdod");
 
 
 start = now();
-dist = 3;
-pts = poissonDiscSampling(canvas(), dist, 100);
+dist = 1;
+pts = poissonDiscSampling(canvas(), dist, 1000);
 
 println(now() - start);
 println(length(pts));
@@ -69,7 +69,7 @@ forall(pts,
 </script> -->
 
 
-<canvas id="CSCanvas" align="left" valign="top" width="1920" height="1080" style="border:1px solid #000000;"></canvas>
+<canvas id="CSCanvas" align="left" valign="top" width="1920" height="1080" style="border:0px solid #000000;"></canvas>
 
 
 

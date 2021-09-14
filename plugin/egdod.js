@@ -312,7 +312,6 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     // *************************************************************************************************
     defOp("expandRect", 1, function(args, modifs) {
         var rect = evaluate(args[0]).value;
-        console.log(rect);
         return cList([
             cList([rect.x, rect.y, cReal(1)]),
             cList([cReal(rect.x.value.real + rect.width.value.real), rect.y, cReal(1)]),
@@ -337,10 +336,10 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         var numberOfPoints = evaluate(args[2]).value.real;
         var searchThreshold = modifs.hasOwnProperty("searchThreshold") ? evaluate(modifs.searchThreshold) : 32;
 
-        var cellSize = dist * 2;
+        var cellSize = dist;
         var hSize = Math.ceil(width / cellSize);
         var vSize = Math.ceil(height / cellSize);
-        var oldPoints = new Array(hSize * vSize).fill(null);
+        var oldPoints = Array(vSize).fill(null).map(() => Array(hSize).fill(null).map(() => Array(0)));
         var result = [];
 
 
@@ -355,10 +354,10 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
 
 
             neighbors:
-            for(let i = Math.max(xIndex - 1, 0); i <= Math.min(xIndex + 1, hSize); i++) {
-                for(let j = Math.max(yIndex - 1, 0); j <= Math.min(yIndex + 1, vSize); j++) {
-                    if(oldPoints[i * vSize + j] != null) {
-                        if(Math.pow(oldPoints[i * vSize + j][0] - candidate[0], 2) + Math.pow(oldPoints[i * vSize + j][1] - candidate[1], 2) < Math.pow(dist, 2)) {
+            for(let i = Math.max(xIndex - 1, 0); i <= Math.min(xIndex + 1, hSize - 1); i++) {
+                for(let j = Math.max(yIndex - 1, 0); j <= Math.min(yIndex + 1, vSize - 1); j++) {
+                    for(let point in oldPoints[j][i]) {
+                        if(Math.pow(point[0] - candidate[0], 2) + Math.pow(point[1] - candidate[1], 2) < Math.pow(dist, 2)) {
                             candidateValid = false;
                             break neighbors;
                         }   
@@ -366,7 +365,7 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
                 }
             }        
             if(candidateValid) {
-                oldPoints[xIndex * vSize + yIndex] = candidate;
+                oldPoints[yIndex][xIndex].push(candidate);
                 result.push(candidate);
                 numberOfSearches = 0;
             } else {
