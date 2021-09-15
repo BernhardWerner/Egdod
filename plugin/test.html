@@ -20,12 +20,6 @@
 use("egdod");
 
 
-dist = 1;
-
-start = now();
-pts = poissonDiscSampling(canvas(), dist, 1500);
-
-println(now() - start);
 
 </script>
 
@@ -35,9 +29,7 @@ println(now() - start);
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-forall(pts,
-  fillcircle(#, dist / 2, color->(0,0,1), alpha->0.2);
-);
+
 </script>
 
 
@@ -50,11 +42,6 @@ forall(pts,
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
-  start = now();
-pts = poissonDiscSampling(canvas(), dist, 3000);
-
-println(now() - start);
-
 
 </script>
 

@@ -197,7 +197,7 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     defOp("sign", 1, function(args, modifs) {
         var x = evaluate(args[0]);   
         if(x.ctype == "number" && x.value.imag == 0) return cReal(Math.sign(x.value.real));
-        console.log("Type missmatch in sign.");
+        console.log("Wrong type in sign.");
         return nada;
     });
 
@@ -385,6 +385,40 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         
 
     })
+
+
+
+
+    // *************************************************************************************************
+    // The squared (Euclidean) distance between two numbers or vectors.
+    // *************************************************************************************************
+    defOp("squaredDist", 2, function(args, modifs) {
+        a = evaluate(args[0]);
+        b = evaluate(args[1]);
+
+        if(a.ctype == "number" && b.ctype == "number") {
+            return cReal(Math.pow(b.value.real - a.value.real, 2) + Math.pow(b.value.imag - a.value.imag, 2));
+        }
+        if(a.ctype == "list" && b.ctype == "list") {
+            if(a.value.length != b.value.length) {
+                console.log("Missmatched array lengths in squaredDist");
+                return nada;
+            }
+            return cReal(a.value.map((currEntry, index, arr) => Math.pow(b.value[index].value.real - currEntry.value.real, 2)).reduce((sum, currValue) => sum + currValue), 0);
+
+        }
+        console.log("Type missmatch in squaredDist.");
+        return nada;
+    });
+
+
+
+
+
+
+
+
+
 
 
 
