@@ -353,15 +353,18 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
             var yIndex = Math.floor(candidate[1] / cellSize);
 
 
+            scanSize = 1;
+
             neighbors:
-            for(let i = Math.max(xIndex - 1, 0); i <= Math.min(xIndex + 1, hSize - 1); i++) {
-                for(let j = Math.max(yIndex - 1, 0); j <= Math.min(yIndex + 1, vSize - 1); j++) {
-                    for(let point in oldPoints[j][i]) {
-                        if(Math.pow(point[0] - candidate[0], 2) + Math.pow(point[1] - candidate[1], 2) < Math.pow(dist, 2)) {
+            for(let i = Math.max(xIndex - scanSize, 0); i <= Math.min(xIndex + scanSize, hSize - 1); i++) {
+                for(let j = Math.max(yIndex - scanSize, 0); j <= Math.min(yIndex + scanSize, vSize - 1); j++) {
+                    for(let k in oldPoints[j][i]) {
+                        if(Math.pow(oldPoints[j][i][k][0] - candidate[0], 2) + Math.pow(oldPoints[j][i][k][1] - candidate[1], 2) < Math.pow(dist, 2)) {
                             candidateValid = false;
                             break neighbors;
                         }   
                     }
+                    
                 }
             }        
             if(candidateValid) {
@@ -373,6 +376,7 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
             }
 
         }
+
 
 
         return cList(result.map(point => cList([point[0] + x, point[1] + y, 1].map(c => cReal(c)))))

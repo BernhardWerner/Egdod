@@ -20,15 +20,14 @@
 
 
 
+  dist = 1;
 
 
-start = now();
-
-pts = poissonDiscSampling(canvasRect, 0.3, 1000);
-
-println(now() - start);
-println(length(pts));
-
+  start = now();
+  pts = poissonDiscSampling(canvasRect, dist, 1500);
+  
+  println(now() - start);
+  
 
 
 
@@ -41,8 +40,9 @@ println(length(pts));
 
 <script id='csdraw' type='text/x-cindyscript'>
 
-drawall(pts);
-</script>
+  forall(pts,
+  fillcircle(#, dist / 2, color->(1,0,0), alpha->0.2);
+);</script>
 
 
 
@@ -53,6 +53,12 @@ drawall(pts);
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
+
+  start = now();
+  pts = poissonDiscSampling(canvasRect, dist, 1500);
+  
+  println(now() - start);
+  
 
 </script>
 

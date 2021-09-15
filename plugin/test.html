@@ -20,13 +20,12 @@
 use("egdod");
 
 
+dist = 1;
 
 start = now();
-dist = 1;
-pts = poissonDiscSampling(canvas(), dist, 1000);
+pts = poissonDiscSampling(canvas(), dist, 1500);
 
 println(now() - start);
-println(length(pts));
 
 </script>
 
@@ -51,7 +50,11 @@ forall(pts,
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
-  
+  start = now();
+pts = poissonDiscSampling(canvas(), dist, 3000);
+
+println(now() - start);
+
 
 </script>
 
