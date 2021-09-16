@@ -47,10 +47,15 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     }
 
     // Return Cindy-compliant variables
-    function cReal(x) {
-        return {ctype: "number", value: {real: x, imag: 0}}
+    
+    function cComplex(x,y) {
+        return {ctype: "number", value: {real: x, imag: y}}
     }
 
+    function cReal(x) {
+        return cComplex(x, 0);
+    }
+    
     function cBool(bool) {
         return {ctype: "boolean", value: bool}
     }
@@ -401,15 +406,51 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
         }
         if(a.ctype == "list" && b.ctype == "list") {
             if(a.value.length != b.value.length) {
-                console.log("Missmatched array lengths in squaredDist");
+                console.log("Missmatched array lengths in squaredDist.");
                 return nada;
             }
-            return cReal(a.value.map((currEntry, index, arr) => Math.pow(b.value[index].value.real - currEntry.value.real, 2)).reduce((sum, currValue) => sum + currValue), 0);
+            return cReal(a.value.map((currEntry, index) => Math.pow(b.value[index].value.real - currEntry.value.real, 2)).reduce((sum, currValue) => sum + currValue), 0);
 
         }
         console.log("Type missmatch in squaredDist.");
         return nada;
     });
+
+
+
+    // *************************************************************************************************
+    // Linear inpterpolation and its variants for numbers and (nested) arrays of numbers.
+    // *************************************************************************************************
+    defOp("lerp", 3, function(args, modifs) {
+        x = evaluate(args[0]);
+        y = evaluate(args[1]);
+        t = evaluate(args[2]);
+
+        if(t.ctype != "number") {
+            console.log("Wrong type in lerp.");
+            return nada;
+        }
+
+        if(x.ctype == "number" && y.ctype == "number") return cComplex(lerp(x.value.real, y.value.real, t.value.real), lerp(x.value.imag, y.value.imag, t.value.real));
+
+        if(x.ctype == "list" && y.ctype == "list") {
+            if(x.value.length != y.value.length) {
+                console.log("Missmatched array lengths in lerp.");
+                return nada;
+            }
+            return cList(x.value.map((currEntry, index) => call("lerp", [x.value[index], y.value[index], t], {})));
+
+        }
+
+        console.log("Type missmatch in lerp.");
+        return nada;          
+    });
+
+
+
+
+
+
 
 
 
