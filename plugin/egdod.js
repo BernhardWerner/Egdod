@@ -422,9 +422,9 @@ CindyJS.registerPlugin(1, "egdod", function(api) {
     // Linear inpterpolation and its variants for numbers and (nested) arrays of numbers.
     // *************************************************************************************************
     defOp("lerp", 3, function(args, modifs) {
-        x = evaluate(args[0]);
-        y = evaluate(args[1]);
-        t = evaluate(args[2]);
+        var x = evaluate(args[0]);
+        var y = evaluate(args[1]);
+        var t = evaluate(args[2]);
 
         if(t.ctype != "number") {
             console.log("Wrong type in lerp.");
