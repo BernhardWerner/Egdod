@@ -20,17 +20,16 @@
 
 
 
-  dist = 1;
+
+line = createRootStrokeObject(canvasCenter, sapColor.blue);
+line.stroke = sampleBezierCurve([(0,0), (1,1), (2,3), (4,-1)]);
+line.scale = 3;
+line.lineSize = 5;
+line.drawEnd = 1;
 
 
-  start = now();
-  pts = poissonDiscSampling(canvasRect, dist, 1500);
-  
-  println(now() - start);
-  
-
-
-
+setupTime();
+playanimation();
 </script>
 
 <script src="egdod.js"></script>
@@ -39,26 +38,20 @@
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-
-  forall(pts,
-  fillcircle(#, dist / 2, color->(1,0,0), alpha->0.2);
-);</script>
+drawStrokeObject(line);
+</script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
+delta = deltaTime();
 
-
+line.rotation = line.rotation + 3 * delta;  
 </script>
 
 
 <script id='csmousemove' type='text/x-cindyscript'>
 
-  start = now();
-  pts = poissonDiscSampling(canvasRect, dist, 1500);
-  
-  println(now() - start);
-  
 
 </script>
 
@@ -75,7 +68,7 @@
 </script> -->
 
 
-<canvas id="CSCanvas" align="left" valign="top" width="1920" height="1080" style="border:0px solid #000000;"></canvas>
+<canvas id="CSCanvas" align="left" valign="top" width="800" height="800" style="border:1px solid #000000;"></canvas>
 
 
 
