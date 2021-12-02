@@ -17,16 +17,33 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
+func(x) := 15 * exp(-(sin(x / 3) * x / 5 - 2)^2);
 
-// test
+nos = 1000;
+samples = apply(1..nos, [lerp(canvasLeft, canvasRight, #, 1, nos), func(lerp(canvasLeft, canvasRight, #, 1, nos))]);
 
 
-line = createRootStrokeObject(canvasCenter, sapColor.blue);
-line.stroke = sampleBezierCurve([(0,0), (1,1), (2,3), (4,-1)]);
-line.scale = 3;
-line.lineSize = 5;
-line.drawEnd = 1;
+lengthLUT = [[canvasLeft, 0]];
+forall(1..nos - 1,
+  x1 = lerp(canvasLeft, canvasRight, #,     1, nos);
+  x2 = lerp(canvasLeft, canvasRight, # + 1, 1, nos);
+  lengthLUT = lengthLUT :> [x2, lengthLUT_(-1).y + dist([x1, func(x1)], [x2, func(x2)])];
+);
 
+equiPoints(nop) := (
+  correction = if(fract(nop) > 0, 0.5, 0);
+  apply(1..nop - correction,
+    l = lerp(0, lengthLUT_(-1).y, #, 1, nop);
+    x = evalLUTbackwards(lengthLUT, l);
+    [x, func(x)];
+  );
+);
+
+number = 2;
+
+
+track = setupAnimationTrack(0, 10);
+track.looping = true;
 
 setupTime();
 playanimation();
@@ -37,8 +54,12 @@ playanimation();
 
 
 
-<script id='csdraw' type='text/x-cindyscript'>
-drawStrokeObject(line);
+<script id='csdraw' type='text/x-cindyscript'> 
+
+plot(func(x), start -> canvasLeft, stop -> canvasRight, size -> 5, color -> sapColor.blue);
+
+drawall(equiPoints(number), color -> sapColor.orange, size -> 6);
+
 </script>
 
 
@@ -46,7 +67,9 @@ drawStrokeObject(line);
 <script id='cstick' type='text/x-cindyscript'>
 delta = deltaTime();
 
-line.rotation = line.rotation + 3 * delta;  
+updateAnimationTrack(track, delta);
+
+number = lerp(2, 20, sin(pi * track.progress)^2);
 </script>
 
 
