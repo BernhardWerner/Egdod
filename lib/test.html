@@ -30,13 +30,11 @@ playanimation();
 fillrect(canvasRect, (0,0,0));
 
 clearimage("drawBuffer");
-canvas(canvasCorners.bl, canvasCorners.br, "drawBuffer", 
-  fillcircle([sin(seconds()), 2 * cos(seconds())], 5, color -> (1,0,0));
-  
-  drawtext([0,0], "This is just a test.", size -> 50);
+canvas(canvasCorners.bl, canvasCorners.br, "drawBuffer",   
+  drawtext([0,0], "This is just a test.", size -> 100);
 );
 
-drawOutline("drawBuffer", lerp(0.1, 0.4, sin(seconds())^2), (1,1,1));
+drawOutline("drawBuffer", lerp(0.1, 0.6, sin(seconds())^2), (1,1,1));
 drawimage(canvasCorners.bl, canvasCorners.br, "drawBuffer");
 
 </script>
