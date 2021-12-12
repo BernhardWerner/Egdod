@@ -17,10 +17,8 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
-func(x) := 10 * exp(-0.5 * ((x - 3) / 1)^2) / (1 * sqrt(2 * pi));
-
-int(x) := integral("func", mouse().x, x, 3);
-
+createimage("drawBuffer", 800, 800);
+playanimation();
 </script>
 
 <script src="egdod.js"></script>
@@ -29,11 +27,17 @@ int(x) := integral("func", mouse().x, x, 3);
 
 
 <script id='csdraw' type='text/x-cindyscript'> 
+fillrect(canvasRect, (0,0,0));
 
-plot(func(x), start -> canvasLeft, stop -> canvasRight, size -> 1, color -> sapColor.blue);
-plot(int(x), start -> canvasLeft, stop -> canvasRight, size -> 4, color -> sapColor.red);
+clearimage("drawBuffer");
+canvas(canvasCorners.bl, canvasCorners.br, "drawBuffer", 
+  fillcircle([sin(seconds()), 2 * cos(seconds())], 5, color -> (1,0,0));
+  
+  drawtext([0,0], "This is just a test.", size -> 50);
+);
 
-
+drawOutline("drawBuffer", lerp(0.1, 0.4, sin(seconds())^2), (1,1,1));
+drawimage(canvasCorners.bl, canvasCorners.br, "drawBuffer");
 
 </script>
 
