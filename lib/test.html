@@ -17,36 +17,10 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
-func(x) := 15 * exp(-(sin(x / 3) * x / 5 - 2)^2);
+func(x) := 10 * exp(-0.5 * ((x - 3) / 1)^2) / (1 * sqrt(2 * pi));
 
-nos = 1000;
-samples = apply(1..nos, [lerp(canvasLeft, canvasRight, #, 1, nos), func(lerp(canvasLeft, canvasRight, #, 1, nos))]);
+int(x) := integral("func", mouse().x, x, 3);
 
-
-lengthLUT = [[canvasLeft, 0]];
-forall(1..nos - 1,
-  x1 = lerp(canvasLeft, canvasRight, #,     1, nos);
-  x2 = lerp(canvasLeft, canvasRight, # + 1, 1, nos);
-  lengthLUT = lengthLUT :> [x2, lengthLUT_(-1).y + dist([x1, func(x1)], [x2, func(x2)])];
-);
-
-equiPoints(nop) := (
-  correction = if(fract(nop) > 0, 0.5, 0);
-  apply(1..nop - correction,
-    l = lerp(0, lengthLUT_(-1).y, #, 1, nop);
-    x = evalLUTbackwards(lengthLUT, l);
-    [x, func(x)];
-  );
-);
-
-number = 2;
-
-
-track = setupAnimationTrack(0, 10);
-track.looping = true;
-
-setupTime();
-playanimation();
 </script>
 
 <script src="egdod.js"></script>
@@ -56,20 +30,16 @@ playanimation();
 
 <script id='csdraw' type='text/x-cindyscript'> 
 
-plot(func(x), start -> canvasLeft, stop -> canvasRight, size -> 5, color -> sapColor.blue);
+plot(func(x), start -> canvasLeft, stop -> canvasRight, size -> 1, color -> sapColor.blue);
+plot(int(x), start -> canvasLeft, stop -> canvasRight, size -> 4, color -> sapColor.red);
 
-drawall(equiPoints(number), color -> sapColor.orange, size -> 6);
+
 
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
-delta = deltaTime();
-
-updateAnimationTrack(track, delta);
-
-number = lerp(2, 20, sin(pi * track.progress)^2);
 </script>
 
 
