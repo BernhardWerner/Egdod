@@ -5,7 +5,6 @@
     <meta charset="utf-8">
     <title>Egdod test</title>
     <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
-    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/CindyGL.js"></script>
   </head>
 
 <body style="font-family:Palatino; margin:0; font-size:16pt">
@@ -25,12 +24,12 @@
 strokeSamleRateEBOW = 256;
 
 
-timeRect = rect(canvasCorners_4, 1, 0.2);
+timeRect = rect(canvasCorners.bl, 0, 0.2);
 
 func(x) := 2 * sin(x) + 1;
 
 strokeStart = canvasCenter + (-5, 0);
-strokeEnd = canvasCorners_2 + (-1, -1);
+strokeEnd = canvasCorners.tr + (-1, -1);
 
 circleStroke = sampleCircle(2, 2*pi);
 triangleStroke = samplePolygon([(0,0), (-4, 0), (0, -5)]);
@@ -42,7 +41,11 @@ origin = canvasCenter + (-6, -3);
 
 
 
-fadeoutRect = rect(canvasCorners_4, canvasWidth, canvasHeight);
+
+
+
+
+
 
 
 
@@ -78,7 +81,7 @@ setupAnimation() := (
 
   grid = randsort(gridH ++ gridV);
 
-  fadeoutTime = 0;
+  texFormula = createTexObject(canvasCenter + (-5, -6), "$\displaystyle    @\int€_{@0€}^{@\infty€} @\begin{pmatrix} @1€ & @2€ & @3€ \\ @4€ & @5€ & @6€ \\ @7€ & @8€ & @9€ \end{pmatrix}€ @=€ @?€   $", 25);
 
 
 
@@ -88,21 +91,23 @@ setupAnimation() := (
   
   tracks = [
     animationTrack1,
-    setupAnimationTrack(1, 2),
-    setupAnimationTrack(3, 6),
-    setupAnimationTrack(7, 8),
-    setupAnimationTrack(7.1, 8.1),
-    setupAnimationTrack(9.5, 10.5),
-    setupAnimationTrack(11.5, 12.5)
+    setupAnimationTrack(1, 2.5),
+    setupAnimationTrack(3, 4),
+    setupAnimationTrack(5, 8),
+    setupAnimationTrack(9, 10),
+    setupAnimationTrack(9.1, 10.1),
+    setupAnimationTrack(11.5, 12.5),
+    setupAnimationTrack(13.5, 14.5)
   ];
 
   setupTime();  
-);
+); // end setupAnimation
 
 
-playanimation();
+
+
 setupAnimation();
-
+playanimation();
 
 </script>
 <script src="egdod.js" data-scriptid="init"></script>
@@ -117,8 +122,9 @@ setupAnimation();
   drawStrokeObject(axisY);
   
   drawStrokeObject(strokeObject);
+
+  drawTexObject(texFormula);
   
-  fillrect(fadeoutRect, (1,1,1), fadeoutTime);
   
   fillrect(timeRect, aliceColor("blue", 2), 1.0);
 </script>
@@ -130,33 +136,40 @@ setupAnimation();
 
   tween(timeRect, "w", 0, canvasWidth, tracks_1);
   
-  constructStrokeDraw(strokeObject, 5, 0, tracks_2);
-  
 
-  tween(strokeObject, "pos", strokeStart, strokeEnd, tracks_3, "easeInOutCubic");
-  tween(strokeObject, "lineColor", aliceColor("orange"), aliceColor("teal"), tracks_3, "easeInOutCubic");
-  tween(strokeObject, "fillColor", aliceColor("orange"), aliceColor("teal"), tracks_3, "easeInOutCubic");
-  tween(strokeObject, "stroke", circleStroke, triangleStroke, tracks_3, "easeInOutCubic");
-  
-  
-  tween(strokeObject, "pos", strokeEnd, origin, tracks_6, "easeInOutCubic");
-  tween(strokeObject, "lineColor", aliceColor("teal"), aliceColor("red"), tracks_6, "easeInOutCubic");
-  tween(strokeObject, "fillColor", aliceColor("teal"), (1,1,1), tracks_6, "easeOutCirc");
-  tween(strokeObject, "fillAlpha", 0.5, 0, tracks_6, "easeOutCirc");
-  tween(strokeObject, "stroke", triangleStroke, functionStroke, tracks_6, "easeInOutCubic");
+  typeTex(texFormula, tracks_2);
+  fadeOut(texFormula, (0,-1), 5, tracks_3);
 
 
+  constructStrokeDraw(strokeObject, 5, 0, tracks_3);
   
-  constructStrokeDraw(axisX, 4, 0.5, tracks_4);
-  constructStrokeDraw(axisY, 4, 0.5, tracks_4);
+
+  tween(strokeObject, "pos", strokeStart, strokeEnd, tracks_4, "easeInOutCubic");
+  tween(strokeObject, "lineColor", aliceColor("orange"), aliceColor("teal"), tracks_4, "easeInOutCubic");
+  tween(strokeObject, "fillColor", aliceColor("orange"), aliceColor("teal"), tracks_4, "easeInOutCubic");
+  tween(strokeObject, "stroke", circleStroke, triangleStroke, tracks_4, "easeInOutCubic");
+  
+  
+  tween(strokeObject, "pos", strokeEnd, origin, tracks_7, "easeInOutCubic");
+  tween(strokeObject, "lineColor", aliceColor("teal"), aliceColor("red"), tracks_7, "easeInOutCubic");
+  tween(strokeObject, "fillColor", aliceColor("teal"), (1,1,1), tracks_7, "easeOutCirc");
+  tween(strokeObject, "fillAlpha", 0.5, 0, tracks_7, "easeOutCirc");
+  tween(strokeObject, "stroke", triangleStroke, functionStroke, tracks_7, "easeInOutCubic");
+
+
+  
+  constructStrokeDraw(axisX, 4, 0.5, tracks_5);
+  constructStrokeDraw(axisY, 4, 0.5, tracks_5);
 
   constructStrokeDrawMany(grid, 2, 0, tracks_5, 0.05);
 
     
-  fadeoutTime = tracks_7.progress;
+  tween(strokeObject, "lineAlpha", 1, 0, tracks_8);
+  tween(axisX, "lineAlpha", 1, 0, tracks_8);
+  tween(axisY, "lineAlpha", 1, 0, tracks_8);
+  forall(grid, tween(#, "lineAlpha", 1, 0, tracks_8));
 
-  if(computerSeconds() - scriptStartTimeEBOW > 12.5 & tracks_1.progress > 0.99, 
-    fadeoutTime = 1;
+  if(computerSeconds() - scriptStartTimeEBOW > 14.5 & tracks_1.progress > 0.99, 
     setupAnimation();
   );
 </script>
@@ -166,7 +179,9 @@ setupAnimation();
 
 <script id='mouse_down' type='text/x-cindyscript'>
 
-  
+
+
+
 
 </script>
 
@@ -188,9 +203,7 @@ setupAnimation();
 </script>
 
 
-<div id="canvasesdiv" style="position:relative; width:500px; height:500px; border:0px solid #000000;">
-  <canvas id="CSCanvas" align="left" valign="top" width="500" height="500" style="border:1px solid #000000;"></canvas>
-</div>
+<canvas id="CSCanvas" width="500" height="500" style="border:0px solid #000000;"></canvas>
 
 
 
@@ -202,7 +215,8 @@ setupAnimation();
                 tickscript:"tick",
                 mousedownscript:"mouse_down",
                 mousedragscript: "mouse_drag",
-                mouseupscript:"mouse_up"
+                mouseupscript:"mouse_up",
+                use: ["katex"]
                });
   
 </script>

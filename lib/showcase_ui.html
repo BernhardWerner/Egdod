@@ -63,19 +63,21 @@ slider = {
   "endLabel":    "low",
   "labelSize":   20,
   "value":       0.3,
+  "dragging",    false,
   "bulbSize":    1
 };
 
 
 selector = {
   "position":    (canvascorners_1 + (5.5, -3.5)),
-  "length":      10,
+  "gapSize":     2,
   "size":        35,
   "vertical":    false,
   "color":       aliceColor("violet", 2),
   "textSize":    17,
   "content":		 [1,2,3,4,5,6,7],
   "index":       3,
+  "dragging",    false,
   "bulbSize":    1.2
 };
 
@@ -135,9 +137,9 @@ if(mouseInButton(toggleButton),
   toggleButton.pressed = !toggleButton.pressed;
 );
 
-catchSlider(slider);
+catchSliderDown(slider);
 
-catchSelector(selector);
+catchSelectorDown(selector);
 
 catchToggle(toggleA);
 catchToggle(toggleB);
@@ -145,8 +147,8 @@ catchToggle(toggleB);
 
 
 <script id='mouse_drag' type='text/x-cindyscript'>
-catchSlider(slider);
-catchSelector(selector);
+catchSliderDrag(slider);
+catchSelectorDrag(selector);
 </script>
   
 
@@ -157,9 +159,9 @@ if(mouseInButton(clickButton) & clickButton.pressed,
 );
 clickButton.pressed = false;
 
-catchSlider(slider);
+catchSliderUp(slider);
 
-catchSelector(selector);
+catchSelectorUp(selector);
 </script>
 
 
