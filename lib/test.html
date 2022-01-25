@@ -17,26 +17,18 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
-createimage("drawBuffer", 800, 800);
-playanimation();
+javascript("load();");
+
+test = canvasCenter;
 </script>
 
-<script src="egdod.js"></script>
 
 
 
 
 <script id='csdraw' type='text/x-cindyscript'> 
-fillrect(canvasRect, (0,0,0));
 
-clearimage("drawBuffer");
-canvas(canvasCorners.bl, canvasCorners.br, "drawBuffer",   
-  drawtext([0,0], "This is just a test.", size -> 100);
-);
-
-drawOutline("drawBuffer", lerp(0.1, 0.6, sin(seconds())^2), (1,1,1));
-drawimage(canvasCorners.bl, canvasCorners.br, "drawBuffer");
-
+drawtext(test, 3);
 </script>
 
 
@@ -69,6 +61,10 @@ drawimage(canvasCorners.bl, canvasCorners.br, "drawBuffer");
 
 
 
+
+
+
+
 <script>
   cindy = createCindy({canvasname:"CSCanvas",
     scripts:"cs*",
@@ -79,8 +75,14 @@ drawimage(canvasCorners.bl, canvasCorners.br, "drawBuffer");
 
 </script>
 
+<script>
+  function load() {
+     fetch("egdod.cjs")
+    .then(response => response.text())
+    .then(data => cindy.evokeCS(data));
+  }
 
-
+</script>
 
 
 
