@@ -11,17 +11,18 @@
 <body style="font-family:Palatino; margin:0; font-size:16pt">
 
 
-<?php
-  echo "My first PHP script!";
-  $fileContent = file_get_contents("egdod.cjs");
-?>
+
 
 
 
 
 <script id='csinit' type='text/x-cindyscript'>
 </script>
-
+<script src="egdodNEW.js"></script>
+<?php
+  $fileContent = file_get_contents("egdod.cjs");
+  echo "<h2>PHP is Fun!</h2>";
+?>
 
 
 
