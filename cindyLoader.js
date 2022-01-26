@@ -1,9 +1,5 @@
-function loadCode(codeString){
-	var code = document.createTextNode(codeString);
-
-
-	var scriptId = document.currentScript.dataset.scriptid;
-	if (!scriptId) scriptId = 'csinit';
+function loadCindyScript(codeString, scriptId = "csinit"){
+	var codeNode = document.createTextNode(codeString);
 
 	var scriptElement = document.getElementById(scriptId);
 	if (!scriptElement) {
@@ -13,9 +9,10 @@ function loadCode(codeString){
 		document.head.appendChild(scriptElement);
 	}
 	if (scriptElement.firstChild) {
-		scriptElement.insertBefore(code, scriptElement.firstChild);
+		scriptElement.insertBefore(codeNode, scriptElement.firstChild);
 	} else {
-		scriptElement.appendChild(code);
+		scriptElement.appendChild(codeNode);
 	}
 
 };
+

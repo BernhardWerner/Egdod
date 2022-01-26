@@ -1,4 +1,4 @@
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
  <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -6,28 +6,22 @@
     <title>Egdod test</title>
     <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
     <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/CindyGL.js"></script>
+    <script type="text/javascript" src="cindyLoader.js"></script>
+
   </head>
 
 <body style="font-family:Palatino; margin:0; font-size:16pt">
 
 
 
-
-
-
-
 <script id='csinit' type='text/x-cindyscript'>
+
 </script>
-<script src="egdodNEW.js"></script>
-<?php
-  $fileContent = file_get_contents("egdod.cjs");
-  echo "<h2>PHP is Fun!</h2>";
-?>
 
 
 
-
-<script id='csdraw' type='text/x-cindyscript'> 
+<script id='csdraw' type='text/x-cindyscript'>
+  fillrect(canvasRect, sapColor.background); 
 </script>
 
 
@@ -59,18 +53,28 @@
 
 
 
+<script>
+  fetch("egdod.cjs")
+  .then(response => response.text())
+  .then(data => {
+    loadCindyScript(data);
+    cindy = createCindy({canvasname:"CSCanvas",
+      scripts:"cs*",
+      images: {
+      },
+      use:["katex"]
+    });
+  });
+</script>
+
+
 
 
 
 
 
 <script>
-  cindy = createCindy({canvasname:"CSCanvas",
-    scripts:"cs*",
-    images: {
-    },
-    use:["katex"]
-  });
+  
 
 </script>
 

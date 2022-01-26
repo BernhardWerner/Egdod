@@ -6,6 +6,8 @@
     <title>Egdod test</title>
     <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
     <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/CindyGL.js"></script>
+    <script src="cindyLoader.js"></script>
+
   </head>
 
 <body style="font-family:Palatino; margin:0; font-size:16pt">
@@ -106,7 +108,6 @@ toggleB = {
 
 
 </script>
-<script src="egdod.js" data-scriptid="init"></script>
 
 
 
@@ -173,14 +174,21 @@ catchSelectorUp(selector);
 
 
 <script>
-  cindy = createCindy({canvasname:"CSCanvas",
+fetch("egdod.cjs")
+  .then(response => response.text())
+  .then(data => {
+    loadCindyScript(data, "init");
+    cindy = createCindy({canvasname:"CSCanvas",
                 drawscript:"draw",
                 initscript:"init",
+                tickscript:"tick",
                 mousedownscript:"mouse_down",
                 mousedragscript: "mouse_drag",
-                mouseupscript:"mouse_up"
+                mouseupscript:"mouse_up",
                });
-  
+  });
+
+
 </script>
 
 
