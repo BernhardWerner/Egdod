@@ -2949,8 +2949,20 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
     // *************************************************************************************************
     randomValue(pos) := fract(sin(pos * [12.9898, 78.233]) * 43758.5453123);
 
-    randomGradient(pos) := [2 * fract(sin(pos * (127.1,311.7)) * 43758.5453) - 1, 
-                            2 * fract(sin(pos * (269.5,183.3)) * 43758.5453) - 1 ];
+    randomGradient2D(pos) := (
+        regional(a);
+
+        a = randomValue(pos);
+        [sin(2 * pi * a), cos(2 * pi * a)]
+    );
+    randomGradient3D(pos) := (
+        regional(a);
+
+        a = randomValue([pos.x, pos.y]);
+        b = randomValue([-pos.z, pos.x + pos.y]);
+
+        [sin(2 * pi * a) * sin(pi * b), cos(pi * b), cos(2 * pi * a) * sin(pi * b)]
+    );                            
     randomPoint(pos) := [fract(sin(pos * (127.1,311.7)) * 43758.5453), 
                          fract(sin(pos * (269.5,183.3)) * 43758.5453) ];
 
@@ -2964,7 +2976,7 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
     // *************************************************************************************************
     // Gives random gradient noise based on a point in the plane.
     // *************************************************************************************************
-    perlinNoise(coords) := (
+    perlinNoise2D(coords) := (
         regional(iPoint, fPoint);
         
         iPoint = [floor(coords.x), floor(coords.y)];
@@ -2972,18 +2984,71 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
 
         0.5 * lerp(
                 lerp(
-                    randomGradient(iPoint) * (fPoint), 
-                    randomGradient(iPoint + [1,0]) * (fPoint - [1,0]), 
+                    randomGradient2D(iPoint) * (fPoint), 
+                    randomGradient2D(iPoint + [1,0]) * (fPoint - [1,0]), 
                 smoothstep(fPoint.x)),
                 lerp(
-                    randomGradient(iPoint + [0,1]) * (fPoint - [0,1]),
-                    randomGradient(iPoint + [1,1]) * (fPoint - [1,1]),
+                    randomGradient2D(iPoint + [0,1]) * (fPoint - [0,1]),
+                    randomGradient2D(iPoint + [1,1]) * (fPoint - [1,1]),
                 smoothstep(fPoint.x)),
             smoothstep(fPoint.y)) + 0.5;
     );
-    perlinNoiseOctaves(coords) := (
-        sum(apply(0..2, pow(0.5, #) * perlinNoise(pow(2, #) * coords))) / 1.75;
+    perlinNoise2DOctaves(coords) := (
+        regional(sum);
+
+        sum = 0;
+        repeat(3,
+            sum = sum + pow(0.5, # - 1) * perlinNoise2D(pow(2, # - 1) * coords);    
+        );
+
+        sum / 1.75
     );
+
+
+
+    perlinNoise3D(coords) := (
+        regional(iPoint, fPoint);
+        
+        iPoint = [floor(coords.x), floor(coords.y), floor(coords.z)];
+        fPoint = [fract(coords.x), fract(coords.y), fract(coords.z)];
+
+        0.5 * lerp(
+            lerp(
+                lerp(
+                    randomGradient3D(iPoint) * (fPoint), 
+                    randomGradient3D(iPoint + [1,0,0]) * (fPoint - [1,0,0]), 
+                smoothstep(fPoint.x)),
+                lerp(
+                    randomGradient3D(iPoint + [0,1,0]) * (fPoint - [0,1,0]),
+                    randomGradient3D(iPoint + [1,1,0]) * (fPoint - [1,1,0]),
+                smoothstep(fPoint.x)),
+            smoothstep(fPoint.y)),
+            lerp(
+                lerp(
+                    randomGradient3D(iPoint + [0,0,1]) * (fPoint - [0,0,1]), 
+                    randomGradient3D(iPoint + [1,0,1]) * (fPoint - [1,0,1]), 
+                smoothstep(fPoint.x)),
+                lerp(
+                    randomGradient3D(iPoint + [0,1,1]) * (fPoint - [0,1,1]),
+                    randomGradient3D(iPoint + [1,1,1]) * (fPoint - [1,1,1]),
+                smoothstep(fPoint.x)),
+            smoothstep(fPoint.y)),
+        smoothStep(fPoint.z)) + 0.5;
+    );
+    perlinNoise3DOctaves(coords) := (
+        regional(sumA, sumB);
+
+        sumA = 0;
+        sumB = 0;
+
+        repeat(3,
+            sumA = sumA + pow(0.5, # - 1) * perlinNoise3D(pow(2, # - 1) * coords);    
+            sumB = sumB + pow(0.5, # - 1);    
+        );
+
+        sumA / sumB;
+    );
+
 
     // *************************************************************************************************
     // Gives noise based on Voronoi decomposition.
