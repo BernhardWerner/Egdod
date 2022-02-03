@@ -1757,11 +1757,11 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     computeangle(p, q, r) := (
         regional(x, y, s, w);
 
-         x = p - q;
-         y = r - q;
-         s = (x * y) / (abs(x) * abs(y));
-         s = if(s < -1, -1, if(s > 1, 1, s));
-         w = arccos(s) + 0;
+        x = p - q;
+        y = r - q;
+        s = (x * y) / (abs(x) * abs(y));
+        s = if(s < -1, -1, if(s > 1, 1, s));
+        w = arccos(s) + 0;
 
          if(perp(x) * y >= 0, w, 2*pi - w);
     );
@@ -1770,7 +1770,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     // ************************************************************************************************* PLUGED IN
     // The sign of a number x.
     // *************************************************************************************************
-    sign(x) := if(x ~= 0, 0, x / abs(x));
+    sign(x) := if(x == 0, 0, x / abs(x));
 
     // *************************************************************************************************
     // The faculty of the positive number n.
