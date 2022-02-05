@@ -1979,7 +1979,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     );
     
     truncatedConeSDF(p, base, baseRadius, tip, tipRadius) := (
-        //regional(rba, baba, papa, paba, x, cax, cay, k, f, cbx, cby, s);
+        regional(rba, baba, papa, paba, x, cax, cay, k, f, cbx, cby, s);
 
         rba  = tipRadius - baseRadius;
         baba = (tip - base) * (tip - base);
@@ -2001,7 +2001,24 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
+    boxSDF(p, c, size) := (
+        regional(x,y,z);
 
+        x = max(
+            p.x - c.x - size.x / 2,
+            c.x - p.x - size.x / 2
+        );
+        y = max(
+            p.y - c.y - size.y / 2,
+            c.y - p.y - size.y / 2
+        );
+        z = max(
+            p.z - c.z - size.z / 2,
+            c.z - p.z - size.z / 2
+        );
+        
+        max([x,y,z]);
+    );
 
 
 
