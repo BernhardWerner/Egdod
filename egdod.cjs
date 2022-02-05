@@ -1550,7 +1550,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
         if((n < 0) % (k < 0) % (k > n),
             err("binom: wrong numbers")
         , // else //
-            faculty(n) / faculty(k) / faculty(n - k)
+            factorial(n) / factorial(k) / factorial(n - k)
         );
     );
     
@@ -1773,10 +1773,20 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     sign(x) := if(x == 0, 0, x / abs(x));
 
     // *************************************************************************************************
-    // The faculty of the positive number n.
+    // The factorial of the positive number n.
     // *************************************************************************************************
-    faculty(n) := if(n <= 0, 1, n * faculty(n - 1));
+    //factorial(n) := if(n <= 0, 1, n * factorial(n - 1));
+    factorial(n) := (
+        prod = 1;
 
+        if(n > 0,
+            repeat(n,
+                prod = prod * n;
+            );    
+        );
+
+        prod;
+    );
     
 
 
@@ -1930,6 +1940,17 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
+    generalLaguerrePoly(k, n, x) := (
+        regional(sum);
+
+        sum = 0;
+
+        repeat(n + 1,
+            sum = sum + (-1)^(# - 1) * binom(n + k, n - # + 1) * x^(# - 1) / factorial(# - 1);    
+        );
+
+        sum;
+    );
 
 
 
@@ -1937,7 +1958,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
     
     lineSegmentSDF2D(endPoints, p) := (
-        if((endPoints_2 - endPoints_1) * (p - endPoints_1) * (endPoints_1 - endPoints_2) * (p - endPoints_2) >= 0,
+        if((endPoints_2 - endPoints_1) * (p - endPoints_1) * (endPoints_1 - endPoints_2) * (p - endPoints_2) > 0,
             abs( det([[endPoints_1_1, endPoints_1_2, 1], [endPoints_2_1, endPoints_2_2, 1], [p_1, p_2, 1]]) / dist(endPoints_1, endPoints_2)  );
         , // else //
             min(dist(endPoints_1, p), dist(endPoints_2, p));
