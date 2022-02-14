@@ -18,7 +18,7 @@
 
 
 
-<script id='init' type='text/x-cindyscript'>
+<script id='csinit' type='text/x-cindyscript'>
 
 
 // **********************************************************************************************************
@@ -113,7 +113,7 @@ toggleB = {
 
 
 
-<script id='draw' type='text/x-cindyscript'>
+<script id='csdraw' type='text/x-cindyscript'>
   drawButton(clickButton);
 
   drawButton(toggleButton);
@@ -129,7 +129,7 @@ toggleB = {
 
 
 
-<script id='mouse_down' type='text/x-cindyscript'>
+<script id='csmousedown' type='text/x-cindyscript'>
   if(mouseInButton(clickButton),
   clickButton.pressed = true;
 );
@@ -147,14 +147,14 @@ catchToggle(toggleB);
 </script>
 
 
-<script id='mouse_drag' type='text/x-cindyscript'>
+<script id='csmousedrag' type='text/x-cindyscript'>
 catchSliderDrag(slider);
 catchSelectorDrag(selector);
 </script>
   
 
 
-<script id='mouse_up' type='text/x-cindyscript'>
+<script id='csmouseup' type='text/x-cindyscript'>
 if(mouseInButton(clickButton) & clickButton.pressed,
   clickButton.corner = 1 - clickButton.corner;
 );
@@ -177,14 +177,9 @@ catchSelectorUp(selector);
 fetch("egdod.cjs")
   .then(response => response.text())
   .then(data => {
-    loadCindyScript(data, "init");
+    loadCindyScript(data);
     cindy = createCindy({canvasname:"CSCanvas",
-                drawscript:"draw",
-                initscript:"init",
-                tickscript:"tick",
-                mousedownscript:"mouse_down",
-                mousedragscript: "mouse_drag",
-                mouseupscript:"mouse_up",
+                scripts:"cs*",
                });
   });
 

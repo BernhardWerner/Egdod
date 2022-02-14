@@ -16,7 +16,7 @@
 
 
 
-<script id='init' type='text/x-cindyscript'>
+<script id='csinit' type='text/x-cindyscript'>
 
 
 // **********************************************************************************************************
@@ -115,7 +115,7 @@ playanimation();
 
 
 
-<script id='draw' type='text/x-cindyscript'>
+<script id='csdraw' type='text/x-cindyscript'>
   forall(gridH, drawStrokeObject(#));
   forall(gridV, drawStrokeObject(#));
   drawStrokeObject(axisX);
@@ -129,7 +129,7 @@ playanimation();
   fillrect(timeRect, aliceColor("blue", 2), 1.0);
 </script>
 
-<script id='tick' type='text/x-cindyscript'>
+<script id='cstick' type='text/x-cindyscript'>
   delta = deltaTime();
 
   forall(tracks, updateAnimationTrack(#, delta));
@@ -177,7 +177,7 @@ playanimation();
 
 
 
-<script id='mouse_down' type='text/x-cindyscript'>
+<script id='csmousedown' type='text/x-cindyscript'>
 
 
 
@@ -186,7 +186,7 @@ playanimation();
 </script>
 
 
-<script id='mouse_drag' type='text/x-cindyscript'>
+<script id='csmousedrag' type='text/x-cindyscript'>
 
   
 
@@ -196,7 +196,7 @@ playanimation();
   
 
 
-<script id='mouse_up' type='text/x-cindyscript'>
+<script id='csmouseup' type='text/x-cindyscript'>
 
   
 
@@ -213,14 +213,9 @@ playanimation();
 fetch("egdod.cjs")
   .then(response => response.text())
   .then(data => {
-    loadCindyScript(data, "init");
+    loadCindyScript(data);
     cindy = createCindy({canvasname:"CSCanvas",
-                drawscript:"draw",
-                initscript:"init",
-                tickscript:"tick",
-                mousedownscript:"mouse_down",
-                mousedragscript: "mouse_drag",
-                mouseupscript:"mouse_up",
+                scripts:"cs*",
                 use: ["katex"]
                });
   });
