@@ -4,7 +4,7 @@ For many years, I have been using the dynamic geometry software <a href="https:/
 
 It's a work-in-progress and might be unusable by anyone but me. Most functions aren't properly documented yet, and the animation code in particular is currently not very user-friendly. But anyone is welcome to use it, give feedback or even contribute code.
 
-## The Main Parts
+## The main parts
 1. A big part of it are common maths and array functionalities like linear interpolation, Bézier splines or shuffling of arrays.
 
 2. A collection of UI elements: Buttons, sliders and toggles. CindyScript allows calling JavaScript, so it can relatively easy interact with all other website elements. But I thought it would be nice to have basic UI elements in CindyScript itself.
