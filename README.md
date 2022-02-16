@@ -35,6 +35,8 @@ If you want to load it without cluttering your file, it currently only works whi
   ```
 The function `loadCindyScript` will take the code in `egdod.cjs` and add it **at the beginning** of the script with id `"csinit"`. If your init-script is named differently, you can pass a second argument to the function: `loadCindyScript(data, "yourCustomId")`.
 
+When in doubt, you can also take a look at the files `test.html`, `showcase_animation.html` and `showcase_ui.html` which *should* always contain working examples.
+
 ## Final note
 If you wondered where the name <i>Egdod</i> is coming from: it is the name of a character in the Neal Stephenson novels <a href="https://en.wikipedia.org/wiki/Reamde" target="_blank">Reamde</a> and <a href="https://en.wikipedia.org/wiki/Fall;_or,_Dodge_in_Hell" target="_blank">Fall; or, Dodge in Hell</a>.
 
