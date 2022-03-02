@@ -2456,7 +2456,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     sliderEnds(slider) := [slider.position, slider.position + if(slider.vertical, [0, -slider.length], [slider.length, 0])];
 
     drawSlider(slider) := (
-      regional(endPoints, startOffest, endOffset);
+      regional(endPoints, startOffset, endOffset);
 
       endPoints = sliderEnds(slider);
 
