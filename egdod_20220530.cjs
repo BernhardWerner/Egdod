@@ -57,31 +57,31 @@ evalLUTbackwards(lut, y) := evalLUTforwards(apply(lut, [#.y, #.x]), y);
 
 
 
-drawCone3D(base, radius, tip, color, resolution) := (
-    regional(dir, aux, orthoA, orthoB);
+    drawCone3D(base, radius, tip, color, resolution) := (
+        regional(dir, aux, orthoA, orthoB);
 
-    dir = tip - base;
+        dir = tip - base;
 
-    aux = dir + [random(), random(), random()];
-    while(aux * dir ~= abs(aux) * abs(dir),
-        aux = dir + [random(), 0, 0];
+        aux = dir + [random(), random(), random()];
+        while(aux * dir ~= abs(aux) * abs(dir),
+            aux = dir + [random(), 0, 0];
+        );
+
+        orthoA = cross(dir, aux);
+        orthoB = cross(dir, orthoA);
+        orthoA = orthoA / abs(orthoA);
+        orthoB = orthoB / abs(orthoB);
+
+        forall(1..resolution,
+            fillpoly3d([
+                base + radius * sin(2 * pi * # / resolution) * orthoA + radius * cos(2 * pi * # / resolution) * orthoB, 
+                base + radius * sin(2 * pi * (# + 1) / resolution) * orthoA + radius * cos(2 * pi * (# + 1) / resolution) * orthoB, 
+                tip
+            ], color -> color);
+        );
+        fillpoly3d(apply(1..resolution, base + radius * sin(2 * pi * # / resolution) * orthoA + radius * cos(2 * pi * # / resolution) * orthoB), color -> color);
     );
-
-    orthoA = cross(dir, aux);
-    orthoB = cross(dir, orthoA);
-    orthoA = orthoA / abs(orthoA);
-    orthoB = orthoB / abs(orthoB);
-
-    forall(1..resolution,
-        fillpoly3d([
-            base + radius * sin(2 * pi * # / resolution) * orthoA + radius * cos(2 * pi * # / resolution) * orthoB, 
-            base + radius * sin(2 * pi * (# + 1) / resolution) * orthoA + radius * cos(2 * pi * (# + 1) / resolution) * orthoB, 
-            tip
-        ], color -> color);
-    );
-    fillpoly3d(apply(1..resolution, base + radius * sin(2 * pi * # / resolution) * orthoA + radius * cos(2 * pi * # / resolution) * orthoB), color -> color);
-);
-drawCone3D(base, radius, tip, color) := drawCone3D(base, radius, tip, color, 128);
+    drawCone3D(base, radius, tip, color) := drawCone3D(base, radius, tip, color, 128);
 
 
 
@@ -554,9 +554,8 @@ updateAnimationTrack(track, delta) := (
             if(track.looping,
                 track.timeLeft = track.end - track.start;
             , // else //
-                track.timeLeft = 0;
-                track.progress = 1;
-                track.running = false;		
+                //track.timeLeft = 0;
+                //track.running = false;		
             );
         );
     );
@@ -586,6 +585,59 @@ tween(obj, prop, from, to, track, easing) := (
 tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");
 
 
+tweenMany(list, prop, from, to, track, delay, easing) := (
+    regional(t);
+
+
+        forall(1..length(list),
+            t = 1 - (track.timeLeft + (# - 1) * delay) / track.duration;
+            
+            if(trackStarted(track),
+                if(track.timeLeft < track.duration - (# - 1) * delay,
+                    if(track.timeLeft > - (# - 1) * delay,
+                        if(easing != "none",
+                            t = parse(easing + "(" + t + ")");
+                        );
+                    
+                        if(contains(keys(list_#), prop),
+                            list_#_prop = lerp(from, to, t);
+                        );	
+                    ,if(track.timeLeft <= - (# - 1) * delay,
+                        if(contains(keys(list_#), prop),
+                            list_#_prop = to;
+                        );	
+                    ));
+                );
+            );
+        );
+
+);
+
+
+tweenMany(list, prop, from, to, track, delay) := tweenMany(list, prop, from, to, track, delay, "none");
+
+// ************************************************************************************************
+// Setting up several animation tracks with delay.
+// ************************************************************************************************
+setupAnimationCascade(number, start, duration, step) := (
+    apply(0..number - 1,
+        setupAnimationTrack(start + # * step, start + # * step + duration);	
+    );
+);
+
+// ************************************************************************************************
+// Updating all tracks in a cascade. Has to run on every frame.
+// ************************************************************************************************
+updateAnimationCascade(cascade, delta) := (
+    forall(cascade, track,
+        updateAnimationTrack(track, delta);
+    );
+);
+
+// ************************************************************************************************
+// Updating all tracks in a cascade. Has to run on every frame.
+// ************************************************************************************************
+runAnimationCascade(cascade) := forall(cascade, track, track.running = true);
 
 
 
@@ -777,6 +829,64 @@ animateFlipbook(obj, track) := (
 
 
 
+// ************************************************************************************************
+// Setting up a stroke object.
+// ************************************************************************************************
+createRootStrokeObject(pos, lineColor, fillColor, fillAlpha) := {
+    "pos": pos,
+    "offset": [0,0],
+    "stroke": apply(1..strokeSampleRateEBOW, [0,0]),
+    "drawStart": 0,
+    "drawEnd": 0,
+    "scale": 1,
+    "rotation": 0,
+    "lineSize": 0,
+    "lineColor": lineColor,
+    "lineAlpha": 1,
+    "fillColor": fillColor,
+    "fillAlpha": fillAlpha,
+    "arrow": false,
+    "arrowSize": 0
+};
+createRootStrokeObject(pos, lineColor) := createRootStrokeObject(pos, lineColor, (1,1,1), 0);
+
+
+
+createRootPointObject(pos, fillColor, lineColor, fillAlpha) := {
+    "pos": pos,
+    "offset": [0,0],
+    "rad": 0.3,
+    "scale": 0,
+    "lineSize": 3,
+    "lineColor": lineColor,
+    "lineAlpha": 1,
+    "fillColor": fillColor,
+    "fillAlpha": fillAlpha
+
+};
+createRootPointObject(pos, fillColor) := createRootPointObject(pos, fillColor, (0,0,0), 1);
+
+
+
+
+
+createRootLineObject(pos, a, b, lineColor) := {
+    "pos": pos,
+    "offset": [0,0],
+    "endPoints": [a, b],
+    "drawStart": 0,
+    "drawEnd": 0,
+    "overhang": 0,
+    "scale": 1,
+    "rotation": 0,
+    "lineSize": 0,
+    "lineColor": lineColor,
+    "lineAlpha": 1,
+    "arrow": false,
+    "arrowSize": 0
+};
+
+
 
 
 
@@ -795,6 +905,13 @@ copy(dict) := (
 
 
 
+
+
+// ************************************************************************************************
+// Zero strokes.
+// ************************************************************************************************
+zeroStrokeCenter() := apply(1..strokeSampleRateEBOW, [0,0]);
+zeroStrokeRight() := apply(1..strokeSampleRateEBOW, [1,0]);
 
 // ************************************************************************************************
 // Creates stroke around a circle.
@@ -1257,12 +1374,42 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     );
 
 
+    // *************************************************************************************************
+    // Removes elements from a that lie in b.
+    // *************************************************************************************************
+    setMinus(a, b) := a -- b; //select(a, !contains(b, #));
 
 
 
 
 
 
+
+
+
+
+
+
+
+
+    // ************************************************************************************************
+    // Gets color value out of a gradient. Gradient time values have to be between 0 and 1.
+    // Gradient has to be an array of JSONs with keys color and t.
+    // ************************************************************************************************
+    evalGradient(grad, time) := (
+        regional(index);
+        
+        grad = sort(grad, #.t);
+
+        time = clamp(time, 0, 1);
+
+        index = 1;
+        forall(1..(length(grad) - 1),
+            if(time > grad_#.t, index = #);
+        );
+
+        lerp(grad_index.color, grad_(index + 1).color, time, grad_index.t, grad_(index + 1).t);
+    );
 
 
     // ************************************************************************************************
@@ -1948,7 +2095,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
         expandrect(bl, diag.x, diag.y);
     );
 
-    aabb(list) := box(list);
+
     
 
 
