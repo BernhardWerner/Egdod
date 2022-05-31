@@ -1020,35 +1020,6 @@ wormStrokeDraw(obj, lineSize, arrowSize, wormSize, track) := (
 );
 
 
-constructStrokeDrawMany(list, lineSize, arrowSize, track, delay) := (
-    tweenMany(list, "lineSize", 0, lineSize, track, delay, "easeOutCirc");
-    tweenMany(list, "drawEnd", 0, 1, track, delay, "easeInOutCubic");
-    tweenMany(list, "arrowSize", 0, arrowSize, track, delay);	
-);
-destroyStrokeDrawBackwardsMany(obj, lineSize, arrowSize, track, delay) := (
-    tweenMany(obj, "lineSize", lineSize, 0, track, delay, "easeInCirc");
-    tweenMany(obj, "drawEnd", 1, 0, track, delay, "easeInOutCubic");
-    tweenMany(obj, "arrowSize", arrowSize, 0, track, delay);	
-);
-destroyStrokeDrawForwardsMany(obj, lineSize, arrowSize, track, delay) := (
-    tweenMany(obj, "lineSize", lineSize, 0, track, delay, "easeInCirc");
-    tweenMany(obj, "drawStart", 0, 1, track, delay, "easeInOutCubic");
-    tweenMany(obj, "arrowSize", arrowSize, 0, track, delay);	
-);
-
-wormStrokeDrawMany(list, lineSize, arrowSize, wormSize, track, delay) := (
-    if(track.progress <= 0.5,
-        tweenMany(list, "lineSize", 0, lineSize, track, delay, "easeOutCirc");
-        tweenMany(list, "arrowSize", 0, arrowSize, track, delay, "easeOutCirc");
-    , // else //
-        tweenMany(list, "lineSize", lineSize, 0, track, delay, "easeInCirc");
-        tweenMany(list, "arrowSize", arrowSize, 0, track, delay, "easeInCirc");
-    );
-    tweenMany(list, "drawEnd", 0, 1 + wormSize, track, delay, "easeInOutQuad");
-    forall(list, #.drawStart = #.drawEnd - wormSize);
-        
-);
-
 // ************************************************************************************************
 // Grows a stroke.
 // ************************************************************************************************
@@ -1056,17 +1027,11 @@ constructGrow(obj, track) := (
     tween(obj, "scale", 0, 1, track, "easeOutBack");
 );
 
-constructGrowMany(list, track, delay) := (
-    tweenMany(list, "scale", 0, 1, track, delay, "easeOutBack");
-);
 
 destroyShrink(obj, track) := (
     tween(obj, "scale", 1, 0, track, "easeInBack");
 );
 
-destroyShrinkMany(list, track, delay) := (
-    tweenMany(list, "scale", 1, 0, track, delay, "easeInBack");
-);
 
     
 
@@ -1376,12 +1341,6 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     // ************************************************************************************************
     clamp(x, a, b) := if(a <= b, min(max(x, a), b), min(max(x, b), a));
 
-    // ************************************************************************************************
-    // t-conorm dual to normal multiplication. (I.e. Hamacher p with p = 1).
-    // ************************************************************************************************
-    oplus(x, y) := x + y - x * y;
-
-
     pNorm(p, v) := (
         v = apply(v, abs(#));
 
@@ -1511,68 +1470,6 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     // *************************************************************************************************
     horner(coeffs, x) := if(length(coeffs) == 1, coeffs_1, horner(bite(coeffs), x) * x + coeffs_1);
 
-
-    // *************************************************************************************************
-    // W.I.P. - DOESN'T WORK!!
-    // The GJK collison detection algorithm for finite convex polygons in 2D.
-    // *************************************************************************************************
-    /*
-    GJKcollision(shapeA, shapeB) := (
-        regional(dir, simplex, found, a, b, c, perpB, perpC);
-
-        if(shapeA == [] % shapeB == [],
-            false;
-        , // else //
-            dir = sum(shapeB) / length(shapeB) - sum(shapeA) / length(shapeA);
-            simplex = [polySupport(shapeA, shapeB, dir)];
-            dir = (0,0) - simplex_1;
-
-            result = false;
-            searching = true;
-            while(searching,
-                a = polySupport(shapeA, shapeB, dir);
-                if(a * dir < 0,
-                    searching = false;
-                , // else //
-                    simplex = simplex :> a;
-                    if(length(simplex) == 2,
-                        [b, a] = simplex;
-                        if(triangleheight(a,b,(0,0)) ~= 0,
-                            result = true;
-                            searching = false;
-                        , // else // 
-                            dir = perp(b-a) * sign(triangleheight(a,b,(0,0)));
-                        );
-                    , // else //
-                        [c, b, a] = simplex;
-                        if(triangleheight(a,b,(0,0)) * triangleheight(a,c,(0,0)) * triangleheight(b,c,(0,0)) ~= 0,
-                            result = true;
-                            searching = false;
-                        , // else // 
-                            perpB = perp(b-a) * sign(triangleheight(a,b,(0,0)));
-                            perpC = perp(c-a) * sign(triangleheight(a,c,(0,0)));
-
-                             if(perpB * a < 0,
-                                simplex = simplex_[2,3];
-                                dir = perpB;
-                            ,if(perpC * a < 0,
-                                simplex = simplex_[1,3];
-                                dir = perpC;
-                            , // else //
-                                result = true;
-                                searching = false;
-                            ));
-                        );
-                    );
-                );
-            );
-
-            result;
-        );
-    );
-    polySupport(shape, dir) := sort(shape, # * dir)_(-1);
-    polySupport(shapeA, shapeB, dir) := polySupport(shapeA, dir) - polySupport(shapeB, -dir);
-    */
 
     lazyCollision(shapeA, shapeB) := (
         regional(mink);
@@ -1776,15 +1673,6 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
-    // *************************************************************************************************
-    // Checks, whether the distance of a point is less than eps to a segment (given by two points).
-    // *************************************************************************************************
-    closeToSegment(p, seg, eps) := (
-      (abs(triangleheight(seg_1, seg_2, p)) < eps)
-      & ((seg_2 - seg_1) * (p - seg_1) >= -0.5 * eps * abs(seg_2 - seg_1) * abs(p - seg_1))
-      & ((seg_1 - seg_2) * (p - seg_2) >= -0.5 * eps * abs(seg_1 - seg_2) * abs(p - seg_2));
-    );
-
 
 
 
@@ -1918,15 +1806,6 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
-    // *************************************************************************************************
-    // Computes signed area of simple polygons (i.e. not self intersecting.)
-    // *************************************************************************************************
-    areaOfPolygon(points) := (
-      0.5 * abs(sum(apply(1..(length(points) - 1),
-        (points_#).x * (points_(# + 1)).y - (points_(# + 1)).x * (points_#).y;
-      )));
-    );
-
 
 
 
@@ -1966,36 +1845,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
-
-
-
-
-
-
-
-    // *************************************************************************************************
-    // Creates a rectangle (as a list of its vertices) of width w and height h with at position pos.
-    // The value c gives the position in relation to the rectangle according to the number pad on a key-
-    // board: E.g. 2 means the position is in the center of the bottom side, 5 means the center and 7
-    // means the top left corner.
-    // No c results in positioning the rectangle with pos in its lower left corner. I.e. c = 1 by
-    // default.
-    // *************************************************************************************************
-    expandrect(pos, c, w, h) := (
-        regional(d, e, shift);
-
-        d     = 0.5 * [w, h];
-        e     = (d_1, -d_2);
-        shift = -compass()_c;
-        shift = (0.5 * w * shift.x, 0.5 * h * shift.y);
-        apply([-d, e, d, -e], pos + # + shift); //LU, RU, RO, LO
-    );
-    expandrect(pos, w, h) := expandrect(pos, 1, w, h);
-    // Uses rect object; see below.
-    expandrect(r) := expandrect(r.xy, r.c, r.w, r.h);
-
-    compass() := -apply(directproduct([1, 0, -1], [1, 0, -1]), reverse(#));
-    
+ 
     
     
     // ************************************************************************************************
@@ -2080,9 +1930,12 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
             drawcircle(toggle.position, toggle.radius, size->toggle.lineSize, color->(0,0,0));
         );
         drawtext(toggle.position + [0, -0.015 * toggle.textSize], toggle.label, size->toggle.textSize, align->"mid", family->toggle.fontFamily);
-      );
+    );
 
-      catchToggle(toggle) := if(dist(mouse().xy, toggle.position) < toggle.radius, toggle.pressed = !toggle.pressed);
+    catchToggle(toggle) := if(dist(mouse().xy, toggle.position) < toggle.radius, toggle.pressed = !toggle.pressed);
+
+
+
 
 
 
@@ -2090,13 +1943,13 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     // *************************************************************************************************
     // Draws text with border.
     // *************************************************************************************************
-    drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
+    drawTextWithBorder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
         forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
                drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align, family -> family);
               );
         drawtext(pos, txt, color -> color, size -> size, align -> align, family -> family);
       );
-      drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize) := (
+      drawTextWithBorder(pos, txt, size, align, color, bordercolor, bordersize) := (
         forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
                drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align);
               );
@@ -2230,7 +2083,30 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
+   // *************************************************************************************************
+    // Creates a rectangle (as a list of its vertices) of width w and height h with at position pos.
+    // The value c gives the position in relation to the rectangle according to the number pad on a key-
+    // board: E.g. 2 means the position is in the center of the bottom side, 5 means the center and 7
+    // means the top left corner.
+    // No c results in positioning the rectangle with pos in its lower left corner. I.e. c = 1 by
+    // default.
+    // *************************************************************************************************
+    expandrect(pos, c, w, h) := (
+        regional(d, e, shift);
 
+        d     = 0.5 * [w, h];
+        e     = (d_1, -d_2);
+        shift = -compass()_c;
+        shift = (0.5 * w * shift.x, 0.5 * h * shift.y);
+        apply([-d, e, d, -e], pos + # + shift); //LU, RU, RO, LO
+    );
+    expandrect(pos, w, h) := expandrect(pos, 1, w, h);
+    // Uses rect object; see below.
+    expandrect(r) := expandrect(r.xy, r.c, r.w, r.h);
+
+    compass() := -apply(directproduct([1, 0, -1], [1, 0, -1]), reverse(#));
+    
+    
     // *************************************************************************************************
     // Creates and handles rectangle objects.
     // *************************************************************************************************
@@ -2475,115 +2351,6 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
-    /* *************************************************************************************************
-    Creates and handles spectrum slider UI element. Has to be a JSON object with the following keys and value-types.
-    gradientSlider = {
-      "position":         (2D vector),
-      "length":           (float),
-      "width":            (float),
-      "vertical":         (bool),
-      "color":            (color vector),
-      "value":            (float),
-      "shaderCode":		  (String),
-      "dragging":		  (bool),
-      "handleWidth":      (float)		  
-    };
-    ************************************************************************************************* */
-
-    drawSpectrumSlider(slider) := (
-        regional(endPoints, sliderRect, handleRect, vert, lambda,col);
-
-        endPoints = sliderEnds(slider);
-        sliderRect = if(slider.vertical,
-            expandrect(slider.position, 8, slider.width, slider.length);
-        , // else //
-            expandrect(slider.position, 4, slider.length, slider.width);
-        );
-
-        handleRect = if(slider.vertical,
-            expandrect(lerp(endPoints_1, endPoints_2, slider.value), 5, slider.handleWidth, 1);
-        , // else //
-            expandrect(lerp(endPoints_1, endPoints_2, slider.value), 5, 0.5, slider.handleWidth);
-        );
-
-        gsave();
-        clip(polygon(sliderRect));
-        colorplot(
-            lambda = inverseLerp(0, abs(endPoints_2 - endPoints_1) * abs(endPoints_2 - endPoints_1), (endPoints_2 - endPoints_1) * (# - endPoints_1) );
-            col = wavelength2rgba(lerp(380, 780, lambda));
-            [col_1, col_2, col_3];
-            
-            
-        );
-        greset();
-
-        drawpoly(sliderRect, color -> slider.color, size -> 3);
-        fillpoly(handleRect, color -> wavelength2rgba(lerp(380, 780, slider.value))_[1,2,3]);
-        drawpoly(handleRect, color -> slider.color, size -> 3);
-      
-
-    );
-
-
-
-    catchSpectrumSliderRaw(slider) := (
-        regional(endPoints);
-        
-        endPoints = sliderEnds(slider);
-        
-
-        if(lineSegmentSDF2D(endPoints, mouse().xy) <= slider.handleWidth,
-          slider.value = if(slider.vertical,
-            clamp(inverseLerp((endPoints_1).y, (endPoints_2).y, mouse().y), 0, 1);
-          , // else //
-            clamp(inverseLerp((endPoints_1).x, (endPoints_2).x, mouse().x), 0, 1);
-          );
-        );
-        
-    );
-
-    catchSpectrumSliderDown(slider) := (
-        regional(endPoints);
-
-        endPoints = sliderEnds(slider);
-
-        if(lineSegmentSDF2D(endPoints, mouse().xy) <= slider.handleWidth,
-          slider.dragging = true;
-        );
-        catchSpectrumSliderDrag(slider);
-    );
-    catchSpectrumSliderDrag(slider) := (
-        regional(endPoints);
-
-        endPoints = sliderEnds(slider);
-
-        if(slider.dragging,
-          slider.value = if(slider.vertical,
-            clamp(inverseLerp((endPoints_1).y, (endPoints_2).y, mouse().y), 0, 1);
-          , // else //
-            clamp(inverseLerp((endPoints_1).x, (endPoints_2).x, mouse().x), 0, 1);
-          );
-        );
-    );
-    catchSpectrumSliderUp(slider) := (
-        catchSpectrumSliderDrag(slider);
-        slider.dragging = false;
-    );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -2606,35 +2373,6 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
 
 
     wavelength2rgbaRaw(lambda) := (
-/*  This should work, but it doesn't.
-        // Sampled from https://upload.wikimedia.org/wikipedia/commons/0/02/CIExy1931.svg		
-        lambdaLUT = [380,460,470,480,490,500,520,540,560,580,600,620,780];
-        redLUT =    [114, 23,  2,  1,  0,  0,  0,  0,148,255,255,255,255];
-        greenLUT =  [  1,  0, 43,133,236,255,255,255,254,181, 71,  1,  1];
-        blueLUT =   [254,255,254,255,254,161,  1,  1,  1,  1,  1,  2,  1];
-
-
-        x = clamp(lambda, 380, 780);
-        //index = 1;
-        //forall(1..12, if(lambdaLUT_# <= x, index = #));
-        index = 12;
-        if(x < 620, index = 11);
-        if(x < 600, index = 10);
-        if(x < 580, index = 9);
-        if(x < 560, index = 8);
-        if(x < 540, index = 7);
-        if(x < 520, index = 6);
-        if(x < 500, index = 5);
-        if(x < 490, index = 4);
-        if(x < 480, index = 3);
-        if(x < 470, index = 2);
-        if(x < 460, index = 1);
-        
-        red =   lerp(redLUT_index,   redLUT_(index + 1), x, lambdaLUT_index, lambdaLUT_(index + 1)) / 255;
-        green = lerp(greenLUT_index, greenLUT_(index + 1), x, lambdaLUT_index, lambdaLUT_(index + 1)) / 255;
-        blue =  lerp(blueLUT_index,  blueLUT_(index + 1), x, lambdaLUT_index, lambdaLUT_(index + 1)) / 255;
-*/
-
         
         regional(red, green, blue);
 
@@ -2691,48 +2429,12 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
             green = 0;
             blue = 0;
         ))))))))))));
-        
-
-/*
-        // sRGB from https://en.wikipedia.org/wiki/SRGB 
-        regional(x, y, z, red, green, blue, magnitude);
-
-        x = cieX(lambda);
-        y = cieY(lambda);
-        z = cieZ(lambda);
-        magnitude = x + y + z;
-
-        x = x / magnitude;
-        y = y / magnitude;
-        z = z / magnitude;
-
-        //x = x / y;
-        //y = y / y;
-        //z = z / y;
-        
-        red   =  3.2404542 * x - 1.5371385 * y - 0.4985314 * z;
-        green = -0.9692660 * x + 1.8760108 * y + 0.0415560 * z;
-        blue  =  0.0556434 * x - 0.2040259 * y + 1.0572252 * z;
-
-        //red = clamp(red, 0, 1);
-        //green = clamp(green, 0, 1);
-        //blue = clamp(blue, 0, 1);
-
-
-        // Gamma corection
-
-        //red   = if(red   <= 0.0031308, 12.92 * red,   1.055 * pow(red,   5/12) - 0.055);
-        //green = if(green <= 0.0031308, 12.92 * green, 1.055 * pow(green, 5/12) - 0.055);
-        //blue  = if(blue  <= 0.0031308, 12.92 * blue,  1.055 * pow(blue,  5/12) - 0.055);
-*/
-
-
-
-
 
         [red, green, blue, 1];
         
     );
+
+
 
 
     wavelength2rgba(lambda) := (
@@ -2776,50 +2478,10 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
 
 
 
-        distSquared(u, v) := (u - v) * (u - v);
+    distSquared(u, v) := (u - v) * (u - v);
 
 
 
-
-
-
-
-
-
-
-    /*************************************************************************************************
-        Creates and handles color swatch UI element. Has to be a JSON object with the following keys and value-types.
-        swatch = {
-          "position":    (2D vector),
-          "gapSize":     (float),
-          "size":        (float),
-          "vertical":    (bool),
-          "color":       (color vector),
-          "content":	 (array of 3D vectors),
-          "index":       (int),
-          "dragging":	 (bool),
-          "bulbSize":    (float)
-        };
-    *************************************************************************************************/
-    drawColorSwatch(swatch) := (
-        regional(endPoints);
-
-          endPoints = selectorEnds(swatch);
-
-          draw(endPoints, size -> swatch.size, color -> swatch.color);
-          fillcircle(lerp(endPoints_1, endPoints_2, swatch.index, 1, length(swatch.content)), swatch.bulbSize, color -> swatch.color);
-
-        forall(1..length(swatch.content),
-            fillcircle(lerp(endPoints_1, endPoints_2, #, 1, length(swatch.content)), if(# == swatch.index, 0.7 * swatch.bulbSize, 0.7 * 0.02 * swatch.size), color -> swatch.content_#);
-            drawcircle(lerp(endPoints_1, endPoints_2, #, 1, length(swatch.content)), if(# == swatch.index, 0.7 * swatch.bulbSize, 0.7 * 0.02 * swatch.size), color -> (0,0,0), size -> 1);
-        );
-
-    );
-
-    catchColorSwatchRaw(swatch) := catchSelectorRaw(swatch);
-    catchColorSwatchDown(swatch) := catchSelectorDown(swatch);
-    catchColorSwatchDrag(swatch) := catchSelectorDrag(swatch);
-    catchColorSwatchUp(swatch) := catchSelectorUp(swatch);
 
 
 
@@ -2999,8 +2661,6 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
 
 
 
-
-    centralProjToOrthoPlane(z, p) := z + ((z * z) / (z * z - z * p)) * (p - z);
 
 
 
