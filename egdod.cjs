@@ -693,6 +693,18 @@ drawStrokeObject(obj) := (
         ratio = max(1,floor(obj.drawStart * n))..min(n, ceil(obj.drawEnd * n));
         fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
         connect(absoluteStroke_ratio, size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+    );
+);
+drawCurvedArrowObject(obj) := (
+    regional(absoluteStroke, ratio, n);
+    
+    if(obj.scale ~!= 0,
+        absoluteStroke = apply(obj.stroke, obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * #);
+        n = length(absoluteStroke);
+
+        ratio = max(1,floor(obj.drawStart * n))..min(n, ceil(obj.drawEnd * n));
+        fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
+        connect(absoluteStroke_ratio, size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
         if(obj.arrow, 
             if(length(ratio) >= 3,
                 connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
@@ -715,8 +727,47 @@ arrowTip(tipPos, dir, size) := (
 
 
 
+/* Needs
+obj = {
+    pos: [0,0],
+    offset: [0,0],
+    scale: 1,
+    endPoints: [[0,0], [0,0]],
+    overhang: 0,
+    lineSize: 1,
+    lineALpha: 1,
+    lineColor: [0,0,0]
 
+};
+*/
 drawLineObject(obj) := (
+    regional(trueStart, trueEnd);
+    if(obj.scale > 0,
+        trueStart = obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * lerp(obj.endPoints_2, obj.endPoints_1, 1 + obj.overhang);
+        trueEnd   = obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * lerp(obj.endPoints_1, obj.endPoints_2, 1 + obj.overhang);
+        
+        draw([lerp(trueStart, trueEnd, obj.drawStart), lerp(trueStart, trueEnd, obj.drawEnd)], size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
+        if(obj.arrow, 
+            connect(arrowTip(lerp(trueStart, trueEnd, obj.drawEnd), trueEnd - trueStart, obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);			
+        );
+    );
+);
+
+/* Needs
+obj = {
+    pos: [0,0],
+    offset: [0,0],
+    scale: 1,
+    endPoints: [[0,0], [0,0]],
+    overhang: 0,
+    lineSize: 1,
+    lineALpha: 1,
+    lineColor: [0,0,0],
+    arrow: true,
+    arrowSize: 1
+};
+*/
+drawStraightArrowObject(obj) := (
     regional(trueStart, trueEnd);
     if(obj.scale > 0,
         trueStart = obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * lerp(obj.endPoints_2, obj.endPoints_1, 1 + obj.overhang);
@@ -732,7 +783,18 @@ drawLineObject(obj) := (
 
 
 
-
+/* Needs
+obj = {
+    pos: [0,0],
+    offset: [0,0],
+    scale: 1,
+    lineSize: 1,
+    lineALpha: 1,
+    lineColor: [0,0,0],
+    fillAlpha: 1,
+    fillColor: [0,0,0]
+};
+*/
 drawPointObject(obj) := (
     if(obj.scale > 0, 
         fillcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.fillColor, alpha->obj.fillAlpha);
@@ -988,25 +1050,43 @@ sampleCurve(curve, start, end) := (
 // ************************************************************************************************
 // Draws a stroke object as a stroke.
 // ************************************************************************************************
-constructStrokeDraw(obj, lineSize, arrowSize, track) := (
+constructStrokeDraw(obj, lineSize, track) := (
+    tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
+    tween(obj, "drawEnd", 0, 1, track, "easeInOutCubic");
+);
+destroyStrokeDrawBackwards(obj, lineSize, track) := (
+    tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
+    tween(obj, "drawEnd", 1, 0, track, "easeInOutCubic");
+);
+destroyStrokeDrawForwards(obj, lineSize, , track) := (
+    tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
+    tween(obj, "drawStart", 0, 1, track, "easeInOutCubic");
+);
+wormStrokeDraw(obj, lineSize, wormSize, track) := (
+    if(track.progress <= 0.5,
+        tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
+        tween(obj, "arrowSize", 0, arrowSize, track, "easeOutCirc");
+    , // else //
+        tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
+    );
+    tween(obj, "drawEnd", 0, 1 + wormSize, track, "easeInOutQuad");
+    obj.drawStart = obj.drawEnd - wormSize;
+        
+);
+
+
+
+constructArrowDraw(obj, lineSize, arrowSize, track) := (
     tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
     tween(obj, "drawEnd", 0, 1, track, "easeInOutCubic");
     tween(obj, "arrowSize", 0, arrowSize, track);	
 );
-destroyStrokeDrawBackwards(obj, lineSize, arrowSize, track) := (
-    tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
-    tween(obj, "drawEnd", 1, 0, track, "easeInOutCubic");
-    tween(obj, "arrowSize", arrowSize, 0, track);	
-);
-destroyStrokeDrawForwards(obj, lineSize, arrowSize, track) := (
+destroyArrowDrawForwards(obj, lineSize, arrowSize, track) := (
     tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
     tween(obj, "drawStart", 0, 1, track, "easeInOutCubic");
     tween(obj, "arrowSize", arrowSize, 0, track);	
 );
-
-
-
-wormStrokeDraw(obj, lineSize, arrowSize, wormSize, track) := (
+wormArrowDraw(obj, lineSize, arrowSize, wormSize, track) := (
     if(track.progress <= 0.5,
         tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
         tween(obj, "arrowSize", 0, arrowSize, track, "easeOutCirc");
