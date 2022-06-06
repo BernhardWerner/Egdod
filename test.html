@@ -16,14 +16,35 @@
 
 <script id='csinit' type='text/x-cindyscript'>
 
+drawZeros() := (
+  regional(i,j,x,y);
+
+  repeat(resolution, i, repeat(resolution, j, 
+    x = lerp(canvasLeft, canvasRight, i, 1, resolution);
+    y = lerp(canvasBottom, canvasTop, j, 1, resolution);
+    forall(roots(halfPolyX(x)),
+      draw([x, #], color -> sapColor.blue, border -> false, size -> 2);
+    );
+    forall(roots(halfPolyY(y)),
+      draw([#, y], color -> sapColor.orange, border -> false, size -> 2);
+    );
+  ));
+);
+
+curveTensor = [[-2, 0, 1], [-1, 0, 0], [0, 0, 0], [-1, 0, 0]];
+halfPolyX(x) := transpose(curveTensor) * [1,x,x^2,x^3];
+halfPolyY(y) := flatten(curveTensor * [[1],[y],[y^2]]);
+poly(x,y) := [[1, x, x^2, x^3]] * curveTensor * [[1], [y]];
+
+resolution = 100;
+
+
 </script>
 
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-  fillrect(canvasRect, sapColor.background); 
-
-  fillcircle(canvasCenter, 5, color -> sapColor.blue);
+drawZeros();
 </script>
 
 

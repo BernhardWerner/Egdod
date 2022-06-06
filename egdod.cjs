@@ -1058,7 +1058,7 @@ destroyStrokeDrawBackwards(obj, lineSize, track) := (
     tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
     tween(obj, "drawEnd", 1, 0, track, "easeInOutCubic");
 );
-destroyStrokeDrawForwards(obj, lineSize, , track) := (
+destroyStrokeDrawForwards(obj, lineSize, track) := (
     tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
     tween(obj, "drawStart", 0, 1, track, "easeInOutCubic");
 );
@@ -2242,6 +2242,31 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
+
+
+        // *************************************************************************************************
+    // Draws text with border.
+    // *************************************************************************************************
+    drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
+        forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
+               drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align, family -> family);
+              );
+        drawtext(pos, txt, color -> color, size -> size, align -> align, family -> family);
+      );
+      drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize) := (
+        forall(bordersize * apply(1..8, [sin(2 * pi * #/ 8), cos(2 * pi * #/ 8)]), o,
+               drawtext(pos, txt, color -> bordercolor, offset -> o, size -> size, align -> align);
+              );
+        drawtext(pos, txt, color -> color, size -> size, align -> align);
+      );
+
+
+
+
+
+
+
+      
 
 
     /* *************************************************************************************************
