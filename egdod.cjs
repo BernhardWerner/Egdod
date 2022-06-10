@@ -1761,6 +1761,17 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
+
+
+
+
+    ang2vec(alpha) := rotate([1,0], alpha);
+
+
+
+
+
+
     generalLaguerrePoly(k, n, x) := (
         regional(sum);
 
@@ -2804,28 +2815,40 @@ cieZ(lambda) := 1.217 * skewGauss(lambda, 437.0, 11.8, 36.0) + 0.681 * skewGauss
 
 
 
-    aliceColor = {
-        "blue": (12,90,166) / 255,
-        "orange": (255,140,0) / 255,
-        "violet": (145,19,204) / 255,
-        "turquoise": (0,128,119) / 255,
-        "teal": (0,128,119) / 255,
-        "red": (215,19,24) / 255,
-        "green": (67,186,16) / 255,
-        "minion": (245,224,80) / 255,
-        "brown": (117,50,0) / 255,
-        "pink": (248,131,248) / 255,
-        "grey": (128,128,12) / 255
-    };
+    // aliceColor = {
+    //     "blue": (12,90,166) / 255,
+    //     "orange": (255,140,0) / 255,
+    //     "violet": (145,19,204) / 255,
+    //     "turquoise": (0,128,119) / 255,
+    //     "teal": (0,128,119) / 255,
+    //     "red": (215,19,24) / 255,
+    //     "green": (67,186,16) / 255,
+    //     "minion": (245,224,80) / 255,
+    //     "brown": (117,50,0) / 255,
+    //     "pink": (248,131,248) / 255,
+    //     "grey": (128,128,12) / 255
+    // };
 
 
-    toolColor = {
-        "blue": (0, 50, 89) / 255,
-        "red": (227,114, 34) / 255, 
-        "green": (162,173,  0) / 255, 
-        "violet": (168,37,  132) / 255,
-        "grey": (128,128,128) / 255 
-    };
+    // toolColor = {
+    //     "blue": (0, 50, 89) / 255,
+    //     "red": (227,114, 34) / 255, 
+    //     "green": (162,173,  0) / 255, 
+    //     "violet": (168,37,  132) / 255,
+    //     "grey": (128,128,128) / 255 
+    // };
+
+    aliceColor = {};
+    forall(["blue", "orange", "violet", "turquoise", "teal", "red", "green", "minion", "brown", "pink", "grey"], 
+        aliceColor_# = reverse(get(aliceColorTable, #));
+    );
+
+    toolColor = {};
+    forall(["blue", "violet", "red", "green", "grey"], 
+        toolColor_# = reverse(get(toolColorTable, #));
+    );
+
+
 
     sapColor = {
         "black":       hex2rgb("000000"),
