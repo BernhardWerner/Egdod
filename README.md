@@ -18,7 +18,7 @@ It's a work-in-progress and might be unusable by anyone but me. Most functions a
 You can always copy-paste the content of `egdod.cjs` directly into your init-script.
 
 If you want to load it without cluttering your file, it currently only works while running on a server. I.e., for local/offline tests, you might want to start a local server via `python -m http.server` in a terminal or any other method you are comfortable with. To make it then work…
-1. Download both `cindyLoader.js` and `egdod.cjs` into the same directory, your CindyJS file is in.
+1. Download both `cindyLoader.js` and `egdod.cjs` into the same directory your CindyJS file is in.
 2. Add `<script type="text/javascript" src="cindyLoader.js"></script>` at the top of your CindyJS file.
 3. Wrap the `createCindy` function the following way: 
   ```JavaScript
