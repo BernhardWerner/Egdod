@@ -2255,7 +2255,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
-        // *************************************************************************************************
+    // *************************************************************************************************
     // Draws text with border.
     // *************************************************************************************************
     drawWithBorder(pos, txt, size, align, color, bordercolor, bordersize, family) := (
@@ -2272,6 +2272,79 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
       );
 
 
+
+/*****
+Dropdown menus must be JSON object of the form
+dropDown = {
+  "position": [3, -3],
+  "width": 10,
+  "lineHeight": 2,
+  "entries": ["This", "is", "just", "a", "test", "$\sum_{i=0}^n i^2$"],
+  "index": 1,
+  "color": toolColor.grey,
+  "textColor": (1,1,1),
+  "textSize": 20,
+  "open": 0,
+  "animationTarget": 0,
+  "animationProgress": 1,
+  "corner": 0.5,
+  "gutter": 0.2
+};
+
+*****/
+
+drawDropDownMenu(obj) := (
+    regional(height, noe, shape, angle, chevron);
+  
+    noe = length(obj.entries);
+    height = obj.lineHeight * (1 + noe * obj.open) + obj.gutter * noe * obj.open;
+  
+    shape = roundedrectangle(obj.position + 0.5 * obj.gutter * [-1,1], obj.width + obj.gutter, height + obj.gutter, obj.corner);
+    fill(shape, color -> obj.color, alpha -> 0.3);
+    
+    fill(roundedrectangle(obj.position, obj.width, obj.lineHeight, obj.corner), color -> obj.color, alpha -> 1);
+    drawtext(obj.position + [1, -0.5 * obj.lineHeight - 0.0125 * obj.textSize], (obj.entries)_(obj.index), size -> obj.textSize, color -> obj.textColor);
+  
+    angle = lerp(0.5 * pi, 1.5 * pi, obj.open);
+    chevron = apply(-1..1, [cos(2 * pi * # / 3), sin(2 * pi * # / 3)]) :> [0.1, 0];
+    chevron = apply(chevron, 0.2 * obj.lineHeight * rotate(#, angle) + obj.position + [0.87 * obj.width, - 0.5 * obj.lineHeight]);
+  
+    fillpoly(chevron, color -> obj.textColor);
+    drawpoly(chevron, color -> obj.textColor, size -> 3);
+  
+    gsave();
+    clip(shape);
+  
+    forall(1..noe,
+      fill(roundedrectangle(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], obj.width, obj.lineHeight, obj.corner), color -> obj.color, alpha -> if(# == obj.index, 0.6, 0.15));
+    );
+    forall(1..noe,
+      drawtext(obj.position + [1, -(# + 0.5) * obj.lineHeight  - # * obj.gutter - 0.0125 * obj.textSize], obj.entries_#, size -> obj.textSize, color -> obj.textColor);
+    );
+    grestore();
+);
+
+animateDropDownMenu(obj, delta) := (
+    obj.animationProgress = clamp(obj.animationProgress + 2 * delta, 0, 1);
+    obj.open = lerp(1 - obj.animationTarget, obj.animationTarget, easeInOutCubic(obj.animationProgress));
+);
+
+switchDropDownMenu(obj) := (
+    if(obj.animationProgress >= 1 & pointInPolygon(mouse().xy, expandrect(obj.position, 7, obj.width, obj.lineHeight)), 
+        obj.animationTarget = 1 - obj.animationTarget;
+        obj.animationProgress = 0;
+    );
+);
+
+catchDropDownMenu(obj) := (
+    if(obj.animationProgress >= 1,
+        forall(1..length(obj.entries),
+        if(pointInPolygon(mouse().xy, expandrect(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], 7, obj.width, obj.lineHeight)),
+            obj.index = #;
+        );
+        );
+    );
+);
 
 
 
