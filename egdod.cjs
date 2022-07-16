@@ -274,6 +274,36 @@ drawOutline(image, size, outlineColor) := (
     );
 );
 
+drawOutline(image, targetTexture, size, outlineColor) := (
+    // Brute force
+
+    regional(vis, a, b, c, resultColor, imageColor);
+
+    
+    a = 128;
+    b = 64;
+    c = 32;
+    
+    colorplot(targetTexture,
+        imageColor = imagergba(image, #);
+        
+        if(imageColor_4 > 0,
+            vis = 1;
+        , // else //
+            vis = 0;
+            repeat(a, i, vis = vis + imagergba(image, # + size *         [sin(2 * pi * i / a), cos(2 * pi * i / a)])_4);
+            repeat(b, i, vis = vis + imagergba(image, # + size * 2 / 3 * [sin(2 * pi * i / b), cos(2 * pi * i / b)])_4);
+            repeat(c, i, vis = vis + imagergba(image, # + size     / 3 * [sin(2 * pi * i / c), cos(2 * pi * i / c)])_4);
+
+            vis = clamp(vis, 0, 1);
+        );
+
+        
+
+        (outlineColor.x, outlineColor.y, outlineColor.z, 1) * vis;
+    );
+);
+
 
 
 
@@ -2449,7 +2479,9 @@ catchDropDownMenu(obj) := (
           "gapSize":     (float),
           "size":        (float),
           "vertical":    (bool),
-          "color":       (color vector),
+          "outerColor":       (color vector),
+          "innerColor":       (color vector),
+          "textColor":       (color vector),
           "textSize":    (float),
           "content":	 (array),
           "index":       (int),
@@ -2463,15 +2495,17 @@ catchDropDownMenu(obj) := (
     drawSelector(selector) := (
         regional(endPoints);
 
-      endPoints = selectorEnds(selector);
+    endPoints = selectorEnds(selector);
 
-      draw(endPoints, size -> selector.size, color -> selector.color);
-      fillcircle(lerp(endPoints_1, endPoints_2, selector.index, 1, length(selector.content)), selector.bulbSize, color -> selector.color);
-      fillcircle(lerp(endPoints_1, endPoints_2, selector.index, 1, length(selector.content)), 0.7 * selector.bulbSize, color -> (1,1,1));
+    draw(endPoints, size -> selector.size, color -> selector.outerColor);
+    fillcircle(lerp(endPoints_1, endPoints_2, selector.index, 1, length(selector.content)), selector.bulbSize, color -> selector.outerColor);
+    fillcircle(lerp(endPoints_1, endPoints_2, selector.index, 1, length(selector.content)), 0.7 * selector.bulbSize, color -> selector.innerColor);
 
-        forall(1..length(selector.content),
-        drawwithborder(lerp(endPoints_1, endPoints_2, #, 1, length(selector.content)) + (0, -0.015 * selector.textSize), selector.content_#, selector.textSize, "mid", [0,0,0], [1,1,1], 1.5, selector.fontFamily);
-      );
+    drawimage(canvasCorners.bl, canvasCorners.br, selector.outlineTexture);
+    forall(1..length(selector.content),
+        drawtext(lerp(endPoints_1, endPoints_2, #, 1, length(selector.content)) + (0, -0.015 * selector.textSize), selector.content_#, size -> selector.textSize, align -> "mid", color -> selector.textColor, family -> selector.fontFamily);
+    );
+    
 
     );
 
@@ -2527,7 +2561,18 @@ catchDropDownMenu(obj) := (
 
 
 
+    preprocessSelector(selector) := (
+        regional(endPoints);
 
+        createimage(selector.outlineTexture, 3 * screenresolution() * canvasWidth, 3 * screenresolution() * canvasHeight);
+        canvas(canvasCorners.bl, canvasCorners.br, selector.outlineTexture,
+            endPoints = selectorEnds(selector);
+            forall(1..length(selector.content),
+                drawtext(lerp(endPoints_1, endPoints_2, #, 1, length(selector.content)) + (0, -0.015 * selector.textSize), selector.content_#, size -> selector.textSize, align -> "mid", color -> selector.innerColor, family -> selector.fontFamily);
+            );
+        );
+        drawOutline(selector.outlineTexture, selector.outlineTexture, 0.1, selector.innerColor);
+    );
 
 
 

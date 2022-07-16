@@ -65,7 +65,7 @@ slider = {
   "endLabel":    "low",
   "labelSize":   20,
   "value":       0.3,
-  "dragging",    false,
+  "dragging":    false,
   "bulbSize":    1
 };
 
@@ -75,14 +75,17 @@ selector = {
   "gapSize":     2,
   "size":        35,
   "vertical":    false,
-  "color":       aliceColor("violet", 2),
+  "outerColor":       aliceColor("violet", 1),
+  "innerColor":       aliceColor("violet", -1),
+  "textColor":       (1,1,1),
   "textSize":    17,
   "content":		 [1,2,3,4,5,6,7],
   "index":       3,
-  "dragging",    false,
-  "bulbSize":    1.2
+  "dragging":    false,
+  "bulbSize":    1.2,
+  "outlineTexture": "sdfhg"
 };
-
+preprocessSelector(selector);
 
 toggleA = {
   "position":   canvascenter + (7, 4),
@@ -206,6 +209,7 @@ fetch("egdod.cjs")
     loadCindyScript(data);
     cindy = createCindy({canvasname:"CSCanvas",
                 scripts:"cs*",
+                use:["CindyGL"]
                });
   });
 
