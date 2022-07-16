@@ -2008,11 +2008,11 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
         if(button.pressed,
             //fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y), button.size.x, button.size.y, button.corner), color -> (button.colors)_2);
             fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y) + (0, -0.2), button.size.x, button.size.y, button.corner), color -> (button.colors)_1);
-                drawtext(button.position + (0, -0.5 * button.textSize / 35) + (0, -0.2), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
+                drawtext(button.position + (0, -0.5 * button.textSize / 35) + (0, -0.2), button.label, align->"mid", size->button.textSize, color->button.labelColor, bold->true, family->button.fontFamily);
         , // else //
             fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y) + (0, -0.2), button.size.x, button.size.y, button.corner), color -> (button.colors)_3);
             fill(roundedrectangle(button.position + 0.5 * (-button.size.x, button.size.y), button.size_1, button.size_2, button.corner), color -> (button.colors)_2);
-            drawtext(button.position + (0, -0.5 * button.textSize / 35), button.label, align->"mid", size->button.textSize, color->(1, 1, 1), bold->true, family->button.fontFamily);
+            drawtext(button.position + (0, -0.5 * button.textSize / 35), button.label, align->"mid", size->button.textSize, color->button.labelColor, bold->true, family->button.fontFamily);
         );
     );
 
@@ -2044,13 +2044,13 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     // };
     // ************************************************************************************************
     drawToggle(toggle) := (
-        fillcircle(toggle.position, toggle.radius, size->toggle.lineSize, color->(1,1,1));
+        fillcircle(toggle.position, toggle.radius, size->toggle.lineSize, color -> toggle.innerColor);
         if(toggle.pressed,
-            drawcircle(toggle.position, toggle.radius, size->5 * toggle.lineSize, color->toggle.color);
+            drawcircle(toggle.position, toggle.radius, size->toggle.lineSize, color->toggle.borderColor);
         , // else //
-            drawcircle(toggle.position, toggle.radius, size->toggle.lineSize, color->(0,0,0));
+            drawcircle(toggle.position, toggle.radius, size->1, color->(0,0,0));
         );
-        drawtext(toggle.position + [0, -0.015 * toggle.textSize], toggle.label, size->toggle.textSize, align->"mid", family->toggle.fontFamily);
+        drawtext(toggle.position + [0, -0.015 * toggle.textSize], toggle.label, size->toggle.textSize, align->"mid", family->toggle.fontFamily, color -> toggle.labelColor);
     );
 
     catchToggle(toggle) := if(dist(mouse().xy, toggle.position) < toggle.radius, toggle.pressed = !toggle.pressed);
@@ -2330,7 +2330,7 @@ drawDropDownMenu(obj) := (
     height = obj.lineHeight * (1 + noe * obj.open) + obj.gutter * noe * obj.open;
   
     shape = roundedrectangle(obj.position + 0.5 * obj.gutter * [-1,1], obj.width + obj.gutter, height + obj.gutter, obj.corner);
-    fill(shape, color -> obj.color, alpha -> 0.3);
+    fill(shape, color -> obj.color, alpha -> 0.5);
     
     fill(roundedrectangle(obj.position, obj.width, obj.lineHeight, obj.corner), color -> obj.color, alpha -> 1);
     drawtext(obj.position + [1, -0.5 * obj.lineHeight - 0.0125 * obj.textSize], (obj.entries)_(obj.index), size -> obj.textSize, color -> obj.textColor);
@@ -2346,7 +2346,7 @@ drawDropDownMenu(obj) := (
     clip(shape);
   
     forall(1..noe,
-      fill(roundedrectangle(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], obj.width, obj.lineHeight, obj.corner), color -> obj.color, alpha -> if(# == obj.index, 0.6, 0.15));
+      fill(roundedrectangle(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], obj.width, obj.lineHeight, obj.corner), color -> obj.color, alpha -> if(# == obj.index, 1, 0.5));
     );
     forall(1..noe,
       drawtext(obj.position + [1, -(# + 0.5) * obj.lineHeight  - # * obj.gutter - 0.0125 * obj.textSize], obj.entries_#, size -> obj.textSize, color -> obj.textColor);
@@ -2408,9 +2408,9 @@ catchDropDownMenu(obj) := (
 
       endPoints = sliderEnds(slider);
 
-      draw(endPoints, size -> slider.size, color -> slider.color);
-      fillcircle(lerp(endPoints_1, endPoints_2, slider.value), slider.bulbSize, color -> slider.color);
-      fillcircle(lerp(endPoints_1, endPoints_2, slider.value), 0.7 * slider.bulbSize, color -> (1,1,1));
+      draw(endPoints, size -> slider.size, color -> slider.outerColor);
+      fillcircle(lerp(endPoints_1, endPoints_2, slider.value), slider.bulbSize, color -> slider.outerColor);
+      fillcircle(lerp(endPoints_1, endPoints_2, slider.value), 0.7 * slider.bulbSize, color -> slider.innerColor);
 
       startOffset = if(slider.vertical,
         [0, 1.2 * slider.bulbSize + 0.2];
@@ -2422,8 +2422,8 @@ catchDropDownMenu(obj) := (
       , // else //
         [1.2 * slider.bulbSize, -0.015 * slider.labelSize];
       );
-      drawtext(endPoints_1 + startOffset, slider.startLabel, align -> if(slider.vertical, "mid", "right"), size -> slider.labelSize, family->slider.fontfamily);
-      drawtext(endPoints_2 + endOffset,   slider.endLabel,   align -> if(slider.vertical, "mid", "left"),   size -> slider.labelSize, family->slider.fontfamily);
+      drawtext(endPoints_1 + startOffset, slider.startLabel, align -> if(slider.vertical, "mid", "right"),  color -> slider.labelColor, size -> slider.labelSize, family->slider.fontfamily);
+      drawtext(endPoints_2 + endOffset,   slider.endLabel,   align -> if(slider.vertical, "mid", "left"),   color -> slider.labelColor, size -> slider.labelSize, family->slider.fontfamily);
     );
 
     catchSliderRaw(slider) := (

@@ -38,7 +38,8 @@ clickButton = {
   "textSize": 17,
   "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
   "corner":   0.7,
-  "pressed":  false
+  "pressed":  false,
+  "labelColor": (1,1,1)
 };
 
 
@@ -50,7 +51,8 @@ toggleButton = {
   "textSize": 17,
   "colors":   (apply(0..2, aliceColor("orange", 1 - #))),
   "corner":   0.7,
-  "pressed":  false
+  "pressed":  false,
+  "labelColor": (1,1,1)
 };
 
 
@@ -60,10 +62,12 @@ slider = {
   "length":      10,
   "size":        30,
   "vertical":    true,
-  "color":       aliceColor("teal", 1),
+  "outerColor":       aliceColor("teal", 0),
+  "innerColor":       aliceColor("teal", 2),
   "startLabel":  "high",
   "endLabel":    "low",
   "labelSize":   20,
+  "labelColor":  aliceColor("teal", -1),
   "value":       0.3,
   "dragging":    false,
   "bulbSize":    1
@@ -88,23 +92,15 @@ selector = {
 preprocessSelector(selector);
 
 toggleA = {
-  "position":   canvascenter + (7, 4),
+  "position":   canvascenter + (7, 2),
   "radius":     2,
-  "lineSize":   1,
+  "lineSize":   10,
   "label":      "Option A",
   "textSize":   17,
-  "color":      aliceColor("green"),
+  "borderColor":      aliceColor("red"),
+  "innerColor": 0.9 * (1,1,1),
+  "labelColor": (0,0,0),
   "pressed":    false
-};
-
-toggleB = {
-  "position":   canvascenter + (7, -1),
-  "radius":     2,
-  "lineSize":   1,
-  "label":      "Option B",
-  "textSize":   17,
-  "color":      aliceColor("red"),
-  "pressed":    true
 };
 
 
@@ -114,7 +110,7 @@ dropDown = {
   "lineHeight": 1.8,
   "entries": ["This", "is", "just", "a", "test"],
   "index": 1,
-  "color": toolColor("grey", -1),
+  "color": aliceColor("green", -1),
   "textColor": (1,1,1),
   "textSize": 20,
   "open": 0,
@@ -144,7 +140,6 @@ playanimation();
 
   drawToggle(toggleA);
 
-  drawToggle(toggleB);
 
   drawDropDownMenu(dropDown);
 </script>
@@ -171,7 +166,6 @@ catchSliderDown(slider);
 catchSelectorDown(selector);
 
 catchToggle(toggleA);
-catchToggle(toggleB);
 
 switchDropDownMenu(dropDown);
 catchDropDownMenu(dropDown);
