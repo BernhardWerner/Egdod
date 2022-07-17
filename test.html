@@ -16,35 +16,39 @@
 
 <script id='csinit' type='text/x-cindyscript'>
 
-drawZeros() := (
-  regional(i,j,x,y);
-
-  repeat(resolution, i, repeat(resolution, j, 
-    x = lerp(canvasLeft, canvasRight, i, 1, resolution);
-    y = lerp(canvasBottom, canvasTop, j, 1, resolution);
-    forall(roots(halfPolyX(x)),
-      draw([x, #], color -> sapColor.blue, border -> false, size -> 2);
-    );
-    forall(roots(halfPolyY(y)),
-      draw([#, y], color -> sapColor.orange, border -> false, size -> 2);
-    );
-  ));
+resetColors() := (
+  colorA = [random(), random(), random()];
+  colorB = rgb2hsv(colorA);
+  colorC = hsv2rgb(colorB);
 );
 
-curveTensor = [[-2, 0, 1], [-1, 0, 0], [0, 0, 0], [-1, 0, 0]];
-halfPolyX(x) := transpose(curveTensor) * [1,x,x^2,x^3];
-halfPolyY(y) := flatten(curveTensor * [[1],[y],[y^2]]);
-poly(x,y) := [[1, x, x^2, x^3]] * curveTensor * [[1], [y]];
+resetColors();
 
-resolution = 100;
-
-
+playanimation();
 </script>
 
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-drawZeros();
+colorplot(
+  x = inverseLerp(canvasLeft, canvasRight, #.x);
+  y = inverseLerp(canvasBottom, canvasTop, #.y);
+  if(y >= 0.9,
+    hsv2rgb([x * 360°, 1, 1]);
+  , // else //
+    [1,1,1]
+  );
+
+);
+
+drawtext(canvasCenter + [-4, 0] + 4 * [-0.5, 1], colorA, size -> 20, align -> "right");
+drawtext(canvasCenter + [0, 8], colorB, size -> 20, align -> "mid");
+drawtext(canvasCenter + [ 4, 0] + 4 * [ 0.5, 1], colorC, size -> 20, align -> "left");
+
+drawtext(canvasCenter + [0, 4], dist(colorA, colorC), size -> 20, align -> "mid");
+
+fillcircle(canvasCenter + [-4, 0], 3, color -> colorA);
+fillcircle(canvasCenter + [ 4, 0], 3, color -> colorC);
 </script>
 
 
@@ -59,6 +63,7 @@ drawZeros();
 </script>
 
 <script id='csmousedown' type='text/x-cindyscript'>
+resetColors();
 </script>
 
 <script id='csmousedrag' type='text/x-cindyscript'>

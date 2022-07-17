@@ -1358,49 +1358,47 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
         cMin = min(vec);
         delta = cMax - cMin;
 
-        h =  if(delta ~= 0,
-                0;
+        if(delta <= 0.0001,
+                h = 0;
             ,if(maxIndex == 1,
-                mod((vec_2 - vec_3) / delta, 6);
+                h = mod((vec_2 - vec_3) / delta, 6);
             ,if(maxIndex == 2,
-                2 + (vec_3 - vec_1) / delta
+                h = 2 + (vec_3 - vec_1) / delta;
             ,if(maxIndex == 3,
-                4 + (vec_1 - vec_2) / delta
+                h = 4 + (vec_1 - vec_2) / delta;
                 
-            )))) / 6;
+            ))));
 
-        s = if(cMax ~= 0, 0, delta / cMax);
+        if(cMax <= 0.0001, s = 0, s = delta / cMax);
 
-        [h, s, cMax];
+        [h * 60°, s, cMax];
 
     );
 
     hsv2rgb(vec) := (
-        regional(c, x, m, r, g, b);
+        regional(c, x, m, res);
 
-        
-
-        vec_1 = vec_1 * 6;
+        vec_1 = vec_1 / 60°;
         c = vec_2 * vec_3;
-        x = c * (1 - abs(mod(vec_1, 2) - 1));
+        x = c * (  1 - abs(mod(vec_1, 2) - 1)  );
         m = vec_3 - c;
 
-        [r, g, b] =  if(vec_1 < 1, 
-                        [c, x, 0];
-                    ,if(vec_1 < 2, 
-                        [x, c, 0];
-                    ,if(vec_1 < 3, 
-                        [0, c, x];
-                    ,if(vec_1 < 4, 
-                        [0, x, c];
-                    ,if(vec_1 < 5, 
-                        [x, 0, c];
-                    ,if(vec_1 <= 6, 
-                        [c, 0, x];
-                    ))))));
+        if(vec_1 < 1, 
+            res = [c, x, 0];
+        ,if(vec_1 < 2, 
+            res = [x, c, 0];
+        ,if(vec_1 < 3, 
+            res = [0, c, x];
+        ,if(vec_1 < 4, 
+            res = [0, x, c];
+        ,if(vec_1 < 5, 
+            res = [x, 0, c];
+        ,if(vec_1 <= 6, 
+            res = [c, 0, x];
+        ))))));
 
         
-        [r + m, g + m, b + m];
+        [res_1 + m, res_2 + m, res_3 + m];
     );
     
     deca2hexa(digit) := ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]_(digit + 1);
@@ -1437,6 +1435,102 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
+// http://www.brucelindbloom.com/index.html?Eqn_RGB_to_XYZ.html
+
+// Pretending its sRGB what I'm using here... ¯\_(ツ)_/¯
+
+rgb2xyz(vec) := (
+    vec = apply(vec, 
+        if(# < 0.04045, # / 12.92, re(pow((# + 0.055) / 1.055, 2.4)));
+    );
+
+    apply([[0.4124564,  0.3575761, 0.1804375],
+     [0.2126729,  0.7151522, 0.0721750],
+     [0.0193339,  0.1191920, 0.9503041]] * vec, clamp(#, 0, 1));
+);
+
+xyz2rgb(vec) := (
+    vec =  [[ 3.2404542, -1.5371385, -0.4985314],
+            [-0.9692660,  1.8760108,  0.0415560],
+            [ 0.0556434, -0.2040259,  1.0572252]] * vec;
+
+    apply(vec,
+        if(# < 0.0031308, # * 12.92, 1.055 * re(pow(#, 1 / 2.4)) - 0.055);    
+    );
+);
+
+
+whitePointD65 = [0.31271, 0.32902, 0.35827];
+
+xyz2lab(vec) := (
+    regional(eps, kappa);
+
+    eps = 216 / 24389;
+    kappa = 24389 / 27;
+
+    vec = apply(1..3, vec_# / whitePointD65_#);
+    vec = apply(vec, if(# > eps, re(pow(#, 1 / 3)), (kappa * # + 16) / 116));
+
+    [116 * vec.y - 16, 500 * (vec.x - vec.y), 200 * (vec.y - vec.z)];
+);
+
+lab2xyz(vec) := (
+    regional(eps, kappa, f, x, y, z);
+
+    eps = 216 / 24389;
+    kappa = 24389 / 27;
+
+    f = [0,0,0];
+    f_2 = (vec_1 + 16) / 116;
+    f_1 = vec_2 / 500 + f_2;
+    f_3 = f_2 - vec_3 / 200;
+
+    x = re(pow(f_1, 3));
+    if(x <= eps, x = (116 * f_1 - 16) / kappa);
+
+    if(vec_1 > kappa * eps, 
+        y = re(pow((vec_1 + 16) / 116, 3));
+    , // else //    
+        y = vec_1 / kappa;
+    );
+
+    z = re(pow(f_3, 3));
+    if(z <= eps, z = (116 * f_3 - 16) / kappa);
+
+    [x * whitePointD65.x, y * whitePointD65.y, z * whitePointD65.z];
+);
+
+rgb2lab(vec) := xyz2lab(rgb2xyz(vec));
+lab2rgb(vec) := xyz2rgb(lab2xyz(vec));
+
+lab2lch(vec) := (
+    [vec_1, abs([vec_2, vec_3]), arctan2(vec_2, vec_3)];
+);
+
+lch2lab(vec) := (
+    [vec_1, vec_2 * cos(vec_3), vec_2 * sin(vec_3)];
+);
+
+
+
+rgb2lch(vec) := lab2lch(rgb2lab(vec));
+lch2rgb(vec) := lab2rgb(lch2lab(vec));
+
+
+
+lerpHSV(vecA, vecB, t) := (
+    regional(d, newH);
+
+    d = abs(vecA_1 - vecB_1);
+    
+    if(d <= pi,
+        newH = lerp1(vecA_1, vecB_1, t);
+    , // else //
+       // TODO Do the right thing!
+    );
+    
+    [newH, lerp1(vecA_2, vecB_2, t), lerp1(vecA_3, vecB_3, t)];
+);
 
 
 
@@ -1903,9 +1997,9 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     slerp(u, v, t) := (
         regional(angle);
 
-        angle = arccos(u * v);
+        angle = re(arccos(u * v));
 
-        if(angle ~= 0,
+        if(angle <= 0.0001,
             u;
         , // else //
             (sin((1 - t) * angle) * u + sin(t * angle) * v) / sin(angle);
@@ -1914,7 +2008,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
     inverseSlerp(u, v, w) := (
         regional(result);
 
-        result = abs(min(inverseLerp(arctan2(u.x, u.y), arctan2(v.x, v.y), arctan2(w.x, w.y)), inverseLerp(arctan2(u.x, u.y) + 2*pi, arctan2(v.x, v.y), arctan2(w.x, w.y))));
+        result = abs(min(inverseLerp(arctan2([u.x, u.y]), arctan2([v.x, v.y]), arctan2([w.x, w.y])), inverseLerp(arctan2([u.x, u.y]) + 2*pi, arctan2([v.x, v.y]), arctan2([w.x, w.y]))));
 
         if(result > 1, 2 - result, result);
 
@@ -1925,6 +2019,10 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
+
+    lerp1(x, y, t) := t * y + (1 - t) * x;
+    lerp2(x, y, t) := t * y + (1 - t) * x;
+    lerp3(x, y, t) := t * y + (1 - t) * x;
 
 
 
@@ -2148,7 +2246,7 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
       
           convertTexDelimiters(
               sum(string_(1..startIndex - 1)) 
-            + if(buffer > 0, "", "\\phantom{")
+            + if(buffer > 0, "", "\phantom{")
             + sum(string_(startIndex + 1 .. endIndex - 1))
             + if(buffer > 0, "", "}") 
             + sum(string_(endIndex + 1 .. length(string)))

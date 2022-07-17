@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <title>Egdod test</title>
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/Cindy.js"></script>
+    <script type="text/javascript" src="https://cindyjs.org/dist/v0.8/CindyGL.js"></script>
+    <script type="text/javascript" src="cindyLoader.js"></script>
+
+  </head>
+
+<body style="font-family:Palatino; margin:0; font-size:16pt">
+
+
+
+<script id='csinit' type='text/x-cindyscript'>
+
+resetColors() := (
+  colorA = [random(), random(), random()];
+  colorB = [random(), random(), random()];
+);
+
+resetColors();
+
+timer = 0;
+
+//playanimation();
+
+</script>
+
+
+
+<script id='csdraw' type='text/x-cindyscript'>
+/*
+colorplot(
+  x = inverseLerp(canvasLeft, canvasRight, #.x);
+  y = inverseLerp(canvasBottom, canvasTop, #.y);
+  if(y >= 2/3,
+    lerp3(colorA, colorB, x);
+  ,if(y >= 1/3,
+    hsv2rgb(lerpHSV(rgb2hsv(colorA), rgb2hsv(colorB), x));
+  , // else //
+    xyz2rgb(lerp3(rgb2xyz(colorA), rgb2xyz(colorB), x));
+  ));
+);
+*/
+
+resolution = 15;
+println([rgb2hsv(colorA), rgb2hsv(colorB)]);
+println(abs(rgb2hsv(colorA)_1 - rgb2hsv(colorB)_1) / 2 / pi * 360°);
+forall(1..resolution,
+  posX = lerp(canvasLeft, canvasRight, #, 1, resolution + 1);
+  x = lerp(0, 1, posX, canvasLeft, canvasRight - canvasWidth / resolution);
+
+  fillrect(rect(posX, lerp(canvasBottom, canvasTop, 0.67), 1, canvasWidth / resolution + 0.1, canvasHeight / 3), lerp3(colorA, colorB, x), 1);
+  fillrect(rect(posX, lerp(canvasBottom, canvasTop, 0.33), 1, canvasWidth / resolution + 0.1, canvasHeight / 3), hsv2rgb(lerpHSV(rgb2hsv(colorA), rgb2hsv(colorB), x)), 1);
+  
+  println(lerpHSV(rgb2hsv(colorA), rgb2hsv(colorB), x));
+  fillrect(rect(posX, lerp(canvasBottom, canvasTop, 0.00), 1, canvasWidth / resolution + 0.1, canvasHeight / 3), xyz2rgb(lerp3(rgb2xyz(colorA), rgb2xyz(colorB), x));, 1);
+
+);
+
+draw(lerp(canvasCorners.bl, canvasCorners.tl, 0.33), lerp(canvasCorners.br, canvasCorners.tr, 0.33), size -> 15, color -> (0,0,0));
+draw(lerp(canvasCorners.bl, canvasCorners.tl, 0.67), lerp(canvasCorners.br, canvasCorners.tr, 0.67), size -> 15, color -> (0,0,0));
+
+drawtext(canvasCenter + [0,  canvasHeight / 3 - 0.015 * 80], "sRGB",    size -> 80, align -> "mid", color -> (1,1,1), bold -> true);
+drawtext(canvasCenter + [0,                 0 - 0.015 * 80], "HSV",     size -> 80, align -> "mid", color -> (1,1,1), bold -> true);
+drawtext(canvasCenter + [0, -canvasHeight / 3 - 0.015 * 80], "XYZ", size -> 80, align -> "mid", color -> (1,1,1), bold -> true);
+
+</script>
+
+
+
+<script id='cstick' type='text/x-cindyscript'>
+delta = deltaTime();
+
+timer = timer + delta;
+if(timer >= 3,
+  resetColors();
+  timer = 0;
+);
+</script>
+
+
+<script id='csmousemove' type='text/x-cindyscript'>
+
+
+</script>
+
+<script id='csmousedown' type='text/x-cindyscript'>
+  resetColors();
+</script>
+
+<script id='csmousedrag' type='text/x-cindyscript'>
+</script>
+
+<script id='csmouseup' type='text/x-cindyscript'>
+</script>
+
+<!-- <script id='cskeydown' type='text/x-cindyscript'>
+</script> -->
+
+
+<canvas id="CSCanvas" align="left" valign="top" width="800" height="800" style="border:1px solid #000000;"></canvas>
+
+
+
+
+<script>
+  fetch("egdod.cjs")
+  .then(response => response.text())
+  .then(data => {
+    loadCindyScript(data);
+    cindy = createCindy({canvasname:"CSCanvas",
+      scripts:"cs*",
+      images: {
+      },
+      use:["katex"]
+    });
+  });
+</script>
+
+
+
+
+
+
+
+<script>
+  
+
+</script>
+
+
+
+
+
+
+</body>
+
+</html>
