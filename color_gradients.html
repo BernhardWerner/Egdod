@@ -16,16 +16,20 @@
 
 <script id='csinit' type='text/x-cindyscript'>
 
-resetColors() := (
-  colorA = [random(), random(), random()];
-  colorB = [random(), random(), random()];
-);
+  resetColors() := (
+    colorA = [random(), random(), random()];
+    colorB = [random(), random(), random()];
+  
+  
+  );
+  
+  
+  
+  colorA = sapColor.blue;
+  colorB = sapColor.orange;
+  
 
-resetColors();
-
-timer = 0;
-
-//playanimation();
+  
 
 </script>
 
@@ -72,13 +76,7 @@ drawtext(canvasCenter + [0, -canvasHeight / 3 - 0.015 * 80], "Lch", size -> 80, 
 
 
 <script id='cstick' type='text/x-cindyscript'>
-delta = deltaTime();
 
-timer = timer + delta;
-if(timer >= 1,
-  resetColors();
-  timer = 0;
-);
 </script>
 
 
