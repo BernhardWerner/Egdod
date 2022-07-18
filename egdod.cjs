@@ -1480,7 +1480,7 @@ lab2xyz(vec) := (
     eps = 216 / 24389;
     kappa = 24389 / 27;
 
-    f = [0,0,0];
+    f = [0.1,0,0];
     f_2 = (vec_1 + 16) / 116;
     f_1 = vec_2 / 500 + f_2;
     f_3 = f_2 - vec_3 / 200;
@@ -1526,11 +1526,39 @@ lerpHSV(vecA, vecB, t) := (
     if(d <= pi,
         newH = lerp1(vecA_1, vecB_1, t);
     , // else //
-       // TODO Do the right thing!
+       vecA_1 = vecA_1 + 180°;
+       vecB_1 = vecB_1 + 180°;
+       if(vecA_1 > 360°, vecA_1 = vecA_1 - 360°);
+       if(vecB_1 > 360°, vecB_1 = vecB_1 - 360°);
+       
+       newH = lerp1(vecA_1, vecB_1, t) + 180°;
+       if(newH > 360°, newH = newH - 360°);
     );
     
     [newH, lerp1(vecA_2, vecB_2, t), lerp1(vecA_3, vecB_3, t)];
 );
+
+
+lerpLCH(vecA, vecB, t) := (
+    regional(d, newH);
+
+    d = abs(vecA_3 - vecB_3);
+    
+    if(d <= pi,
+        newH = lerp1(vecA_3, vecB_3, t);
+    , // else //
+       vecA_3 = vecA_3 + 180°;
+       vecB_3 = vecB_3 + 180°;
+       if(vecA_3 > 360°, vecA_3 = vecA_3 - 360°);
+       if(vecB_3 > 360°, vecB_3 = vecB_3 - 360°);
+       
+       newH = lerp1(vecA_3, vecB_3, t) + 180°;
+       if(newH > 360°, newH = newH - 360°);
+    );
+    
+    [lerp1(vecA_1, vecB_1, t), lerp1(vecA_2, vecB_2, t), newH];
+);
+
 
 
 
