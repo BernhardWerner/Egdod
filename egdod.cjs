@@ -1159,8 +1159,8 @@ rotate(point, alpha) := rotate(point, alpha, [0,0]);
 
 
 
-
-
+// n is normal vector of a plane through the origin.
+centralProjToOrthoPlane(n, p) := n + ((n * n) / (n * n - n * p)) * (p - n);
 
 
 

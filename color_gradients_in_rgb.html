@@ -33,7 +33,7 @@ resetColors() := (
 );
 
 
-resolution = 300;
+resolution = 256;
 
 colorA = sapColor.blue;
 colorB = sapColor.orange;
@@ -118,19 +118,50 @@ cameraMatrix() := (
 );
 
 
+projectTo2D(p) := (
+  regional(cc);
 
-drawLabels() := (
-  draw(cameraMatrix() * (colorA - camera3D()) + canvasCenter, color -> (1,1,1));
-  drawtext(cameraMatrix() * (colorA - camera3D()) + canvasCenter, "sRGB", align -> "mid", color -> (1,1,1));
+  cc = computeCamAxes();
+
+  33 * tan(20°) / tan(fov) * [cc.x, cc.y] * centralProjToOrthoPlane(cc.z, p - camera3D() + cc.z) + canvasCenter;
 );
 
 
 
+drawLabel(index) := (
+  drawtext(projectTo2D( anchor(index) ) + [0.1, 0.1], labels_index, size -> 1.2 * max(25 - 3 * dist(camera3D(), anchor(index)), 0), align -> "left", color -> (1,1,1));
+);
+
+
+anchor(index) := gradients_index_(round(0.5 * resolution));
+
+
+drawAllLables() := (
+  drawOrder = sort(1..3, -dist(camera3D(), anchor(#)) );
+
+  forall(drawOrder,
+    clearimage("outlineBuffer");
+    canvas(canvasCorners.bl, canvasCorners.br, "outlineBuffer",
+      drawLabel(#);
+    );
+
+    drawOutline("outlineBuffer", 0.1, sapColor.background);
+    drawLabel(#);
+  );
+);
+
+
+labels = ["sRGB", "HSV", "Lch"];
 
 
 
 
-focalLength(phi) := canvasWidth / tan(phi / 2); 
+
+
+
+
+
+createimage("outlineBuffer", 800, 600);
 
 
 
@@ -148,8 +179,6 @@ playanimation();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-  cc = computeCamAxes();
-
   begin3d();
     background3d(sapColor.background);
 
@@ -161,33 +190,55 @@ playanimation();
     depthrange3d(0.2, 300);
 
     
-    draw3d([1,1,1], [1,1,0], color -> toolColor("grey"), size -> 0.2);
-    draw3d([1,1,1], [1,0,1], color -> toolColor("grey"), size -> 0.2);
-    draw3d([1,1,1], [0,1,1], color -> toolColor("grey"), size -> 0.2);
+
+    end = 1.2;
+    arrowHeadLength = 0.1;
+    arrowHeadRadius = 0.04;
+    drawCone3D([end - 0.5 * arrowHeadLength, 0, 0], arrowHeadRadius, [end + 0.5 * arrowHeadLength, 0, 0], [1,0,0]);
+    drawCone3D([0, end - 0.5 * arrowHeadLength, 0], arrowHeadRadius, [0, end + 0.5 * arrowHeadLength, 0], [0,1,0]);
+    drawCone3D([0, 0, end - 0.5 * arrowHeadLength], arrowHeadRadius, [0, 0, end + 0.5 * arrowHeadLength], [0,0,1]);
+    boxSize = 0.15;
+    boxResolution = 40;
+    gradientSize = 0.4;
+
+
+    forall(1..boxResolution - 1, index,
+      draw3d([1,0,0] * inverseLerp(1, boxResolution, index), [1,0,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [1,0,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([0,1,0] + [1,0,0] * inverseLerp(1, boxResolution, index), [0,1,0] + [1,0,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [0,1,0] + [1,0,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([0,0,1] + [1,0,0] * inverseLerp(1, boxResolution, index), [0,0,1] + [1,0,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [0,0,1] + [1,0,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([0,1,1] + [1,0,0] * inverseLerp(1, boxResolution, index), [0,1,1] + [1,0,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [0,1,1] + [1,0,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+        
+      draw3d([0,1,0] * inverseLerp(1, boxResolution, index), [0,1,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [0,1,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([1,0,0] + [0,1,0] * inverseLerp(1, boxResolution, index), [1,0,0] + [0,1,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [1,0,0] + [0,1,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([0,0,1] + [0,1,0] * inverseLerp(1, boxResolution, index), [0,0,1] + [0,1,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [0,0,1] + [0,1,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([1,0,1] + [0,1,0] * inverseLerp(1, boxResolution, index), [1,0,1] + [0,1,0] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [1,0,1] + [0,1,0] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      
+      draw3d([0,0,1] * inverseLerp(1, boxResolution, index), [0,0,1] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [0,0,1] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));        
+      draw3d([1,0,0] + [0,0,1] * inverseLerp(1, boxResolution, index), [1,0,0] + [0,0,1] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [1,0,0] + [0,0,1] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([0,1,0] + [0,0,1] * inverseLerp(1, boxResolution, index), [0,1,0] + [0,0,1] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [0,1,0] + [0,0,1] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+      draw3d([1,1,0] + [0,0,1] * inverseLerp(1, boxResolution, index), [1,1,0] + [0,0,1] * (inverseLerp(1, boxResolution, index) + 1/boxResolution), size -> boxSize, color -> [1,1,0] + [0,0,1] * (inverseLerp(1, boxResolution, index) + 0.5/boxResolution));
+    );
+    draw3d([0,0,0], [-0.2,0,0], size -> boxSize, color -> [0,0,0]);
+    draw3d([0,0,0], [0,-0.2,0], size -> boxSize, color -> [0,0,0]);
+    draw3d([0,0,0], [0,0,-0.2], size -> boxSize, color -> [0,0,0]);
     
-    draw3d([0,0,1], [0,1,1], color -> toolColor("grey"), size -> 0.2);
-    draw3d([0,1,0], [0,1,1], color -> toolColor("grey"), size -> 0.2);
-    draw3d([1,0,0], [1,0,1], color -> toolColor("grey"), size -> 0.2);
-    draw3d([0,0,1], [1,0,1], color -> toolColor("grey"), size -> 0.2);
-    draw3d([0,1,0], [1,1,0], color -> toolColor("grey"), size -> 0.2);
-    draw3d([1,0,0], [1,1,0], color -> toolColor("grey"), size -> 0.2);
+    draw3d([1,0,0], [1.2,0,0], size -> boxSize, color -> [1,0,0]);
+    draw3d([0,1,0], [0,1.2,0], size -> boxSize, color -> [0,1,0]);
+    draw3d([0,0,1], [0,0,1.2], size -> boxSize, color -> [0,0,1]);
 
     forall(gradients, grad,
       forall(1..resolution - 1, index,
-        draw3d(grad_index, grad_(index + 1), size -> 0.2, color -> lerp(grad_index, grad_(index + 1), 0.5));
+        draw3d(grad_index, grad_(index + 1), size -> gradientSize, color -> lerp(grad_index, grad_(index + 1), 0.5));
       );
     );
 
     drawsphere3d(colorA, 0.04, color -> colorA);
     drawsphere3d(colorB, 0.04, color -> colorB);
     
-    drawsphere3d(lookAt3D, 0.04, color -> colorB);
 
-    drawAxes3D(-0.2, 1.2, 0.2, 0.1, 0.05);
-  end3d();
+    end3d();
 
-  drawLabels();
-
+drawAllLables();
 
 </script>
 
@@ -238,7 +289,7 @@ move(delta);
       scripts:"cs*",
       images: {
       },
-      use:["katex", "Cindy3D"]
+      use:["Cindy3D"]
     });
   });
 </script>
