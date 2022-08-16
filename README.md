@@ -20,20 +20,25 @@ You can always copy-paste the content of `egdod.cjs` directly into your init-scr
 If you want to load it without cluttering your file, it currently only works while running on a server. I.e., for local/offline tests, you might want to start a local server via `python -m http.server` in a terminal or any other method you are comfortable with. To make it then work…
 1. Download both `cindyLoader.js` and `egdod.cjs` into the same directory your CindyJS file is in.
 2. Add `<script type="text/javascript" src="cindyLoader.js"></script>` at the top of your CindyJS file.
-3. Wrap the `createCindy` function the following way: 
+3. Add the following line at the end of the createCindy argument
   ```JavaScript
-  fetch("egdod.cjs")
-  .then(response => response.text())
-  .then(data => {
-    loadCindyScript(data);
-    cindy = createCindy({
-      canvasname:"CSCanvas",
-      scripts:"cs*",
-      // plus other stuff
-    });
-  });
-  ```
-The function `loadCindyScript` will take the code in `egdod.cjs` and add it **at the beginning** of the script with id `"csinit"`. If your init-script is named differently, you can pass a second argument to the function: `loadCindyScript(data, "yourCustomId")`.
+cindy = createCindy({
+  canvasname:"CSCanvas",
+    scripts:"cs*",
+    oninit: importCindyScript(["egdod"])
+});
+```
+The function `importCindyScript` will take the code in `egdod.cjs` and add it **at the beginning** of the script with id `"csinit"`. Currently, it won't work if your 
+`init`-script is named differently. I'm still contemplating how to incorporate that in a way that I like.
+
+This `importCindyScript` works with any file that ends in `.cjs` and contains CindyScript code. Moreover, it can take several files. (Up to 32 at the moment), so you can create your own libraries. Note that they will be added in order. so if `libraryB.cjs` needs `libraryA.cjs` to run, you should write something like
+  ```JavaScript
+cindy = createCindy({
+  canvasname:"CSCanvas",
+    scripts:"cs*",
+    oninit: importCindyScript(["libraryA", "libraryB"])
+});
+```
 
 When in doubt, you can also take a look at the files `test.html`, `showcase_animation.html` and `showcase_ui.html` which *should* always contain working examples.
 
