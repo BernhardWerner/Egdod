@@ -1,4 +1,4 @@
-function loadCindyScript(codeString, scriptId = "csinit"){
+function loadCindyScript(codeString, scriptId = "csinit") {
 	var codeNode = document.createTextNode(codeString);
 
 	var scriptElement = document.getElementById(scriptId);
@@ -13,6 +13,22 @@ function loadCindyScript(codeString, scriptId = "csinit"){
 	} else {
 		scriptElement.appendChild(codeNode);
 	}
-
 };
 
+importThreshold = 32;
+importCounter = 0;
+
+function importCindyScript(scripts) {
+	if(importCounter < importThreshold & scripts.length > 0) {
+		for(s of scripts) {
+			fetch(s + ".cjs")
+			.then(response => response.text())
+			.then(data => {
+				loadCindyScript(data);
+				scripts.shift();
+				importCounter += 1;
+				importCindyScript(scripts);
+			});
+		}
+	};
+}

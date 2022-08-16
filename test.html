@@ -15,45 +15,28 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
-
-resetColors() := (
-  colorA = [random(), random(), random()];
-  colorB = rgb2hsv(colorA);
-  colorC = hsv2rgb(colorB);
-);
-
-resetColors();
-
-playanimation();
+clickButton = {
+  "position": canvasCenter,
+  "size":     [5, 2],
+  "label":    "Click Me",
+  "textSize": 17,
+  "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
+  "corner":   0.7,
+  "pressed":  false,
+  "labelColor": (1,1,1)
+};
 </script>
 
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-colorplot(
-  x = inverseLerp(canvasLeft, canvasRight, #.x);
-  y = inverseLerp(canvasBottom, canvasTop, #.y);
-  if(y >= 0.9,
-    hsv2rgb([x * 360°, 1, 1]);
-  , // else //
-    [1,1,1]
-  );
-
-);
-
-drawtext(canvasCenter + [-4, 0] + 4 * [-0.5, 1], colorA, size -> 20, align -> "right");
-drawtext(canvasCenter + [0, 8], colorB, size -> 20, align -> "mid");
-drawtext(canvasCenter + [ 4, 0] + 4 * [ 0.5, 1], colorC, size -> 20, align -> "left");
-
-drawtext(canvasCenter + [0, 4], dist(colorA, colorC), size -> 20, align -> "mid");
-
-fillcircle(canvasCenter + [-4, 0], 3, color -> colorA);
-fillcircle(canvasCenter + [ 4, 0], 3, color -> colorC);
+drawButton(clickButton);
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
+
 </script>
 
 
@@ -63,13 +46,16 @@ fillcircle(canvasCenter + [ 4, 0], 3, color -> colorC);
 </script>
 
 <script id='csmousedown' type='text/x-cindyscript'>
-resetColors();
+if(mouseInButton(clickButton),
+  clickButton.pressed = true;
+);
 </script>
 
 <script id='csmousedrag' type='text/x-cindyscript'>
 </script>
 
 <script id='csmouseup' type='text/x-cindyscript'>
+clickButton.pressed = false;
 </script>
 
 <!-- <script id='cskeydown' type='text/x-cindyscript'>
@@ -82,17 +68,13 @@ resetColors();
 
 
 <script>
-  fetch("egdod.cjs")
-  .then(response => response.text())
-  .then(data => {
-    loadCindyScript(data);
-    cindy = createCindy({canvasname:"CSCanvas",
-      scripts:"cs*",
-      images: {
-      },
-      use:["katex"]
-    });
-  });
+cindy = createCindy({
+  canvasname:"CSCanvas",
+    scripts:"cs*",
+    images: {},
+    use:["katex"],
+    oninit: importCindyScript(["egdod"])
+});
 </script>
 
 
@@ -102,7 +84,6 @@ resetColors();
 
 
 <script>
-  
 
 </script>
 
