@@ -18,12 +18,12 @@ function loadCindyScript(codeString, scriptId = "csinit") {
 importThreshold = 32;
 importCounter = 0;
 
-function importCindyScript(scripts) {
+function importCindyScript(scripts, scriptId = "csinit") {
 	if(importCounter < importThreshold & scripts.length > 0) {
 		fetch(scripts[0] + ".cjs")
 		.then(response => response.text())
 		.then(data => {
-			loadCindyScript(data);
+			loadCindyScript(data, scriptId);
 			scripts.shift();
 			importCounter += 1;
 			importCindyScript(scripts);
