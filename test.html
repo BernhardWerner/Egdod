@@ -15,6 +15,10 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
+println("Main code");
+test = test^2;
+println(test);
+
 clickButton = {
   "position": canvasCenter,
   "size":     [5, 2],
@@ -68,12 +72,12 @@ clickButton.pressed = false;
 
 
 <script>
-cindy = createCindy({
+cindy = startCindy({
   canvasname:"CSCanvas",
     scripts:"cs*",
     images: {},
-    use:["katex"],
-    oninit: importCindyScript(["egdod"])
+    use: ["katex"],
+    import: ["egdod", "libraryA", "libraryB"]
 });
 </script>
 

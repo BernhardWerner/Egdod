@@ -18,15 +18,25 @@ function loadCindyScript(codeString, scriptId = "csinit") {
 importThreshold = 32;
 importCounter = 0;
 
-function importCindyScript(scripts, scriptId = "csinit") {
-	if(importCounter < importThreshold & scripts.length > 0) {
-		fetch(scripts[0] + ".cjs")
-		.then(response => response.text())
-		.then(data => {
-			loadCindyScript(data, scriptId);
-			scripts.shift();
-			importCounter += 1;
-			importCindyScript(scripts);
-		});
-	};
-}
+function startCindy(dict) {
+	if(!dict.hasOwnProperty("import")) return createCindy(dict);
+
+	libraries = dict.import;
+	if(importCounter >= importThreshold || libraries.length <= 0) return createCindy(dict);
+
+	library = libraries.pop();
+	if(dict.hasOwnProperty("initscript")) {
+		initId = dict.initscript;
+	} else {
+		initId = dict.scripts.replace("*", "init"); 
+	}
+	console.log("Loading " + library + " into " + initId + " ...");
+	fetch(library + ".cjs")
+	.then(response => response.text())
+	.then(data => {
+		loadCindyScript(data, initId);
+		importCounter += 1;
+		console.log(library + " loaded!");
+		startCindy(dict);
+	});
+};
