@@ -28,9 +28,9 @@ cindy = startCindy({
     import:["egdod"]
 });
 ```
-The function `startCindy` will take the code in `egdod.cjs` and add it **at the beginning** of the script with id `"csinit"`.
+The function `startCindy` will take the code in `egdod.cjs` and add it **at the beginning** of the `init`-script.
 
-This works with any file that ends in `.cjs` and contains CindyScript code. Moreover, it can take several files. (Up to 32 at the moment.) So, you can create your own libraries. Note that they will be added in reverse order to the start. So, the libraries listed first get executed first. I.e., if `libraryB.cjs` needs `libraryA.cjs` to run, you should write something like
+This works with any file that ends in `.cjs` and contains CindyScript code. Moreover, it can take several files. (Up to 32 at the moment.) So, you can create your own libraries. Note that they will be added in reverse order at the start of the `init`-script. So, the libraries listed first get executed first. I.e., if `libraryB.cjs` needs `libraryA.cjs` to run, you should write something like
 ```JavaScript
 cindy = startCindy({
     canvasname:"CSCanvas",
