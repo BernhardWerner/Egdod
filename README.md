@@ -11,32 +11,31 @@ It's a work-in-progress and might be unusable by anyone but me. Most functions a
 
 3. A collection of functions, which allow for maths animations, heavily inspired by Grant Sanderson's <a href="https://github.com/3b1b/manim" target="_blank">manim Animation Engine</a>. My library provides animation tracks which create individual time-tracking variables. These can then be used to animate any property. Moreover, there are additional objects which draw strokes for which there are pre-defined animations. These allow you to draw coordinate systems, circles, polygons, function graphs, etc. with relative ease. (Emphasis on *relative*…)
 
-4. Some shader-friendly functions for use in the CindyGL plugin. E.g. Perlin noise or a few signed distance functions.
+4. Some shader-friendly functions for use in the CindyGL plugin. For example, Perlin noise and a few signed distance functions.
 
 
 ## How to use it
 You can always copy-paste the content of `egdod.cjs` directly into your init-script.
 
-If you want to load it without cluttering your file, it currently only works while running on a server. I.e., for local/offline tests, you might want to start a local server via `python -m http.server` in a terminal or any other method you are comfortable with. To make it then work…
+If you want to load it without cluttering your file, **it currently only works while running on a server**. I.e., for local/offline tests, you might want to start a local server via `python -m http.server` in a terminal or any other method you are comfortable with. To make it then work…
 1. Download both `cindyLoader.js` and `egdod.cjs` into the same directory your CindyJS file is in.
 2. Add `<script type="text/javascript" src="cindyLoader.js"></script>` at the top of your CindyJS file.
-3. Add the following line at the end of the createCindy argument:
-  ```JavaScript
-cindy = createCindy({
-  canvasname:"CSCanvas",
+3. Replace `createCindy` with `startCindy` and add the `import` to the argument:
+```JavaScript
+cindy = startCindy({
+    canvasname:"CSCanvas",
     scripts:"cs*",
-    oninit: importCindyScript(["egdod"])
+    import:["egdod"]
 });
 ```
-The function `importCindyScript` will take the code in `egdod.cjs` and add it **at the beginning** of the script with id `"csinit"`. Currently, it won't work if your 
-`init`-script is named differently. I'm still contemplating how to incorporate that in a way that I like.
+The function `startCindy` will take the code in `egdod.cjs` and add it **at the beginning** of the script with id `"csinit"`.
 
-This `importCindyScript` works with any file that ends in `.cjs` and contains CindyScript code. Moreover, it can take several files. (Up to 32 at the moment.) So, you can create your own libraries. Note that they will be added in order. so if `libraryB.cjs` needs `libraryA.cjs` to run, you should write something like
-  ```JavaScript
-cindy = createCindy({
-  canvasname:"CSCanvas",
+This works with any file that ends in `.cjs` and contains CindyScript code. Moreover, it can take several files. (Up to 32 at the moment.) So, you can create your own libraries. Note that they will be added in reverse order to the start. So, the libraries listed first get executed first. I.e., if `libraryB.cjs` needs `libraryA.cjs` to run, you should write something like
+```JavaScript
+cindy = startCindy({
+    canvasname:"CSCanvas",
     scripts:"cs*",
-    oninit: importCindyScript(["libraryA", "libraryB"])
+    import:["libraryA", "libraryB"]
 });
 ```
 
