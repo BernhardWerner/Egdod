@@ -467,11 +467,6 @@ reduceHomoCoords(vec) := (
 
 
 
-// ************************************************************************************************
-// Reverts a string.
-// ************************************************************************************************
-reverseString(string) := sum(tokenize(string, ""));
-
 
 // ************************************************************************************************
 // Gets the current time from the computer clock converted to seconds.
@@ -618,132 +613,6 @@ tween(obj, prop, from, to, track) := tween(obj, prop, from, to, track, "none");
 
 
 
-
-
-// ************************************************************************************************
-// Rendering various animation objects.
-// ************************************************************************************************
-// Text objects needs
-// pos
-// offset
-// text
-// percentVisible
-// size
-// alpha
-// color 
-// fontFamily
-// align
-// ************************************************************************************************
-drawTextObject(obj) := (
-    drawtext(obj.pos + obj.offset, substring(obj.text, 0, round(obj.percentVisible * length(obj.text))), size->obj.size, color->obj.color, align->obj.align, family->obj.fontFamily, align->obj.align, alpha->obj.alpha);
-);
-
-
-createTextObject(pos, text, size) := {
-    "pos": pos,
-    "offset": [0,0],
-    "text": text,
-    "percentVisible": 1,
-    "size": size,
-    "alpha": 1,
-    "color ": (0,0,0),
-    "align": "left"
-};
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-slideIn(obj, dir, dist, track) := (
-    if(dir != [0,0],
-        dir = dir / abs(dir);
-        tween(obj, "offset", dist * dir, [0,0], track, "easeInOutBack");	
-    );
-);
-slideOut(obj, dir, dist, track) := (
-    if(dir != [0,0],
-        dir = dir / abs(dir);
-        tween(obj, "offset", [0,0], dist * dir, track, "easeInOutBack");	
-    );
-);
-
-fadeIn(obj, dir, dist, track) := (
-    slideIn(obj, dir, dist, track);
-    tween(obj, "alpha", 0, 1, track, "easeInQuint");
-);
-fadeOut(obj, dir, dist, track) := (
-    slideOut(obj, dir, dist, track);
-    tween(obj, "alpha", 1, 0, track, "easeOutQuint");
-);
-
-
-
-
-
-
-// ************************************************************************************************
-// Stroke object needs
-// pos
-// stroke (list of points, relative to pos)
-// drawStart
-// drawEnd
-// scale
-// rotation
-// lineColor
-// lineAlpha
-// lineSize
-// fillColor
-// fillAlpha
-// arrow
-// arrowSize
-// ************************************************************************************************
-drawStrokeObject(obj) := (
-    regional(absoluteStroke, ratio, n);
-    
-    if(obj.scale ~!= 0,
-        absoluteStroke = apply(obj.stroke, obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * #);
-        n = length(absoluteStroke);
-
-        ratio = max(1,floor(obj.drawStart * n))..min(n, ceil(obj.drawEnd * n));
-        fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
-        connect(absoluteStroke_ratio, size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-    );
-);
-drawCurvedArrowObject(obj) := (
-    regional(absoluteStroke, ratio, n);
-    
-    if(obj.scale ~!= 0,
-        absoluteStroke = apply(obj.stroke, obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * #);
-        n = length(absoluteStroke);
-
-        ratio = max(1,floor(obj.drawStart * n))..min(n, ceil(obj.drawEnd * n));
-        fillpoly(absoluteStroke_ratio, color->obj.fillColor, alpha->obj.fillAlpha);
-        connect(absoluteStroke_ratio, size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-        if(obj.arrow, 
-            if(length(ratio) >= 3,
-                connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-3)), obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-            ,if(length(ratio) >= 2,
-                connect(arrowTip(absoluteStroke_(ratio_(-1)), absoluteStroke_(ratio_(-1)) - absoluteStroke_(ratio_(-2)), obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-            ));
-        );
-    );
-);
 arrowTipAngleEBOW = pi/ 6;
 arrowTip(tipPos, dir, size) := (
     if(abs(dir) > 0, dir = dir / abs(dir));
@@ -757,115 +626,8 @@ arrowTip(tipPos, dir, size) := (
 
 
 
-/* Needs
-obj = {
-    pos: [0,0],
-    offset: [0,0],
-    scale: 1,
-    endPoints: [[0,0], [0,0]],
-    overhang: 0,
-    lineSize: 1,
-    lineALpha: 1,
-    lineColor: [0,0,0]
 
-};
-*/
-drawLineObject(obj) := (
-    regional(trueStart, trueEnd);
-    if(obj.scale > 0,
-        trueStart = obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * lerp(obj.endPoints_2, obj.endPoints_1, 1 + obj.overhang);
-        trueEnd   = obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * lerp(obj.endPoints_1, obj.endPoints_2, 1 + obj.overhang);
-        
-        draw([lerp(trueStart, trueEnd, obj.drawStart), lerp(trueStart, trueEnd, obj.drawEnd)], size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-        if(obj.arrow, 
-            connect(arrowTip(lerp(trueStart, trueEnd, obj.drawEnd), trueEnd - trueStart, obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);			
-        );
-    );
-);
-
-/* Needs
-obj = {
-    pos: [0,0],
-    offset: [0,0],
-    scale: 1,
-    endPoints: [[0,0], [0,0]],
-    overhang: 0,
-    lineSize: 1,
-    lineALpha: 1,
-    lineColor: [0,0,0],
-    arrow: true,
-    arrowSize: 1
-};
-*/
-drawStraightArrowObject(obj) := (
-    regional(trueStart, trueEnd);
-    if(obj.scale > 0,
-        trueStart = obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * lerp(obj.endPoints_2, obj.endPoints_1, 1 + obj.overhang);
-        trueEnd   = obj.pos + obj.offset + obj.scale * rotation(obj.rotation) * lerp(obj.endPoints_1, obj.endPoints_2, 1 + obj.overhang);
-        
-        draw([lerp(trueStart, trueEnd, obj.drawStart), lerp(trueStart, trueEnd, obj.drawEnd)], size->obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);
-        if(obj.arrow, 
-            connect(arrowTip(lerp(trueStart, trueEnd, obj.drawEnd), trueEnd - trueStart, obj.scale * obj.arrowSize), size->obj.scale * obj.lineSize, color->obj.lineColor, alpha->obj.lineAlpha);			
-        );
-    );
-);
-
-
-
-
-/* Needs
-obj = {
-    pos: [0,0],
-    offset: [0,0],
-    scale: 1,
-    lineSize: 1,
-    lineALpha: 1,
-    lineColor: [0,0,0],
-    fillAlpha: 1,
-    fillColor: [0,0,0]
-};
-*/
-drawPointObject(obj) := (
-    if(obj.scale > 0, 
-        fillcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.fillColor, alpha->obj.fillAlpha);
-        drawcircle(obj.pos + obj.offset, obj.rad * obj.scale, color->obj.lineColor, size->obj.lineSize * obj.scale, alpha->obj.lineAlpha);
-    );
-);
-
-
-
-
-
-
-
-// ************************************************************************************************
-// Flipbook object needs
-// pos
-// offset
-// scale
-// flipbook
-// index
-// flipx
-// flipy
-// rotation
-// alpha
-// ************************************************************************************************
-drawFlipbookObject(obj) := (
-    drawimage(obj.pos + obj.offset, obj.flipbook_(obj.index), scale->obj.scale, rotation->obj.rotation, flipx->obj.flipx, flipy->obj.flipy, alpha->obj.alpha);
-);
-
-
-// ************************************************************************************************
-// Cycles through flipbook of a flipbook object. Flipbook pages are equdistantly 
-// spread across animation track as key frames.
-// ************************************************************************************************
-animateFlipbook(obj, track) := (
-    regional(n);
-    n = length(obj.flipbook);
-
-    obj.index = floor(lerp(1, n + 0.9999, track.timeLeft, track.end, track.start));
-);
-
+flipBookIndex(progress, max) := floor(lerp(1, max + 0.9999, progress));
 
 
 
@@ -1074,72 +836,6 @@ sampleCurve(curve, start, end) := (
 
         parse(curve + "(" + t + ")");	
     );
-);
-
-
-// ************************************************************************************************
-// Draws a stroke object as a stroke.
-// ************************************************************************************************
-constructStrokeDraw(obj, lineSize, track) := (
-    tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
-    tween(obj, "drawEnd", 0, 1, track, "easeInOutCubic");
-);
-destroyStrokeDrawBackwards(obj, lineSize, track) := (
-    tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
-    tween(obj, "drawEnd", 1, 0, track, "easeInOutCubic");
-);
-destroyStrokeDrawForwards(obj, lineSize, track) := (
-    tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
-    tween(obj, "drawStart", 0, 1, track, "easeInOutCubic");
-);
-wormStrokeDraw(obj, lineSize, wormSize, track) := (
-    if(track.progress <= 0.5,
-        tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
-        tween(obj, "arrowSize", 0, arrowSize, track, "easeOutCirc");
-    , // else //
-        tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
-    );
-    tween(obj, "drawEnd", 0, 1 + wormSize, track, "easeInOutQuad");
-    obj.drawStart = obj.drawEnd - wormSize;
-        
-);
-
-
-
-constructArrowDraw(obj, lineSize, arrowSize, track) := (
-    tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
-    tween(obj, "drawEnd", 0, 1, track, "easeInOutCubic");
-    tween(obj, "arrowSize", 0, arrowSize, track);	
-);
-destroyArrowDrawForwards(obj, lineSize, arrowSize, track) := (
-    tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
-    tween(obj, "drawStart", 0, 1, track, "easeInOutCubic");
-    tween(obj, "arrowSize", arrowSize, 0, track);	
-);
-wormArrowDraw(obj, lineSize, arrowSize, wormSize, track) := (
-    if(track.progress <= 0.5,
-        tween(obj, "lineSize", 0, lineSize, track, "easeOutCirc");
-        tween(obj, "arrowSize", 0, arrowSize, track, "easeOutCirc");
-    , // else //
-        tween(obj, "lineSize", lineSize, 0, track, "easeInCirc");
-        tween(obj, "arrowSize", arrowSize, 0, track, "easeInCirc");
-    );
-    tween(obj, "drawEnd", 0, 1 + wormSize, track, "easeInOutQuad");
-    obj.drawStart = obj.drawEnd - wormSize;
-        
-);
-
-
-// ************************************************************************************************
-// Grows a stroke.
-// ************************************************************************************************
-constructGrow(obj, track) := (
-    tween(obj, "scale", 0, 1, track, "easeOutBack");
-);
-
-
-destroyShrink(obj, track) := (
-    tween(obj, "scale", 1, 0, track, "easeInBack");
 );
 
 
@@ -1710,7 +1406,7 @@ lerpLCH(vecA, vecB, t) := (
 
         result = true;
         forall(cycle(mink),
-            result = result & (triangleheight(#_1, #_2, (0,0)) >= 0);
+            result = result & (det([#_1 :> 1, #_2 :> 1, (0,0,1)]) >= 0);
         );
 
         result;
@@ -1723,8 +1419,8 @@ lerpLCH(vecA, vecB, t) := (
         resultForwards = true;
         resultBackwards = true;
         forall(cycle(poly),
-            resultForwards  = and(resultForwards , triangleheight(#_1, #_2, point) >= 0);
-            resultBackwards = and(resultBackwards, triangleheight(#_1, #_2, point) <= 0);
+            resultForwards  = and(resultForwards , det([#_1 :> 1, #_2 :> 1, point :> 1]) >= 0);
+            resultBackwards = and(resultBackwards, det([#_1 :> 1, #_2 :> 1, point :> 1]) <= 0);
         );
 
         or(resultForwards, resultBackwards);
@@ -1843,7 +1539,7 @@ lerpLCH(vecA, vecB, t) := (
     // *************************************************************************************************
     // Checks, whether two line segments intersect.
     // *************************************************************************************************
-    intersect(a, b) := (
+    intersectLineSegments(a, b) := (
           area(a_1, a_2, b_1) * area(a_1, a_2, b_2) < 0
         & area(b_1, b_2, a_1) * area(b_1, b_2, a_2) < 0
     );
@@ -1891,16 +1587,9 @@ lerpLCH(vecA, vecB, t) := (
     randomDirection() := (
         regional(alpha);
         
-        alpha = 2*pi*random();
+        alpha = 2 * pi * random();
         [sin(alpha), cos(alpha)];
     );
-
-
-    // *************************************************************************************************
-    // Returns the middle of three numbers.
-    // Call it as mid(x, min_value, max_value) to clamp x in the interval [min_value, max_value].
-    // *************************************************************************************************
-    mid(a, b, c) := [a,b,c]--[min([a,b,c]),max([a,b,c])];
 
 
 
@@ -2285,46 +1974,6 @@ lerpLCH(vecA, vecB, t) := (
       parseTex(string) := apply(0..frequency(tokenize(string, ""), texDelimitersEBOW_1), convertTexDelimiters(string, #));
 
       
-
-    // ************************************************************************************************
-    // Draws tex formula. Needs to have
-    // toggle = {
-    //   "pos":        (2D vector),
-    //   "offset":     (2D vector)
-    //   "pyramid":    (Array of strings), 
-    //   "size":       (float),
-    //   "size":       (float),
-    //   "alpha":      (float),
-    //   "color":      (3D Vector),
-    //   "align":      (String)
-    // };
-    // ************************************************************************************************
-    drawTexObject(obj) := drawtext(obj.pos + obj.offset, obj.outputString, size->obj.size, color->obj.color, align->obj.align, alpha->obj.alpha);
-
-    createTexObject(pos, inputString, size) := (
-        regional(pyramid);
-        
-        pyramid = parseTex(inputString);
-
-        {
-            "pos": pos,
-            "offset": [0,0],
-            "inputString": inputString,
-            "pyramid": pyramid,
-            "outputString": pyramid_1,
-            "finalString": pyramid_(-1),
-            "progress": 0,
-            "size": size,
-            "align": "left",
-            "alpha": 1,
-            "color": (0,0,0)
-        };
-    );
-    typeTex(obj, track) := (
-        obj.progress = clamp(track.progress, 0, 1);
-        obj.outputString = obj.pyramid_(round(lerp(1, length(obj.pyramid), obj.progress)));
-    );
-
 
 
 
