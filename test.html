@@ -15,32 +15,20 @@
 
 
 <script id='csinit' type='text/x-cindyscript'>
-println("Main code");
-test = test^2;
-println(test);
 
-clickButton = {
-  "position": canvasCenter,
-  "size":     [5, 2],
-  "label":    "Click Me",
-  "textSize": 17,
-  "colors":   (apply(0..2, aliceColor("blue", 1 - #))),
-  "corner":   0.7,
-  "pressed":  false,
-  "labelColor": (1,1,1)
-};
+
+
+
 </script>
 
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-drawButton(clickButton);
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
-
 </script>
 
 
@@ -50,16 +38,13 @@ drawButton(clickButton);
 </script>
 
 <script id='csmousedown' type='text/x-cindyscript'>
-if(mouseInButton(clickButton),
-  clickButton.pressed = true;
-);
+
 </script>
 
 <script id='csmousedrag' type='text/x-cindyscript'>
 </script>
 
 <script id='csmouseup' type='text/x-cindyscript'>
-clickButton.pressed = false;
 </script>
 
 <!-- <script id='cskeydown' type='text/x-cindyscript'>
@@ -77,7 +62,7 @@ cindy = startCindy({
     scripts:"cs*",
     images: {},
     use: ["katex"],
-    import: ["egdod", "libraryA", "libraryB"]
+    import: ["egdod", "colorPalettes"]
 });
 </script>
 
