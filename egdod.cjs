@@ -1986,20 +1986,18 @@ lerpLCH(vecA, vecB, t) := (
     // No c results in positioning the rectangle with pos in its lower left corner. I.e. c = 1 by
     // default.
     // *************************************************************************************************
-    expandrect(pos, c, w, h) := (
+    expandrect(pos, w, h, c) := (
         regional(d, e, shift);
 
         d     = 0.5 * [w, h];
         e     = (d_1, -d_2);
-        shift = -compass()_c;
+        shift = -compass(c);
         shift = (0.5 * w * shift.x, 0.5 * h * shift.y);
         apply([-d, e, d, -e], pos + # + shift); //LU, RU, RO, LO
     );
-    expandrect(pos, w, h) := expandrect(pos, 1, w, h);
-    // Uses rect object; see below.
-    expandrect(r) := expandrect(r.xy, r.c, r.w, r.h);
+    expandrect(pos, w, h) := expandrect(pos, w, h, 1);
 
-    compass() := -apply(directproduct([1, 0, -1], [1, 0, -1]), reverse(#));
+    compass(index) := apply(directproduct(-1..1, -1..1), reverse(#))_index;
     
     
     // *************************************************************************************************
