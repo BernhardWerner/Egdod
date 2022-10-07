@@ -1,9 +1,9 @@
-canvasCorners = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+canvasPoly = apply(screenbounds(), #.xy); //LO, RO, RU, LU
 canvasCorners = {
-    "tl": canvasCorners_1,
-    "tr": canvasCorners_2,
-    "br": canvasCorners_3,
-    "bl": canvasCorners_4
+    "tl": canvasPoly_1,
+    "tr": canvasPoly_2,
+    "br": canvasPoly_3,
+    "bl": canvasPoly_4
 };
 canvasCenter  = 0.5 * canvasCorners.tl + 0.5 * canvasCorners.br;
 canvasWidth   = dist(canvasCorners.tl, canvasCorners.tr);
@@ -15,7 +15,6 @@ screenMouse() := [(mouse().x - canvasLeft) / canvasWidth, (mouse().y - canvasBot
 
 
 strokeSampleRateEBOW = 64;
-lineSampleRateEBOW = 64;
 texDelimitersEBOW = ["@", "€"];
 integralResolutionEBOW = 3;
 
@@ -236,6 +235,24 @@ rotate3D(vec, axis, angle) := (
 
 
 
+
+
+
+
+
+
+roundedRectangleStroke(center, w, h, cornerRadius) := (
+    regional(corners);
+
+    corners = [];
+    corners = corners :> apply(sampleCircle(cornerRadius, 0.5 * pi, pi), # + center + 0.5 * [-w, h] + cornerRadius * [1, -1]);
+    corners = corners :> apply(sampleCircle(cornerRadius, pi, 1.5 * pi), # + center + 0.5 * [-w, -h] + cornerRadius * [1, 1]);
+    corners = corners :> apply(sampleCircle(cornerRadius, 1.5 * pi, 2 * pi), # + center + 0.5 * [w, -h] + cornerRadius * [-1, 1]);
+    corners = corners :> apply(sampleCircle(cornerRadius, 0, 0.5 * pi), # + center + 0.5 * [w, h] + cornerRadius * [-1, -1]);
+    
+
+    resample(resample(corners_4_(-1) <: flatten(corners)));
+);
 
 
 
@@ -507,6 +524,12 @@ deltaTime() := (
 
 
 
+timeOffset(t, a, b) := clamp(inverseLerp(a, b, t), 0, 1);
+timeOffsetGPU(t, a, b) := clamp(inverseLerp1(a, b, t), 0, 1);
+
+stepSignal(t, a, b, c, d) := clamp(min(inverseLerp(a, b, t), inverseLerp(d, c, t)), 0, 1);
+
+
 // ************************************************************************************************
 // Easing functions.
 // ************************************************************************************************
@@ -633,6 +656,11 @@ flipBookIndex(progress, max) := floor(lerp(1, max + 0.9999, progress));
 
 
 
+// Normal mod, but instead of returning a number between 0 and n-1, it returns a number between 1 and n.
+cindyMod(k, n) := mod(k - 1, n) + 1;
+
+
+
 
 // ************************************************************************************************
 // Creates deep copy of a dictionary.
@@ -729,8 +757,15 @@ bezier(controls, t) := (
 
     n = length(controls);
 
-    sum(apply(1..n, binom(n - 1, # - 1) * t^(# - 1) * (1 - t)^(n - #) * controls_#));
+    if(n == 1,
+        controls_1;
+    , // else //
+        (1 - t) * bezier(pop(controls), t) + t * bezier(bite(controls), t);
+    );
 );
+
+
+
 
 sampleBezierCurve(controls) := (
     regional(t, sr);
@@ -1693,6 +1728,22 @@ lerpLCH(vecA, vecB, t) := (
     );
 
 
+    rectSDF(p, c, size) := (
+        regional(x,y);
+
+        x = max(
+            p.x - c.x - size.x / 2,
+            c.x - p.x - size.x / 2
+        );
+        y = max(
+            p.y - c.y - size.y / 2,
+            c.y - p.y - size.y / 2
+        );
+        
+        max([x,y]);
+    );
+
+
 
 
 
@@ -1739,7 +1790,13 @@ lerpLCH(vecA, vecB, t) := (
     lerp1(x, y, t) := t * y + (1 - t) * x;
     lerp2(x, y, t) := t * y + (1 - t) * x;
     lerp3(x, y, t) := t * y + (1 - t) * x;
-
+    lerp4(x, y, t) := t * y + (1 - t) * x;
+    inverseLerp1(x, y, p) := (p - x) / (y - x);
+    inverseLerp2(x, y, p) := abs(p - x) / abs(y - x);
+    inverseLerp3(x, y, p) := abs(p - x) / abs(y - x);
+    lerp1(x, y, t, a, b) := lerp1(x, y, inverseLerp1(a, b, t));
+    lerp2(x, y, t, a, b) := lerp2(x, y, inverseLerp2(a, b, t));
+    lerp3(x, y, t, a, b) := lerp3(x, y, inverseLerp3(a, b, t));
 
 
 
@@ -1747,7 +1804,9 @@ lerpLCH(vecA, vecB, t) := (
     lissajoue(a, b, d, t) := [sin(a * t + d), cos(b * t)];
 
 
-
+    equalGPU(a, b) := floor(max(0, 1 - abs(a - b)));
+    largerGPU(a, b) := floor(max(0, min(a, b) - (b - 1)));
+    smallerGPU(a, b) := 1 - largerGPU(a, b);
 
 
     
@@ -1937,46 +1996,59 @@ lerpLCH(vecA, vecB, t) := (
     // *************************************************************************************************
     convertTexDelimiters(string, buffer) := (
         regional(startIndex, endIndex, innerCount, foundEnd);
-      
+        
         startIndex = indexof(string, texDelimitersEBOW_1);
         if(startIndex == 0,
-          string;
+            string;
         , // else //
-          endIndex = startIndex;
-          innerCount = 0;
-          foundEnd = false;
-          while(not(foundEnd),
+            endIndex = startIndex;
+            innerCount = 0;
+            foundEnd = false;
+            while(not(foundEnd),
             endIndex = endIndex + 1;
             if(endIndex == length(string),
-              foundEnd = true;
+                foundEnd = true;
             , // else //
-              if(string_endIndex == texDelimitersEBOW_1, innerCount = innerCount + 1);
-              if(string_endIndex == texDelimitersEBOW_2, 
+                if(string_endIndex == texDelimitersEBOW_1, innerCount = innerCount + 1);
+                if(string_endIndex == texDelimitersEBOW_2, 
                 innerCount = innerCount - 1;
                 if(innerCount == -1,
-                  foundEnd = true;            
+                    foundEnd = true;            
                 );
-              );
+                );
             )
-          );
-      
-          convertTexDelimiters(
-              sum(string_(1..startIndex - 1)) 
+            );
+        
+            convertTexDelimiters(
+                sum(string_(1..startIndex - 1)) 
             + if(buffer > 0, "", "\phantom{")
             + sum(string_(startIndex + 1 .. endIndex - 1))
             + if(buffer > 0, "", "}") 
             + sum(string_(endIndex + 1 .. length(string)))
-          , buffer - 1);
-          
-      
+            , buffer - 1);
+            
+        
         );
-      );
-      parseTex(string) := apply(0..frequency(tokenize(string, ""), texDelimitersEBOW_1), convertTexDelimiters(string, #));
+    );
+    parseTex(string) := apply(0..frequency(tokenize(string, ""), texDelimitersEBOW_1), convertTexDelimiters(string, #));
+    parseText(string) := "" <: apply(1..length(string), sum(string_(1..#)));
+        
+    stitch(parts) := (
+        regional(n, res, ends);
+        n = length(parts);
+        ends = apply(parts, #_(-1));
 
-      
+        res = parts_1;
+
+        forall(2..n, i,
+            res = res ++ bite(apply(parts_i, sum(ends_(1..i-1)) + #));
+        );
+
+        res;
+    );
 
 
-
+    typeParsedText(list, time) := list_(round(lerp(1, length(list), time)));
 
    // *************************************************************************************************
     // Creates a rectangle (as a list of its vertices) of width w and height h with at position pos.
@@ -2006,9 +2078,9 @@ lerpLCH(vecA, vecB, t) := (
     rect(x, y, c, w, h) := {"x": x, "y": y, "w": w, "h": h, "c": c, "xy": [x, y]};
     rect(x, y, w, h) := rect(x, y, 1, w, h);
     rect(pos, w, h)  := rect(pos.x, pos.y, w, h);
-    drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect), size -> size, color -> color, alpha -> alpha);
+    drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect.xy, rect.w, rect.h), size -> size, color -> color, alpha -> alpha);
     drawRect(rect, size, color) := drawRect(rect, size, color, 1);
-    fillRect(rect, color, alpha) := fillpoly(expandrect(rect), color -> color, alpha -> alpha);
+    fillRect(rect, color, alpha) := fillpoly(expandrect(rect.xy, rect.w, rect.h), color -> color, alpha -> alpha);
     fillRect(rect, color) := fillRect(rect, color, 1);
 
     updateRectPos(rect, x, y) := (
