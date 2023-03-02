@@ -17,25 +17,12 @@ It's a work-in-progress and might be unusable by anyone but me. Most functions a
 ## How to use it
 You can always copy-paste the content of `egdod.cjs` directly into your init-script.
 
-If you want to load it without cluttering your file, **it currently only works while running on a server**. I.e., for local/offline tests, you might want to start a local server via `python -m http.server` in a terminal or any other method you are comfortable with. To make it then work…
-1. Download both `cindyLoader.js` and `egdod.cjs` into the same directory your CindyJS file is in.
-2. Add `<script type="text/javascript" src="cindyLoader.js"></script>` at the top of your CindyJS file.
-3. Replace `createCindy` with `startCindy` and add the `import` to the argument:
+If you want to load it without cluttering your file, **it currently only works while running on a server**. I.e., for local/offline tests, you might want to start a local server via `python -m http.server` in a terminal or any other method you are comfortable with. To then load Egdod, add the `import` to the argument of the `createCindy` function:
 ```JavaScript
-cindy = startCindy({
+cindy = createCindy({
     canvasname:"CSCanvas",
     scripts:"cs*",
     import:["egdod"]
-});
-```
-The function `startCindy` will take the code in `egdod.cjs` and add it **at the beginning** of the `init`-script.
-
-This works with any file that ends in `.cjs` and contains CindyScript code. Moreover, it can take several files. (Up to 32 at the moment.) So, you can create your own libraries. Note that they will be added in reverse order at the start of the `init`-script. So, the libraries listed first get executed first. I.e., if `libraryB.cjs` needs `libraryA.cjs` to run, you should write something like
-```JavaScript
-cindy = startCindy({
-    canvasname:"CSCanvas",
-    scripts:"cs*",
-    import:["libraryA", "libraryB"]
 });
 ```
 
