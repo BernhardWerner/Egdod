@@ -21,6 +21,27 @@ integralResolutionEBOW = 3;
 
 
 
+u0022 := unicode("0022");
+u2013 := unicode("2013");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 sinh(x) := 0.5 * (exp(x) - exp(-x));
 cosh(x) := 0.5 * (exp(x) + exp(-x));
 tanh(x) := (exp(x) - exp(-x)) / (exp(x) + exp(-x));
@@ -83,7 +104,17 @@ drawCone3D(base, radius, tip, color, resolution) := (
 drawCone3D(base, radius, tip, color) := drawCone3D(base, radius, tip, color, 128);
 
 
+plane3D(x, y, p, size) := (
+    x = x / abs(x);
+    y = y / abs(y);
 
+    [
+        p - size * x - size * y,
+        p + size * x - size * y,
+        p + size * x + size * y,
+        p - size * x + size * y
+    ];
+);
 
 
 
@@ -105,13 +136,13 @@ drawCone3D(base, radius, tip, color) := drawCone3D(base, radius, tip, color, 128
 
 drawAxes3D(start, end, rodSize, arrowHeadLength, arrowHeadRadius) := (
     
-    draw3d([start,0,0], [end,0,0], color -> sapColor.lightRed,   size -> rodSize);
-    draw3d([0,start,0], [0,end,0], color -> sapColor.lightGreen, size -> rodSize);
-    draw3d([0,0,start], [0,0,end], color -> sapColor.lightBlue,  size -> rodSize);
+    draw3d([start,0,0], [end,0,0], color -> sapColor.red2,   size -> rodSize);
+    draw3d([0,start,0], [0,end,0], color -> sapColor.green2, size -> rodSize);
+    draw3d([0,0,start], [0,0,end], color -> sapColor.blue2,  size -> rodSize);
   
-    drawCone3D([end - 0.5 * arrowHeadLength, 0, 0], arrowHeadRadius, [end + 0.5 * arrowHeadLength, 0, 0], sapColor.lightRed);
-    drawCone3D([0, end - 0.5 * arrowHeadLength, 0], arrowHeadRadius, [0, end + 0.5 * arrowHeadLength, 0], sapColor.lightGreen);
-    drawCone3D([0, 0, end - 0.5 * arrowHeadLength], arrowHeadRadius, [0, 0, end + 0.5 * arrowHeadLength], sapColor.lightBlue);
+    drawCone3D([end - 0.5 * arrowHeadLength, 0, 0], arrowHeadRadius, [end + 0.5 * arrowHeadLength, 0, 0], sapColor.red2);
+    drawCone3D([0, end - 0.5 * arrowHeadLength, 0], arrowHeadRadius, [0, end + 0.5 * arrowHeadLength, 0], sapColor.green2);
+    drawCone3D([0, 0, end - 0.5 * arrowHeadLength], arrowHeadRadius, [0, 0, end + 0.5 * arrowHeadLength], sapColor.blue2);
 );
 
 
@@ -585,6 +616,19 @@ setupAnimationTrack(s, e) := {
     "looping":  false
 }; 
 
+setupMultiAnimationTracks(start, listOfDurations, pause) := (
+    regional(t, res);
+
+    res = [];
+    t = start;
+    forall(listOfDurations, d,
+        res = res :> setupAnimationTrack(t, t + d);
+        t = t + d + pause;
+    );
+
+    res;
+);
+
 trackStarted(track, delay) := now() >= track.start + delay;
 trackEnded(track, delay) := now() > track.end + delay;
 trackRunning(track, delay) := and(trackStarted(track, delay), not(trackEnded(track, delay)));
@@ -683,6 +727,7 @@ copy(dict) := (
 // ************************************************************************************************
 sampleCircle(rad, angle) := apply(0..strokeSampleRateEBOW - 1, rad * [cos(angle * # / (strokeSampleRateEBOW - 1)), sin(angle * # / (strokeSampleRateEBOW - 1))]);
 sampleCircle(rad, startAngle, endAngle) := apply(0..strokeSampleRateEBOW - 1, rad * [cos(startAngle + (endAngle - startAngle) * # / (strokeSampleRateEBOW - 1)), sin(startAngle + (endAngle - startAngle) * # / (strokeSampleRateEBOW - 1))]);
+sampleCircle(rad) := sampleCircle(rad, 2*pi);
 
 
 // ************************************************************************************************
@@ -700,7 +745,7 @@ samplePolygonFREE(poly, nop, closed) := (
         poly = poly :> poly_1;
     );
     
-    sr = if(length(poly) == 2, lineSampleRateEBOW, nop);
+    sr = if(length(poly) == 2, strokeSampleRateEBOW, nop);
     
     pairs = consecutive(poly);
     
@@ -770,7 +815,7 @@ bezier(controls, t) := (
 sampleBezierCurve(controls) := (
     regional(t, sr);
 
-    sr = if(length(controls) == 2, lineSampleRateEBOW, strokeSampleRateEBOW);
+    sr = strokeSampleRateEBOW;
     apply(0..sr - 1, 
         t = # / (sr - 1);
 
