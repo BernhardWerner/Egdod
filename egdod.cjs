@@ -35,6 +35,65 @@ u2013 := unicode("2013");
 
 
 
+sphericalCoordinates(radius, azimuth, polar) := radius * [cos(azimuth) * sin(polar), sin(azimuth) * sin(polar), cos(polar)];
+
+/* These needs a camera object with of the form
+camera = {
+    "position": [1, 1, 1],
+    "lookAt": [0, 0, 0],
+    "up": [0, 0, 1],
+    "fov": pi / 2
+}
+*/
+
+cameraBasis(cam) := (
+    regional(backward, right);
+
+    backward = cam.position - cam.lookAt;
+    backward = backward / abs(backward);
+
+    right = cross(cam.up, backward);
+    right = right / abs(right);
+
+    transpose([right, cross(backward, right), backward]);
+);
+
+projectToScreen(p, cam) := (
+    p = inverse(cameraBasis(cam)) * (p - cam.position);
+    p = - p / p.z / tan(cam.fov / 2) * canvasWidth / 2;
+
+    canvasCenter + [p.x, p.y];
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

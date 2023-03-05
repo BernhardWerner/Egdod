@@ -16,19 +16,73 @@
 
 <script id='csinit' type='text/x-cindyscript'>
 
+project() := (
+  //drawOrder = sort(1..length(points3D), -dist(points3D_#, camera.position));
+  //pointsScreen = apply(points3D, projectToScreen(#, camera));
+  linesProjected = apply(gridLines, line, apply(line, projectToScreen(#, camera)));
+);
+
+
+rad = 10;
+polar = 60°;
+camera = {
+  "position": sphericalCoordinates(rad, 0°, polar),
+  "lookAt": [0, 0, 0],
+  "up": [0, 0, 1],
+  "fov": pi / 3
+};
+
+
+//points3D = apply(1..1000, 3 * [2 * random() - 1, 2 * random() - 1, 2 * random() - 1]);
+//pointsScreen = [];
+//drawOrder = [];
+//project();
+
+f(x, y) := 4 - 0.3 * x^2 - 0.2 * y^2;
+
+numberOfLines = 4;
+gridLines = apply(-numberOfLines..numberOfLines, x, apply(1..48, 
+  y = lerp(-numberOfLines - 0.5, numberOfLines + 0.5, #, 1, 48);
+  [x, y, f(x, y)];
+)) ++ apply(-numberOfLines..numberOfLines, y, apply(1..48, 
+  x = lerp(-numberOfLines - 0.5, numberOfLines + 0.5, #, 1, 48);
+  [x, y, f(x, y)];
+));
+project();
 
 
 
+setupTime();
+playanimation();
 </script>
 
 
 
 <script id='csdraw' type='text/x-cindyscript'>
+//forall(drawOrder, 
+//  fillcircle(pointsScreen_#, 4 / dist(points3D_#, camera.position) + 0.04, color -> (1,1,1));
+//  fillcircle(pointsScreen_#, 4 / dist(points3D_#, camera.position), color -> sapColor.blue1);
+//);
+
+forall(gridLines, line,
+  forall(consecutive(line),
+    edge = [projectToScreen(#_1, camera), projectToScreen(#_2, camera)];
+    draw(edge, size -> 10 / dist((#_1 + #_2) / 2, camera.position), alpha -> 1 - dist((#_1 + #_2) / 2, camera.position) / 20);
+  );
+);
+
+drawtext(canvasCorners.bl + [1,1], delta);
+
 </script>
 
 
 
 <script id='cstick' type='text/x-cindyscript'>
+delta = deltaTime();
+
+camera.position = sphericalCoordinates(rad, 0.5 * now(), polar);
+//project();
+
 </script>
 
 
@@ -61,7 +115,7 @@ cindy = startCindy({
   canvasname:"CSCanvas",
     scripts:"cs*",
     images: {},
-    use: ["katex"],
+    //use: ["katex"],
     import: ["egdod", "colorPalettes"]
 });
 </script>
