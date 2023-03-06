@@ -16,29 +16,60 @@
 
 <script id='csinit' type='text/x-cindyscript'>
 
-project() := (
-  //drawOrder = sort(1..length(points3D), -dist(points3D_#, camera.position));
-  //pointsScreen = apply(points3D, projectToScreen(#, camera));
+projectPoints() := (
+  drawOrder = sort(1..length(points3D), -dist(points3D_#, camera.position));
+  pointsScreen = apply(points3D, projectToScreen(#, camera));
+);
+
+projectLines() := (
   linesProjected = apply(gridLines, line, apply(line, projectToScreen(#, camera)));
 );
 
 
+
+
+drawPoints() := (
+  forall(drawOrder, 
+    fillcircle(pointsScreen_#, lerp(0.3, 0.1, dist(points3D_#, camera.position), 6, 2 * rad - 6) + 0.04, color -> (1,1,1));
+    fillcircle(pointsScreen_#, lerp(0.3, 0.1, dist(points3D_#, camera.position), 6, 2 * rad - 6), color -> sapColor.blue1);
+  );
+);
+
+drawLines() := (
+  forall(gridLines, line,
+    forall(consecutive(line),
+      edge = [projectToScreen(#_1, camera), projectToScreen(#_2, camera)];
+      draw(edge, size -> lerp(4, 1, dist((#_1 + #_2) / 2, camera.position), 6, 2 * rad - 6), alpha -> lerp(1, 0.3, dist((#_1 + #_2) / 2, camera.position), 6, 2 * rad - 6));
+    );
+  );
+);
+
+
+
+
+
 rad = 10;
-polar = 60°;
+polar = 45°;
 camera = {
   "position": sphericalCoordinates(rad, 0°, polar),
   "lookAt": [0, 0, 0],
   "up": [0, 0, 1],
-  "fov": pi / 3
+  "fov": pi / 2
 };
 
 
-//points3D = apply(1..1000, 3 * [2 * random() - 1, 2 * random() - 1, 2 * random() - 1]);
-//pointsScreen = [];
-//drawOrder = [];
-//project();
+points3D = apply(1..1000, 3 * [2 * random() - 1, 2 * random() - 1, 2 * random() - 1]);
+pointsScreen = [];
+drawOrder = [];
+projectPoints();
 
-f(x, y) := 4 - 0.3 * x^2 - 0.2 * y^2;
+
+
+
+
+
+/*
+f(x, y) := 6 * perlinNoise3D(0.3 * [x, y, now()]);
 
 numberOfLines = 4;
 gridLines = apply(-numberOfLines..numberOfLines, x, apply(1..48, 
@@ -48,7 +79,11 @@ gridLines = apply(-numberOfLines..numberOfLines, x, apply(1..48,
   x = lerp(-numberOfLines - 0.5, numberOfLines + 0.5, #, 1, 48);
   [x, y, f(x, y)];
 ));
-project();
+projectLines();
+*/
+
+
+fpsBuffer = [0];
 
 
 
@@ -59,19 +94,11 @@ playanimation();
 
 
 <script id='csdraw' type='text/x-cindyscript'>
-//forall(drawOrder, 
-//  fillcircle(pointsScreen_#, 4 / dist(points3D_#, camera.position) + 0.04, color -> (1,1,1));
-//  fillcircle(pointsScreen_#, 4 / dist(points3D_#, camera.position), color -> sapColor.blue1);
-//);
+drawPoints();
 
-forall(gridLines, line,
-  forall(consecutive(line),
-    edge = [projectToScreen(#_1, camera), projectToScreen(#_2, camera)];
-    draw(edge, size -> 10 / dist((#_1 + #_2) / 2, camera.position), alpha -> 1 - dist((#_1 + #_2) / 2, camera.position) / 20);
-  );
-);
+//drawLines();
 
-drawtext(canvasCorners.bl + [1,1], delta);
+drawtext(canvasCorners.bl + [1,1], sum(fpsBuffer) / length(fpsBuffer));
 
 </script>
 
@@ -79,9 +106,13 @@ drawtext(canvasCorners.bl + [1,1], delta);
 
 <script id='cstick' type='text/x-cindyscript'>
 delta = deltaTime();
+fpsBuffer = fpsBuffer :> 1 / delta;
+if(length(fpsBuffer) > 60, fpsBuffer = bite(fpsBuffer));
 
-camera.position = sphericalCoordinates(rad, 0.5 * now(), polar);
-//project();
+camera.position = sphericalCoordinates(rad, 0.3 * now(), polar);
+
+projectPoints();
+//projectLines();
 
 </script>
 
