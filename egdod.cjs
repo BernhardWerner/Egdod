@@ -37,35 +37,6 @@ u2013 := unicode("2013");
 
 sphericalCoordinates(radius, azimuth, polar) := radius * [cos(azimuth) * sin(polar), sin(azimuth) * sin(polar), cos(polar)];
 
-/* These needs a camera object with of the form
-camera = {
-    "position": [1, 1, 1],
-    "lookAt": [0, 0, 0],
-    "up": [0, 0, 1],
-    "fov": pi / 2
-}
-*/
-
-cameraBasis(cam) := (
-    regional(backward, right);
-
-    backward = cam.position - cam.lookAt;
-    backward = backward / abs(backward);
-
-    right = cross(cam.up, backward);
-    right = right / abs(right);
-
-    transpose([right, cross(backward, right), backward]);
-);
-
-projectToScreen(p, cam) := (
-    p = inverse(cameraBasis(cam)) * (p - cam.position);
-    p = - p / p.z / tan(cam.fov / 2) * canvasWidth / 2;
-
-    canvasCenter + [p.x, p.y];
-);
-
-
 
 
 
@@ -309,17 +280,19 @@ qProd(u, v) := [
 qConj(a) := [a_1, -a_2, -a_3, -a_4];
 
 rotate3D(vec, axis, angle) := (
-    regional(r, p);
+    regional(r, p, res);
 
-    if(abs(axis) ~= 0,
+    if(abs(axis) <= 0.001,
         vec;
     , // else //
         axis = axis / abs(axis);
 
         r = [cos(angle / 2), sin(angle / 2) * axis_1, sin(angle / 2) * axis_2, sin(angle / 2) * axis_3];
-        p = 0 <: vec;
+        p = [0, vec_1, vec_2, vec_3];
 
-        qProd(qProd(r, p), qConj(r))_[2,3,4];
+        res = qProd(qProd(r, p), qConj(r));
+
+        [res_2, res_3, res_4];
     );
 );
 
@@ -987,7 +960,7 @@ rotation(alpha) := [[cos(alpha), -sin(alpha)], [sin(alpha), cos(alpha)]];
 
 
 rotate(point, alpha, center) := rotation(alpha) * (point - center) + center;
-rotate(point, alpha) := rotate(point, alpha, [0,0]);
+rotate(vector, alpha) := rotate(vector, alpha, [0,0]);
 
 
 
@@ -1257,7 +1230,14 @@ centralProjToOrthoPlane(n, p) := n + ((n * n) / (n * n - n * p)) * (p - n);
         ));			
     );
 
+    alpha2hex(x) := (
+        regional(a,b);
 
+        x = round(x * 255);
+        a = mod(x, 16);
+        b = (x - a) / 16;
+        deca2hexa(b) + deca2hexa(a);
+    );
 
     hex2rgb(string) := (
         regional(digits);
@@ -1586,7 +1566,7 @@ lerpLCH(vecA, vecB, t) := (
     // ************************************************************************************************* PLUGED IN
     // The sign of a number x.
     // *************************************************************************************************
-    sign(x) := if(x == 0, 0, x / abs(x));
+    sign(x) := if(x == 0.0, 0.0, x / abs(x));
 
     // *************************************************************************************************
     // The factorial of the positive number n.
@@ -1767,14 +1747,66 @@ lerpLCH(vecA, vecB, t) := (
 
 
 
-    
-    lineSegmentSDF2D(endPoints, p) := (
-        if((endPoints_2 - endPoints_1) * (p - endPoints_1) * (endPoints_1 - endPoints_2) * (p - endPoints_2) > 0,
-            abs( det([[endPoints_1_1, endPoints_1_2, 1], [endPoints_2_1, endPoints_2_2, 1], [p_1, p_2, 1]]) / dist(endPoints_1, endPoints_2)  );
+    cro(a,b) := a.x * b.y - a.y * b.x;
+
+
+// NOT WORKING (YET...)
+    quadBezierSDF(pos, aa, bb, cc) := (
+        regional(a, b, c, d, kk, kx, ky, kz, res, p, p3, q, h, x, uv, z, v, m, n, s, k, sgn, r); 
+        a = bb - aa;
+        b = aa - 2.0 * bb + cc;
+        c = aa * 2.0;
+        d = aa - pos;
+
+        kk = 1.0 / (b * b);
+        kx = kk * (a * b);
+        ky = kk * (2.0 * (a * a) + (d * b)) / 3.0;
+        kz = kk * (d * a);
+        res = 0.0;
+        p = ky - kx * kx;
+        p3 = p * p * p;
+        q = kx * (2.0 * kx * kx - 3.0 * ky) + kz;
+        h = q * q + 4.0 * p3;
+
+        if(h >= 0.0,
+            h = re(sqrt(h));
+            x = ([h - q, -h - q]) / 2.0;
+
+
+
+            if(abs(p) < 0.001,
+                k = p3 / q;
+                x = [k, -k-q];
+            );
+
+            uv = [sign(x_1) * re(pow(abs(x_1), 1/3)), sign(x_2) * re(pow(abs(x_2), 1/3))];
+            t = clamp(uv_1 + uv_2 - kx, 0.0, 1.0);
+            r = d + (c + b * t) * t;
+            res = r * r;
+            sgn = cro(c + 2.0 * b * t, r);
+
         , // else //
-            min(dist(endPoints_1, p), dist(endPoints_2, p));
+            z = re(sqrt(-p));
+            v = arccos(q / (p * z * 2.0)) / 3.0;
+            m = re(cos(v));
+            n = re(sin(v) * 1.732050808);
+            s = [clamp((m + m) * z - kx, 0.0, 1.0), clamp((-n - m) * z - kx, 0.0, 1.0), clamp((n - m) * z - kx, 0.0, 1.0)];
+            res = min(
+                (d + (c + b * s_1) * s_1) * (d + (c + b * s_1) * s_1),
+                (d + (c + b * s_2) * s_2) * (d + (c + b * s_2) * s_2)
+            );
+            sgn = 1.0;
         );
+
+        re(sqrt(res)) * sign(sgn);
     );
+
+
+
+
+
+
+
 
     sphereSDF(p, center, radius) := dist(p, center) - radius;
     
@@ -1812,42 +1844,101 @@ lerpLCH(vecA, vecB, t) := (
 
 
 
-    boxSDF(p, c, size) := (
-        regional(x,y,z);
+boxSDF(p, size) := (
+    regional(d);
 
-        x = max(
-            p.x - c.x - size.x / 2,
-            c.x - p.x - size.x / 2
-        );
-        y = max(
-            p.y - c.y - size.y / 2,
-            c.y - p.y - size.y / 2
-        );
-        z = max(
-            p.z - c.z - size.z / 2,
-            c.z - p.z - size.z / 2
-        );
+    d = [abs(p.x), abs(p.y), abs(p.z)] - size;
+
+    min(max(d), 0.0) + abs([max(d.x, 0.0), max(d.y, 0.0), max(d.z, 0.0)]);
+
+
+);
+
+
+rectSDF(p, size) := (
+    regional(d);
+
+    d = [abs(p.x), abs(p.y)] - size;
+    min(max(d), 0.0) + abs([max(d.x, 0.0), max(d.y, 0.0)]);
+);
+
+
+
+
+polygonSDF(p, vertices) := (
+    regional(d, s, e, w, b, c, f, u);
+
+    d = (p - vertices_1) * (p - vertices_1); // float
+    s = 1.0; // float
+
+    u = vertices_(-1);
+    forall(vertices, v,
+        e = u - v; // vec2
+        w = p - v; // vec2
+        b = w - e * clamp((w * e) / (e * e), 0, 1); // vec2
+        f = capsuleSDF(p, u, v, 0);
         
-        max([x,y,z]);
+        d = min(d, b * b); // float
+        
+        c = [
+            p.y >= v.y,
+            p.y < u.y,
+            e.x * w.y > e.y * w.x
+        ]; // bvec3
+        if(c_1 & c_2 & c_3,
+            s = -s;
+        );
+        if(not(c_1) & not(c_2) & not(c_3),
+            s = -s;
+        );  
+
+        u = v;
     );
 
+    s * abs(sqrt(d));
+);
 
-    rectSDF(p, c, size) := (
-        regional(x,y);
 
-        x = max(
-            p.x - c.x - size.x / 2,
-            c.x - p.x - size.x / 2
+
+triangleSDF(p, p0, p1, p2) := (
+    regional(e0, e1, e2, v0, v1, v2, pq0, pq1, pq2, s, d);
+
+    e0 = p1 - p0;
+    e1 = p2 - p1;
+    e2 = p0 - p2;
+
+    v0 = p - p0;
+    v1 = p - p1;
+    v2 = p - p2;
+
+    pq0 = v0 - e0 * clamp((v0 * e0) / (e0 * e0), 0.0, 1.0);
+    pq1 = v1 - e1 * clamp((v1 * e1) / (e1 * e1), 0.0, 1.0);
+    pq2 = v2 - e2 * clamp((v2 * e2) / (e2 * e2), 0.0, 1.0);
+
+    s = sign(e0.x * e2.y - e0.y * e2.x);
+    d = [
+            min(min(pq0 * pq0, pq1 * pq1), pq2 * pq2),
+            min(min(s * (v0.x * e0.y - v0.y * e0.x), s * (v1.x * e1.y - v1.y * e1.x)), s * (v2.x * e2.y - v2.y * e2.x))
+        ];
+
+    -re(sqrt(d.x)) * sign(d.y);
+);
+
+
+
+moonSDF(p, ra, rb, d) := (
+    p = [p.x, abs(p.y)];
+    a = (ra * ra - rb * rb + d * d) / (2 * d);
+    b = re(sqrt(max(ra * ra - a * a, 0.0)));
+    if(d * (p.x * b - p.y * a) > d * d * max(b - p.y, 0.0),
+        abs(p - [a,b]);
+    , // else //
+        max(
+            abs(p) - ra,
+            -(abs(p - [d, 0]) - rb)
         );
-        y = max(
-            p.y - c.y - size.y / 2,
-            c.y - p.y - size.y / 2
-        );
-        
-        max([x,y]);
     );
-
-
+);
 
 
 
