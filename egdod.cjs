@@ -2066,6 +2066,7 @@ moonSDF(p, ra, rb, d) := (
        "size":       (2D vector),
        "label":      (String),
        "textSize":   (float),
+       "labelColor": (3D Vector),
        "colors":     (array with 3 colour vectors),
        "corner":     (float),
        "pressed":    (bool),
@@ -2181,7 +2182,7 @@ moonSDF(p, ra, rb, d) := (
         result;
     );
 
-
+    wrapText(string, lineLength) := joinStrings(splitString(string, lineLength), newLine);
 
 
 
@@ -2429,7 +2430,9 @@ catchDropDownMenu(obj) := (
       "length":      (float),
       "size":        (float),
       "vertical":    (bool),
-      "color":       (color vector),
+      "outerColor":       (color vector),
+      "innerColor":       (color vector),
+      "labelColor":       (color vector),
       "startLabel":  (string),
       "endLabel":    (string),
       "labelSize":   (float),
@@ -2470,7 +2473,7 @@ catchDropDownMenu(obj) := (
 
         endPoints = sliderEnds(slider);
 
-        if(lineSegmentSDF2D(endPoints, mouse().xy) <= slider.bulbSize + 0.02 * slider.size,
+        if(capsuleSDF(mouse().xy, endPoints_1, endPoints_2, slider.bulbSize + 0.02 * slider.size) <= 0,
           slider.value = if(slider.vertical,
             clamp(inverseLerp((endPoints_1).y, (endPoints_2).y, mouse().y), 0, 1);
           , // else //
@@ -2484,7 +2487,7 @@ catchDropDownMenu(obj) := (
 
         endPoints = sliderEnds(slider);
 
-        if(lineSegmentSDF2D(endPoints, mouse().xy) <= slider.bulbSize + 0.02 * slider.size,
+        if(capsuleSDF(mouse().xy, endPoints_1, endPoints_2, slider.bulbSize + 0.02 * slider.size) <= 0,
           slider.dragging = true;
         );
         catchSliderDrag(slider);
