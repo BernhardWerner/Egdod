@@ -2182,6 +2182,23 @@ moonSDF(p, ra, rb, d) := (
         result;
     );
 
+
+    joinStrings(strings, separator) := (
+        regional(result);
+
+        result = strings_1;
+
+        forall(2..length(strings),
+            result = result + separator + strings_#;
+        );
+
+        result;
+    );
+
+
+    newLine = "
+";
+
     wrapText(string, lineLength) := joinStrings(splitString(string, lineLength), newLine);
 
 
