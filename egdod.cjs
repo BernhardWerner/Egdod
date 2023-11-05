@@ -56,7 +56,14 @@ sphericalCoordinates(radius, azimuth, polar) := radius * [cos(azimuth) * sin(pol
 
 
 
-
+formatNumber(x,n) := (
+    regional(rounded, back, front);
+  
+    rounded = round(x * 10^n);
+    back = mod(rounded, 10^n);
+    front = (rounded - back) / 10^n;
+    front + "." + sum(const(n - length("" + back), "0")) + back;
+  );
 
 
 
@@ -1943,6 +1950,18 @@ moonSDF(p, ra, rb, d) := (
 
 
 
+
+
+
+
+sdfTwist(p, amount) := (
+    regional(c, s, m);
+
+    c = cos(amount * p_3);
+    s = sin(amount * p_3);
+    m = [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+    m * p;
+);
 
 
 
