@@ -57,18 +57,20 @@ sphericalCoordinates(radius, azimuth, polar) := radius * [cos(azimuth) * sin(pol
 
 
 formatNumber(x,n) := (
-    regional(rounded, back, front);
+    regional(rounded, back, front, sign);
   
+    sign = sign(x);
+    x = abs(x);
     rounded = round(x * 10^n);
     back = mod(rounded, 10^n);
     front = (rounded - back) / 10^n;
-    front + "." + sum(const(n - length("" + back), "0")) + back;
+    if(sign == -1, "-", "") + front + "." + sum(const(n - length("" + back), "0") :> "") + back;
   );
 
 
 
 
-
+println(sum([]));
 
 
 
@@ -1039,7 +1041,6 @@ centralProjToOrthoPlane(n, p) := n + ((n * n) / (n * n - n * p)) * (p - n);
     const(n, x) := if(n == 0, [], apply(1..n, x));
 
 
-    
     // *************************************************************************************************
     // Finds first index at which x appears in list. Returns 0, when x is not in list.
     // *************************************************************************************************
