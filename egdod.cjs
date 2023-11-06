@@ -70,7 +70,6 @@ formatNumber(x,n) := (
 
 
 
-println(sum([]));
 
 
 
