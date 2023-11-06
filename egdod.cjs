@@ -2436,7 +2436,7 @@ animateDropDownMenu(obj, delta) := (
 );
 
 switchDropDownMenu(obj) := (
-    if(obj.animationProgress >= 1 & pointInPolygon(mouse().xy, expandrect(obj.position, 7, obj.width, obj.lineHeight)), 
+    if(obj.animationProgress >= 1 & pointInPolygon(mouse().xy, expandrect(obj.position, obj.width, obj.lineHeight, 7)), 
         obj.animationTarget = 1 - obj.animationTarget;
         obj.animationProgress = 0;
     );
@@ -2445,7 +2445,7 @@ switchDropDownMenu(obj) := (
 catchDropDownMenu(obj) := (
     if(obj.animationProgress >= 1,
         forall(1..length(obj.entries),
-        if(pointInPolygon(mouse().xy, expandrect(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], 7, obj.width, obj.lineHeight)),
+        if(pointInPolygon(mouse().xy, expandrect(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], obj.width, obj.lineHeight, 7)),
             obj.index = #;
         );
         );
