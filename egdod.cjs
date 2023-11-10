@@ -2310,9 +2310,9 @@ sdfTwist(p, amount) := (
     rect(x, y, c, w, h) := {"x": x, "y": y, "w": w, "h": h, "c": c, "xy": [x, y]};
     rect(x, y, w, h) := rect(x, y, 1, w, h);
     rect(pos, w, h)  := rect(pos.x, pos.y, w, h);
-    drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect.xy, rect.w, rect.h), size -> size, color -> color, alpha -> alpha);
+    drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect.xy, rect.w, rect.h, rect.c), size -> size, color -> color, alpha -> alpha);
     drawRect(rect, size, color) := drawRect(rect, size, color, 1);
-    fillRect(rect, color, alpha) := fillpoly(expandrect(rect.xy, rect.w, rect.h), color -> color, alpha -> alpha);
+    fillRect(rect, color, alpha) := fillpoly(expandrect(rect.xy, rect.w, rect.h, rect.c), color -> color, alpha -> alpha);
     fillRect(rect, color) := fillRect(rect, color, 1);
 
     updateRectPos(rect, x, y) := (
