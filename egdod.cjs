@@ -1597,7 +1597,7 @@ lerpLCH(vecA, vecB, t) := (
 
     // ************************************************************************************************* PLUGED IN
     poissonDiscSampling(rect, d, numberOfPoints, searchThreshold) := (
-        regional(oldPoints, hSize, vSize, result, searching, i, j, candidate, candidateValid, rangeA, rangeB);
+        regional(oldPoints, hSize, vSize, result, searching, i, j, candidate, candidateValid, rangeA, rangeB, offset);
 
         hSize = ceil(rect.w / d);
         vSize = ceil(rect.h / d);
@@ -1640,8 +1640,10 @@ lerpLCH(vecA, vecB, t) := (
                 candidateValid = true;
             );
         );
-
-        apply(result, # + rect.xy);
+        
+        offset = -compass(rect.c);
+        offset = ((offset.x - 1) * 0.5 * rect.w, (offset.y - 1) * 0.5 * rect.h);
+        apply(result, # + rect.xy + offset);
     );
     poissonDiscSampling(rect, d, numberOfPoints) := poissonDiscSampling(rect, d, numberOfPoints, 32);
 
