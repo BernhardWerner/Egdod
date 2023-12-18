@@ -1,15 +1,19 @@
-canvasPoly = apply(screenbounds(), #.xy); //LO, RO, RU, LU
-canvasCorners = {
-    "tl": canvasPoly_1,
-    "tr": canvasPoly_2,
-    "br": canvasPoly_3,
-    "bl": canvasPoly_4
-};
-canvasCenter  = 0.5 * canvasCorners.tl + 0.5 * canvasCorners.br;
-canvasWidth   = dist(canvasCorners.tl, canvasCorners.tr);
-canvasHeight  = dist(canvasCorners.tl, canvasCorners.bl);
-[canvasLeft, canvasTop] = canvasCorners.tl;
-[canvasRight, canvasBottom] = canvasCorners.br;
+updateLayout() := (
+    canvasPoly = apply(screenbounds(), #.xy); //LO, RO, RU, LU
+    canvasCorners = {
+        "tl": canvasPoly_1,
+        "tr": canvasPoly_2,
+        "br": canvasPoly_3,
+        "bl": canvasPoly_4
+    };
+    canvasCenter  = 0.5 * canvasCorners.tl + 0.5 * canvasCorners.br;
+    canvasWidth   = dist(canvasCorners.tl, canvasCorners.tr);
+    canvasHeight  = dist(canvasCorners.tl, canvasCorners.bl);
+    [canvasLeft, canvasTop] = canvasCorners.tl;
+    [canvasRight, canvasBottom] = canvasCorners.br;
+);
+updateLayout();
+
 screenMouse() := [(mouse().x - canvasLeft) / canvasWidth, (mouse().y - canvasBottom) / canvasHeight];
 
 
@@ -56,16 +60,8 @@ sphericalCoordinates(radius, azimuth, polar) := radius * [cos(azimuth) * sin(pol
 
 
 
-formatNumber(x,n) := (
-    regional(rounded, back, front, sign);
-  
-    sign = sign(x);
-    x = abs(x);
-    rounded = round(x * 10^n);
-    back = mod(rounded, 10^n);
-    front = (rounded - back) / 10^n;
-    if(sign == -1, "-", "") + front + "." + sum(const(n - length("" + back), "0") :> "") + back;
-  );
+
+
 
 
 
@@ -1040,6 +1036,7 @@ centralProjToOrthoPlane(n, p) := n + ((n * n) / (n * n - n * p)) * (p - n);
     const(n, x) := if(n == 0, [], apply(1..n, x));
 
 
+    
     // *************************************************************************************************
     // Finds first index at which x appears in list. Returns 0, when x is not in list.
     // *************************************************************************************************
@@ -1597,7 +1594,7 @@ lerpLCH(vecA, vecB, t) := (
 
     // ************************************************************************************************* PLUGED IN
     poissonDiscSampling(rect, d, numberOfPoints, searchThreshold) := (
-        regional(oldPoints, hSize, vSize, result, searching, i, j, candidate, candidateValid, rangeA, rangeB, offset);
+        regional(oldPoints, hSize, vSize, result, searching, i, j, candidate, candidateValid, rangeA, rangeB);
 
         hSize = ceil(rect.w / d);
         vSize = ceil(rect.h / d);
@@ -1640,10 +1637,8 @@ lerpLCH(vecA, vecB, t) := (
                 candidateValid = true;
             );
         );
-        
-        offset = -compass(rect.c);
-        offset = ((offset.x - 1) * 0.5 * rect.w, (offset.y - 1) * 0.5 * rect.h);
-        apply(result, # + rect.xy + offset);
+
+        apply(result, # + rect.xy);
     );
     poissonDiscSampling(rect, d, numberOfPoints) := poissonDiscSampling(rect, d, numberOfPoints, 32);
 
@@ -1952,18 +1947,6 @@ moonSDF(p, ra, rb, d) := (
 
 
 
-
-
-
-
-sdfTwist(p, amount) := (
-    regional(c, s, m);
-
-    c = cos(amount * p_3);
-    s = sin(amount * p_3);
-    m = [[c, -s, 0], [s, c, 0], [0, 0, 1]];
-    m * p;
-);
 
 
 
@@ -2312,9 +2295,9 @@ sdfTwist(p, amount) := (
     rect(x, y, c, w, h) := {"x": x, "y": y, "w": w, "h": h, "c": c, "xy": [x, y]};
     rect(x, y, w, h) := rect(x, y, 1, w, h);
     rect(pos, w, h)  := rect(pos.x, pos.y, w, h);
-    drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect.xy, rect.w, rect.h, rect.c), size -> size, color -> color, alpha -> alpha);
+    drawRect(rect, size, color, alpha) := drawpoly(expandrect(rect.xy, rect.w, rect.h), size -> size, color -> color, alpha -> alpha);
     drawRect(rect, size, color) := drawRect(rect, size, color, 1);
-    fillRect(rect, color, alpha) := fillpoly(expandrect(rect.xy, rect.w, rect.h, rect.c), color -> color, alpha -> alpha);
+    fillRect(rect, color, alpha) := fillpoly(expandrect(rect.xy, rect.w, rect.h), color -> color, alpha -> alpha);
     fillRect(rect, color) := fillRect(rect, color, 1);
 
     updateRectPos(rect, x, y) := (
@@ -2438,7 +2421,7 @@ animateDropDownMenu(obj, delta) := (
 );
 
 switchDropDownMenu(obj) := (
-    if(obj.animationProgress >= 1 & pointInPolygon(mouse().xy, expandrect(obj.position, obj.width, obj.lineHeight, 7)), 
+    if(obj.animationProgress >= 1 & pointInPolygon(mouse().xy, expandrect(obj.position, 7, obj.width, obj.lineHeight)), 
         obj.animationTarget = 1 - obj.animationTarget;
         obj.animationProgress = 0;
     );
@@ -2447,7 +2430,7 @@ switchDropDownMenu(obj) := (
 catchDropDownMenu(obj) := (
     if(obj.animationProgress >= 1,
         forall(1..length(obj.entries),
-        if(pointInPolygon(mouse().xy, expandrect(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], obj.width, obj.lineHeight, 7)),
+        if(pointInPolygon(mouse().xy, expandrect(obj.position + [0, -# * (obj.lineHeight) - # * obj.gutter], 7, obj.width, obj.lineHeight)),
             obj.index = #;
         );
         );
